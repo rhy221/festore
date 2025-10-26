@@ -1,0 +1,139 @@
+"use client"
+
+import http from "@/lib/http";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { cn } from "@workspace/ui/lib/utils";
+import { Controller, useForm } from "react-hook-form";
+import { Field, FieldError, FieldGroup, FieldLabel } from '@workspace/ui/components/field';
+import z from "zod";
+import { Input } from "@workspace/ui/components/input";
+import { Button } from "@workspace/ui/components/button";
+import { useRouter, useSearchParams } from "next/navigation";
+
+const changePasswordBodySchema = z.object({
+    password: z
+      .string()
+      .min(6)
+      .max(100)
+      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{6,100}$/),
+    confirmPassword: z.string().min(6).max(100),
+  })
+  .strict()
+  .superRefine(({ confirmPassword, password }, ctx) => {
+    if (confirmPassword !== password) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Password does not match",
+        path: ["confirmPassword"],
+      });
+    }
+  });
+
+type ChangePasswordBodyType = z.infer<typeof changePasswordBodySchema>;
+
+
+export default function ChangePasswordForm()
+{
+
+    const params = useSearchParams();
+    const token = params.get("token");
+    const router = useRouter();
+
+    if(!token) 
+        router.push("/auth/login");
+
+    const form = useForm<ChangePasswordBodyType>({
+      resolver: zodResolver(changePasswordBodySchema),
+      defaultValues: {
+        password: "",
+        confirmPassword: ""
+      }
+    })
+
+    const resetPass = async ({password}: ChangePasswordBodyType) => {
+        const response = await http.post("http://localhost:3003/auth/reset-password", {token: token, password: password});
+        return response;
+    }
+
+    const mutation = useMutation({
+      mutationFn: resetPass
+    })
+
+    const onSubmit = async (data: ChangePasswordBodyType) => {
+      if(mutation.isPending) return;
+      try {
+        const result = await mutation.mutateAsync(data);
+        console.log(result);
+        router.push("/auth/login");
+      } catch(error) {
+        console.log(error);
+      }
+    }
+    return (
+        <form
+          id="register-form"
+          method="post"
+          className={cn("flex flex-col gap-6")}
+          onSubmit={form.handleSubmit(onSubmit)}
+        >
+          <div className="flex flex-col items-center gap-2 text-center">
+            <h1 className="text-2xl font-bold">Forgot your password</h1>
+            <p className="text-muted-foreground text-sm">
+              Enter your email to send reset password mail
+            </p>
+          </div>
+          <FieldGroup>
+          <Controller
+            name="password"
+            control={form.control}
+            render={({field, fieldState}) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>
+                  New Password
+                </FieldLabel>
+                <Input
+                  {...field}
+                  id={field.name}
+                  type="password"
+                  required>
+                </Input>
+                {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+              </Field>
+            )}>
+          </Controller>
+        </FieldGroup>
+
+        <FieldGroup>
+          <Controller
+            name="confirmPassword"
+            control={form.control}
+            render={({field, fieldState}) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>
+                  Confirm Password
+                </FieldLabel>
+                <Input
+                  {...field}
+                  id={field.name}
+                  type="password"
+                  required>
+                </Input>
+                {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+              </Field>
+            )}>
+          </Controller>
+        </FieldGroup>
+  
+          <Field>
+            <Button type="submit" className="w-full">
+              Change Password
+            </Button>
+          </Field>
+        </form> 
+    );
+}
