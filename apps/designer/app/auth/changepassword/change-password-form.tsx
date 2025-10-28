@@ -1,36 +1,14 @@
 "use client"
 
-import http from "@/lib/http";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
 import { cn } from "@workspace/ui/lib/utils";
 import { Controller, useForm } from "react-hook-form";
 import { Field, FieldError, FieldGroup, FieldLabel } from '@workspace/ui/components/field';
-import z from "zod";
 import { Input } from "@workspace/ui/components/input";
 import { Button } from "@workspace/ui/components/button";
 import { useRouter, useSearchParams } from "next/navigation";
-
-const changePasswordBodySchema = z.object({
-    password: z
-      .string()
-      .min(6)
-      .max(100)
-      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{6,100}$/),
-    confirmPassword: z.string().min(6).max(100),
-  })
-  .strict()
-  .superRefine(({ confirmPassword, password }, ctx) => {
-    if (confirmPassword !== password) {
-      ctx.addIssue({
-        code: "custom",
-        message: "Password does not match",
-        path: ["confirmPassword"],
-      });
-    }
-  });
-
-type ChangePasswordBodyType = z.infer<typeof changePasswordBodySchema>;
+import { changePasswordSchema, ChangePasswordType } from "@/schema/auth.schema";
+import { useChangePasswordMutation } from "@/queries/useAuth";
 
 
 export default function ChangePasswordForm()
@@ -43,27 +21,21 @@ export default function ChangePasswordForm()
     if(!token) 
         router.push("/auth/login");
 
-    const form = useForm<ChangePasswordBodyType>({
-      resolver: zodResolver(changePasswordBodySchema),
+    const form = useForm<ChangePasswordType>({
+      resolver: zodResolver(changePasswordSchema),
       defaultValues: {
         password: "",
         confirmPassword: ""
-      }
+      },
+      mode: "onChange",
     })
 
-    const resetPass = async ({password}: ChangePasswordBodyType) => {
-        const response = await http.post("http://localhost:3003/auth/reset-password", {token: token, password: password});
-        return response;
-    }
+    const mutation = useChangePasswordMutation();
 
-    const mutation = useMutation({
-      mutationFn: resetPass
-    })
-
-    const onSubmit = async (data: ChangePasswordBodyType) => {
+    const onSubmit = async (data: ChangePasswordType) => {
       if(mutation.isPending) return;
       try {
-        const result = await mutation.mutateAsync(data);
+        const result = await mutation.mutateAsync({ token: token!, password: data.password});
         console.log(result);
         router.push("/auth/login");
       } catch(error) {

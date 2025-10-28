@@ -1,7 +1,7 @@
 "use client";
 
 import { useLoginMutation } from "@/queries/useAuth";
-import { LoginBody, LoginBodyType } from "@/schema/auth.schema";
+import { LoginBodySchema, LoginBodyType } from "@/schema/auth.schema";
 import { useRegisterStore } from "@/stores/useRegisterStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
@@ -16,7 +16,7 @@ export default function LoginForm() {
 
   const router = useRouter();
   const form = useForm<LoginBodyType>({
-    resolver: zodResolver(LoginBody),
+    resolver: zodResolver(LoginBodySchema),
     defaultValues: {
       email: "",
       password: "",

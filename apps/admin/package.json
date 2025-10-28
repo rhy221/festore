@@ -11,6 +11,9 @@
     "lint:fix": "next lint --fix",
     "typecheck": "tsc --noEmit"
   },
+  "overrides": {
+  "react-is": "^19.0.0-rc-69d4b800-20241021"
+  },
   "dependencies": {
     "@workspace/ui": "workspace:*",
     "lucide-react": "^0.475.0",

@@ -1,4 +1,4 @@
-import authAction from "@/api/auth";
+import authAction from "@/api/auth.api";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const useLoginMutation = () => {
@@ -16,6 +16,18 @@ export const useRegisterMutation = () => {
 export const useSendVerifyEmailMutation = () => {
   return useMutation({
     mutationFn: authAction.sendVerifyEmail,
+  })
+}
+
+export const useForgotPasswordMutation = () => {
+  return useMutation({
+    mutationFn: authAction.forgotPassword,
+  })
+}
+
+export const useChangePasswordMutation = () => {
+  return useMutation({
+    mutationFn: authAction.changePassword,
   })
 }
 

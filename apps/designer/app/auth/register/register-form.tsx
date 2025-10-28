@@ -1,7 +1,7 @@
 "use client";
 
 import { useRegisterMutation } from "@/queries/useAuth";
-import { RegisterBody, RegisterBodyType } from "@/schema/auth.schema";
+import { RegisterSchema, RegisterType } from "@/schema/auth.schema";
 import { useRegisterStore } from "@/stores/useRegisterStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
@@ -20,15 +20,16 @@ export default function RegisterForm({ onChangeRegisted }: RegisterFormProps) {
   const registerMutation = useRegisterMutation();
   const router = useRouter();
 
-  const form = useForm<RegisterBodyType>({
-    resolver: zodResolver(RegisterBody),
+  const form = useForm<RegisterType>({
+    resolver: zodResolver(RegisterSchema),
     defaultValues: {
       email: "",
       password: "",
     },
+    mode: "onChange",
   });
 
-  const onSubmit = async (data: RegisterBodyType) => {
+  const onSubmit = async (data: RegisterType) => {
     if (registerMutation.isPending) return; 
     try {
       const result = await registerMutation.mutateAsync(data);

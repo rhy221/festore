@@ -11,18 +11,9 @@ import { cn } from '@workspace/ui/lib/utils';
 import { Field, FieldError, FieldGroup, FieldLabel } from '@workspace/ui/components/field';
 import { Input } from '@workspace/ui/components/input';
 import { Button } from '@workspace/ui/components/button';
+import { forgotPasswordBodySchema, ForgotPasswordBodyType } from '@/schema/auth.schema';
+import { useForgotPasswordMutation } from '@/queries/useAuth';
 
-
-const forgotPasswordBodySchema = z.object({
-    email: z.string().regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/),
-})
-
-type ForgotPasswordBodyType = z.infer<typeof forgotPasswordBodySchema>;
-
-const sendResetPassMail = async (body: ForgotPasswordBodyType) => {
-    const response = await http.post("http://localhost:3003/auth/forgot-password", {...body, origin: process.env.NEXT_PUBLIC_URL + "/auth/changepassword"});
-    return response;
-}
 
 export default function ForgotPasswordForm() {
     const router = useRouter();
@@ -34,9 +25,7 @@ export default function ForgotPasswordForm() {
         }
     })
 
-    const mutation = useMutation({
-        mutationFn: sendResetPassMail,
-    })
+    const mutation = useForgotPasswordMutation();
 
 
     const onSubmit = async (data: ForgotPasswordBodyType) => {
