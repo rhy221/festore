@@ -52,7 +52,7 @@ const NavBar = () => {
             <div className='flex items-center gap-2'>
                 <Link href="/profile">
                    <Avatar className="">
-                        <AvatarImage src="/pathetic.jpg"/>
+                        <AvatarImage src="https://picsum.photos/seed/picsum/200/300"/>
                         <AvatarFallback>Avatar</AvatarFallback>
                     </Avatar> 
                 </Link> 

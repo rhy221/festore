@@ -1,9 +1,8 @@
 "use client";
 import React from "react";
-import Header from "../../../components/Header";
-import AuctionTimer from "../../../components/AuctionTimer";
-import BiddingHistory from "../../../components/BiddingHistory";
-import AuctionInfo from "../../../components/AuctionInfo";
+import AuctionTimer from "../../../../components/AuctionTimer";
+import BiddingHistory from "../../../../components/BiddingHistory";
+import AuctionInfo from "../../../../components/AuctionInfo";
 
 // API Data Interfaces
 interface Bidder {
@@ -190,8 +189,8 @@ export default function AuctionScreen() {
       const timeB = b.timestamp.split(":").map((num) => parseInt(num));
 
       // Convert to minutes for easier comparison
-      const minutesA = timeA[0] * 60 + timeA[1];
-      const minutesB = timeB[0] * 60 + timeB[1];
+      const minutesA = timeA[0]! * 60 + timeA[1]!;
+      const minutesB = timeB[0]! * 60 + timeB[1]!;
 
       // Sort in descending order (most recent first)
       return minutesB - minutesA;
@@ -220,7 +219,7 @@ export default function AuctionScreen() {
       (bid) => bid.id === winningBid.id
     );
     if (winnerIndex !== -1) {
-      updatedBids[winnerIndex].isWinning = true;
+      updatedBids[winnerIndex]!.isWinning = true;
     }
   }
 
@@ -235,13 +234,9 @@ export default function AuctionScreen() {
 
   return (
     <div>
-      {/* Fixed Header */}
-      <div className="fixed top-0 left-0 right-0 z-40">
-        <Header />
-      </div>
 
       {/* Main Content */}
-      <div className="pt-24 min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50">
         <main className="container mx-auto px-6 py-8">
           {/* Auction Info Bar */}
           <div className="grid grid-cols-4 gap-4 mb-6 mt-8">
