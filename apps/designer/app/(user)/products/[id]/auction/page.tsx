@@ -1,8 +1,9 @@
 "use client";
 import React from "react";
-import AuctionTimer from "../../../../components/AuctionTimer";
-import BiddingHistory from "../../../../components/BiddingHistory";
-import AuctionInfo from "../../../../components/AuctionInfo";
+import AuctionTimer from "../../../../../components/AuctionTimer";
+import BiddingHistory from "../../../../../components/BiddingHistory";
+import AuctionInfo from "../../../../../components/AuctionInfo";
+import { useAuctionTimer } from "../../../../../hooks/useAuctionTimer";
 
 // API Data Interfaces
 interface Bidder {
@@ -132,54 +133,8 @@ const mockAuctionData: AuctionData = {
 };
 
 export default function AuctionScreen() {
-  // ==================== API INTEGRATION GUIDE ====================
-  //
-  // ELEMENTS POPULATED FROM API DATA:
-  // 1. Auction Info Bar:
-  //    - auctionData.id (Mã phiên)
-  //    - auctionData.participants (Người tham gia)
-  //    - auctionData.totalBids (Tổng lượt đặt)
-  //    - auctionData.status + timeRemaining (Trạng thái)
-  //
-  // 2. Product Information:
-  //    - auctionData.product.name (Product title)
-  //    - auctionData.product.images[] (Product images)
-  //    - auctionData.product.code (Mã sản phẩm)
-  //    - auctionData.product.category (Danh mục)
-  //    - auctionData.product.material (Chất liệu)
-  //    - auctionData.product.designerName (Nhà thiết kế)
-  //
-  // 3. Auction Details (AuctionInfo component):
-  //    - auctionData.currentPrice (Giá hiện tại)
-  //    - auctionData.startingPrice (Giá khởi điểm)
-  //    - auctionData.bidIncrement (Bước giá)
-  //    - auctionData.startTime (Thời gian bắt đầu)
-  //    - auctionData.endTime (Thời gian kết thúc)
-  //
-  // 4. Bidding History (BiddingHistory component):
-  //    - auctionData.bids[] (All bids with bidder info, amounts, timestamps)
-  //    - auctionData.totalBids (Total bid count)
-  //
-  // 5. Timer (AuctionTimer component):
-  //    - auctionData.endTime (For countdown calculation)
-  //
-  // API FUNCTIONS TO IMPLEMENT:
-  // const [auctionData, setAuctionData] = useState<AuctionData | null>(null);
-  // const [loading, setLoading] = useState(true);
-  // const [error, setError] = useState<string | null>(null);
-  //
-  // - fetchAuctionData(auctionId: string): Promise<AuctionApiResponse>
-  // - placeBid(auctionId: string, amount: number): Promise<Bid>
-  // - getRealtimeUpdates(auctionId: string): WebSocket connection
-  // - uploadProductImage(file: File): Promise<string>
-  // - updateAuctionStatus(auctionId: string, status: string): Promise<boolean>
-  //
-  // REAL-TIME UPDATES NEEDED:
-  // - New bids (update bids array and currentPrice)
-  // - Participant count changes
-  // - Auction status changes
-  // - Time remaining updates
-  // ============================================================
+  // Use the auction timer hook to get real-time data
+  const liveTimeRemaining = useAuctionTimer(mockAuctionData.endTime);
 
   // Function to sort bids by timestamp (most recent first)
   const sortBidsByTimestamp = (bids: Bid[]): Bid[] => {
@@ -234,7 +189,6 @@ export default function AuctionScreen() {
 
   return (
     <div>
-
       {/* Main Content */}
       <div className="min-h-screen bg-gray-50">
         <main className="container mx-auto px-6 py-8">
@@ -276,31 +230,26 @@ export default function AuctionScreen() {
               </div>
             </div>
 
-            {/* Status - API Data */}
+            {/* Status - Live Data */}
             <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
               <div className="flex flex-col items-center justify-center text-center">
                 <div>
                   <p className="text-xs text-gray-600">Trạng thái</p>
                   <p
                     className={`text-sm font-bold ${
-                      auctionDataWithWinner.status === "active"
-                        ? "text-green-600"
-                        : auctionDataWithWinner.status === "ended"
+                      liveTimeRemaining.isExpired
                         ? "text-red-600"
-                        : "text-yellow-600"
+                        : "text-green-600"
                     }`}
                   >
-                    {auctionDataWithWinner.status === "active"
-                      ? "Thời gian còn lại"
-                      : auctionDataWithWinner.status === "ended"
+                    {liveTimeRemaining.isExpired
                       ? "Đã kết thúc"
-                      : "Sắp bắt đầu"}
+                      : "Thời gian còn lại"}
                   </p>
-                  {auctionDataWithWinner.status === "active" && (
+                  {!liveTimeRemaining.isExpired && (
                     <span className="text-xs text-red-500">
-                      {auctionDataWithWinner.timeRemaining.days} ngày{" "}
-                      {auctionDataWithWinner.timeRemaining.hours} giờ{" "}
-                      {auctionDataWithWinner.timeRemaining.minutes} phút
+                      {liveTimeRemaining.days} ngày {liveTimeRemaining.hours}{" "}
+                      giờ {liveTimeRemaining.minutes} phút
                     </span>
                   )}
                 </div>
@@ -319,31 +268,19 @@ export default function AuctionScreen() {
 
                 {/* Product image from API */}
                 <div className="w-full h-64 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
-                  {auctionDataWithWinner.product.images &&
-                  auctionDataWithWinner.product.images.length > 0 ? (
-                    <img
-                      src={auctionDataWithWinner.product.images[0]}
-                      alt={auctionDataWithWinner.product.name}
-                      className="w-full h-full object-cover rounded-lg"
-                      onError={(e) => {
-                        // Fallback to placeholder if image fails to load
-                        e.currentTarget.style.display = "none";
-                        e.currentTarget.nextElementSibling?.classList.remove(
-                          "hidden"
-                        );
-                      }}
-                    />
-                  ) : null}
-                  <div
-                    className={`text-center text-gray-500 ${
-                      auctionDataWithWinner.product.images?.length
-                        ? "hidden"
-                        : ""
-                    }`}
-                  >
-                    <div className="w-16 h-16 bg-gray-300 rounded-lg mx-auto mb-2"></div>
-                    <p className="text-sm">No Image Available</p>
-                  </div>
+                  <img
+                    src={
+                      auctionDataWithWinner.product.images &&
+                      auctionDataWithWinner.product.images.length > 0
+                        ? auctionDataWithWinner.product.images[0]
+                        : "https://picsum.photos/id/1/200"
+                    }
+                    alt={auctionDataWithWinner.product.name}
+                    className="w-full h-full object-cover rounded-lg"
+                    onError={(e) => {
+                      e.currentTarget.src = "https://picsum.photos/id/1/200";
+                    }}
+                  />
                 </div>
 
                 {/* Product details from API */}
