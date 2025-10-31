@@ -87,8 +87,17 @@ export default function ProductListScreen() {
   // - Search by product name
   // ============================================================
 
-  // Mock data with API-ready structure
-  const [products] = useState<Product[]>([
+  // Mock data with API-ready structure - moved to state declaration below
+
+  const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
+  const [showActionModal, setShowActionModal] = useState(false);
+  const [showSalesTypeModal, setShowSalesTypeModal] = useState(false);
+  const [selectedProductForSales, setSelectedProductForSales] = useState<
+    string | null
+  >(null);
+  const [showDirectSaleModal, setShowDirectSaleModal] = useState(false);
+  const [showAuctionModal, setShowAuctionModal] = useState(false);
+  const [products, setProducts] = useState<Product[]>([
     {
       id: "prod_001",
       name: "Giày thể thao",
@@ -104,6 +113,7 @@ export default function ProductListScreen() {
         email: "designer_a@example.com",
       },
       status: "available",
+      isPublic: true,
       createdAt: "2024-01-15T10:00:00Z",
       updatedAt: "2024-01-15T10:00:00Z",
     },
@@ -122,6 +132,7 @@ export default function ProductListScreen() {
         email: "designer_a@example.com",
       },
       status: "available",
+      isPublic: false,
       createdAt: "2024-01-16T10:00:00Z",
       updatedAt: "2024-01-16T10:00:00Z",
     },
@@ -141,6 +152,7 @@ export default function ProductListScreen() {
       },
       status: "direct-sale",
       salePrice: 250000,
+      isPublic: true,
       createdAt: "2024-01-17T10:00:00Z",
       updatedAt: "2024-01-17T10:00:00Z",
     },
@@ -168,19 +180,11 @@ export default function ProductListScreen() {
         totalBids: 12,
         isActive: true,
       },
+      isPublic: false,
       createdAt: "2024-01-18T10:00:00Z",
       updatedAt: "2024-01-18T10:00:00Z",
     },
   ]);
-
-  const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
-  const [showActionModal, setShowActionModal] = useState(false);
-  const [showSalesTypeModal, setShowSalesTypeModal] = useState(false);
-  const [selectedProductForSales, setSelectedProductForSales] = useState<
-    string | null
-  >(null);
-  const [showDirectSaleModal, setShowDirectSaleModal] = useState(false);
-  const [showAuctionModal, setShowAuctionModal] = useState(false);
 
   // Handle Escape key to close modal
   useEffect(() => {
@@ -210,6 +214,19 @@ export default function ProductListScreen() {
 
   const handleAddProduct = () => {
     window.location.href = "/products/upload";
+  };
+
+  // Handle privacy toggle
+  const handleTogglePrivacy = (productId: string) => {
+    setProducts((prevProducts) =>
+      prevProducts.map((product) =>
+        product.id === productId
+          ? { ...product, isPublic: !product.isPublic }
+          : product
+      )
+    );
+
+    // Update product privacy here
   };
 
   const handleViewDetails = (productId: string) => {
@@ -248,26 +265,10 @@ export default function ProductListScreen() {
 
     if (action === "view") {
       // TODO: Navigate to product details page
-      // window.location.href = `/designer/products/${selectedProduct}/view`;
-      // OR: router.push(`/designer/products/${selectedProduct}/view`);
     } else if (action === "edit") {
       // TODO: Navigate to product edit page
-      // window.location.href = `/designer/products/${selectedProduct}/edit`;
-      // OR: router.push(`/designer/products/${selectedProduct}/edit`);
     } else if (action === "delete") {
       // TODO: Call delete product API
-      // if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
-      //   deleteProduct(selectedProduct!)
-      //     .then(() => {
-      //       // Refresh product list
-      //       fetchProducts();
-      //       // Show success message
-      //     })
-      //     .catch(error => {
-      //       // Show error message
-      //       console.error('Delete failed:', error);
-      //     });
-      // }
     }
   };
 
@@ -303,12 +304,15 @@ export default function ProductListScreen() {
           {/* Product Table */}
           <div className="bg-white rounded-lg border border-gray-200 overflow-hidden relative mb-8">
             {/* Table Header */}
-            <div className="grid grid-cols-3 bg-gray-100 border-b border-gray-200">
+            <div className="grid grid-cols-4 bg-gray-100 border-b border-gray-200">
               <div className="p-4 font-semibold text-gray-700 text-center">
                 Mẫu
               </div>
               <div className="p-4 font-semibold text-gray-700 text-center border-l border-gray-200">
                 Hình thức bán
+              </div>
+              <div className="p-4 font-semibold text-gray-700 text-center border-l border-gray-200">
+                Trạng thái
               </div>
               <div className="p-4 font-semibold text-gray-700 text-center border-l border-gray-200">
                 Thao tác
@@ -320,7 +324,7 @@ export default function ProductListScreen() {
               {products.map((product) => (
                 <div
                   key={product.id}
-                  className="grid grid-cols-3 border-b border-gray-200 hover:bg-gray-50 transition-colors"
+                  className="grid grid-cols-4 border-b border-gray-200 hover:bg-gray-50 transition-colors"
                 >
                   {/* Product Column */}
                   <div className="p-4 flex items-center gap-4">
@@ -366,6 +370,33 @@ export default function ProductListScreen() {
                     >
                       {getSaleTypeDisplay(product.status)}
                     </span>
+                  </div>
+
+                  {/* Privacy Toggle Column */}
+                  <div className="p-4 flex items-center justify-center border-l border-gray-200">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`text-xs font-medium ${
+                          product.isPublic ? "text-green-600" : "text-gray-500"
+                        }`}
+                      >
+                        {product.isPublic ? "Công khai" : "Riêng tư"}
+                      </span>
+                      <button
+                        onClick={() => handleTogglePrivacy(product.id)}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                          product.isPublic ? "bg-green-600" : "bg-gray-200"
+                        }`}
+                        role="switch"
+                        aria-checked={product.isPublic}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
+                            product.isPublic ? "translate-x-6" : "translate-x-1"
+                          }`}
+                        />
+                      </button>
+                    </div>
                   </div>
 
                   {/* Actions Column */}
