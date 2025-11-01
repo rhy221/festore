@@ -1,0 +1,58 @@
+import http from "@/lib/http";
+
+export type UserProducts = {
+    id?: string;
+    name?: string;
+    thumbUrl?: string;
+}
+
+const MOCK_KEY = "fe_mock_user_products";
+const useMockEnv =
+  typeof process !== "undefined" && process.env.NEXT_PUBLIC_USE_MOCK === "true";
+
+function readMock(): UserProducts {
+  const initial: UserProducts = {
+    id: "1",
+    name: "Product 2",
+    thumbUrl: "https://picsum.photos/seed/picsum/200/300",
+  };
+  if (typeof window === "undefined") return initial;
+  const raw = localStorage.getItem(MOCK_KEY);
+  if (!raw) {
+    localStorage.setItem(MOCK_KEY, JSON.stringify(initial));
+    return initial;
+  }
+  try {
+    return JSON.parse(raw) as UserProducts;
+  } catch {
+    return initial;
+  }
+}
+function writeMock(payload: Partial<UserProducts>) {
+  if (typeof window === "undefined") return null;
+  const cur = readMock();
+  const merged = { ...cur, ...payload };
+  localStorage.setItem(MOCK_KEY, JSON.stringify(merged));
+  return merged;
+}
+const productsAction = {
+  get: async (): Promise<UserProducts> => {
+    if (useMockEnv) return Promise.resolve(readMock());
+    try {
+      const token =
+        typeof window !== "undefined"
+          ? localStorage.getItem("access_token")
+          : null;
+      const res = await http.get<UserProducts>("/user/products", {
+        headers: { Authorization: token ? `Bearer ${token}` : "" },
+      });
+      try {
+        writeMock(res.data);
+      } catch {}
+      return res.data;
+    } catch (err) {
+      return readMock();
+    }
+  },
+};
+export default productsAction;
