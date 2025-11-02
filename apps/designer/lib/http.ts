@@ -1,8 +1,26 @@
 import envConfig from "@/config";
 import axios, { AxiosError, AxiosInstance } from "axios";
 
+function decodeJwtPayload(token: string) {
+  try {
+    const payloadBase64 = token.split(".")[1];
+    if (!payloadBase64) return null;
+    return JSON.parse(atob(payloadBase64));
+  } catch {
+    return null;
+  }
+}
+
+function isTokenExpired(token: string) {
+  const payload = decodeJwtPayload(token);
+  if (!payload?.exp) return true;
+  const now = Math.floor(Date.now() / 1000);
+  return payload.exp < now;
+}
+
 class Http {
   instance: AxiosInstance;
+
   constructor() {
     this.instance = axios.create({
       baseURL: envConfig.NEXT_PUBLIC_API_ENDPOINT,
@@ -14,19 +32,28 @@ class Http {
 
     this.instance.interceptors.request.use(
       (config) => {
+        const token = localStorage.getItem("accessToken");
+
+        if (token) {
+          if (isTokenExpired(token)) {
+            localStorage.removeItem("accessToken");
+          } else {
+            config.headers.set(
+              "Authorization",
+              `Bearer ${token}`
+            );
+          }
+        }
+
         return config;
       },
-      (error) => {
-        return Promise.reject(error);
-      }
+      (error) => Promise.reject(error)
     );
 
     this.instance.interceptors.response.use(
       (response) => response,
       (error: AxiosError) => {
-        if (error.response) {
-          return Promise.reject(error.response.data);
-        }
+        if (error.response) return Promise.reject(error.response.data);
         return Promise.reject(error);
       }
     );
@@ -34,5 +61,4 @@ class Http {
 }
 
 const http = new Http().instance;
-
 export default http;

@@ -31,10 +31,10 @@ export default function LoginForm() {
       // toast("Success", {
       //   description: "Login successful!",
       // });
-      // localStorage.setItem("access_token", result.accessToken);
+      localStorage.setItem("accessToken", result.accessToken);
       // localStorage.setItem("refresh_token", result.refreshToken);
       // localStorage.setItem("user", JSON.stringify(result));
-      router.push("/user");
+      router.push("/dashboard");
     } catch (error) {
       console.log(error);
     }
