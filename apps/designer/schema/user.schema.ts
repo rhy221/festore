@@ -10,8 +10,14 @@ export type UserProfileResType = {
   createdAt: string;
 };
 
+export type UserProfileStaticsResType = {
+  followerCount: number,
+  likeCount: number,
+  rating: number,
+};
+
 export type UserProfileEditingType = {
     name: string;
     bio: string;
-    avatar: HTMLInputElement | null;
+    avatar: File | null;
 }

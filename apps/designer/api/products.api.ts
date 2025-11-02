@@ -48,28 +48,10 @@ function writeMock(payload: UserProduct[]) {
 }
 
 const productsAction = {
-  get: async (): Promise<UserProduct[]> => {
-    if (useMockEnv) return Promise.resolve(readMock());
-    try {
-      const token =
-        typeof window !== "undefined"
-          ? localStorage.getItem("access_token")
-          : null;
-      const res = await http.get<unknown>("/user/products", {
-        headers: { Authorization: token ? `Bearer ${token}` : "" },
-      });
-      const data = Array.isArray((res as any).data)
-        ? ((res as any).data as UserProduct[])
-        : (res as any).data
-        ? [((res as any).data as UserProduct)]
-        : [];
-      try {
-        writeMock(data);
-      } catch {}
-      return data;
-    } catch (err) {
-      return readMock();
-    }
+  get: async () => {
+    const response = await http.get("/products");
+    console.log(response.data)
+    return response.data;
   },
 };
 export default productsAction;

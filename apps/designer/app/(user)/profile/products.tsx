@@ -21,30 +21,33 @@ import {
   UserPlus,
   UserRoundPlus,
 } from "lucide-react";
+import { useProducts } from "@/queries/useProduct";
+import { DesignResType } from "@/schema/design.schema";
 
 export default function Products() {
-  const [modals, setModals] = useState<UserProduct[]>([]);
+
+  const qquery = useProducts();
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState("All");
-  useEffect(() => {
-    let mounted = true;
-    const fetchProducts = async () => {
-      try {
-        const data = await productsAction.get();
-        if (!mounted) return;
-        setModals(data);
-      } catch (e) {
-        // giữ nguyên danh sách rỗng khi lỗi
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-    fetchProducts();
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  // useEffect(() => {
+  //   let mounted = true;
+  //   const fetchProducts = async () => {
+  //     try {
+  //       const data = await productsAction.get();
+  //       if (!mounted) return;
+  //       // setModals(data);
+  //     } catch (e) {
+  //       // giữ nguyên danh sách rỗng khi lỗi
+  //     } finally {
+  //       if (mounted) setLoading(false);
+  //     }
+  //   };
+  //   fetchProducts();
+  //   return () => {
+  //     mounted = false;
+  //   };
+  // }, []);
   return (
     <>
       <Tabs value={tab} onValueChange={setTab} className="w-full">
@@ -53,7 +56,6 @@ export default function Products() {
             <TabsTrigger value="All">All</TabsTrigger>
             <TabsTrigger value="Sellings">Sellings</TabsTrigger>
             <TabsTrigger value="Auctions">Auctions</TabsTrigger>
-            <TabsTrigger value="Boughts">Boughts</TabsTrigger>
           </TabsList>
           <div className="flex px-4 pb-4 gap-2">
             <Input
@@ -68,53 +70,46 @@ export default function Products() {
         </Card>
 
         <TabsContent value="All">
-          {loading ? (
+          {qquery.isLoading ? (
             <ProductsSkeleton />
           ) : (
-            <ModalListing modals={filterByQuery(filterByTab(modals, tab), query)} />
+            <ModalListing modals={filterByQuery(filterByTab(qquery.data!, tab), query)} />
           )}
         </TabsContent>
         <TabsContent value="Sellings">
-          {loading ? (
+          {qquery.isLoading ? (
             <ProductsSkeleton />
           ) : (
-            <ModalListing modals={filterByQuery(filterByTab(modals, tab), query)} />
+            <ModalListing modals={filterByQuery(filterByTab(qquery.data!, tab), query)} />
           )}
         </TabsContent>
         <TabsContent value="Auctions">
-          {loading ? (
+          {qquery.isLoading ? (
             <ProductsSkeleton />
           ) : (
-            <ModalListing modals={filterByQuery(filterByTab(modals, tab), query)} />
-          )}
-        </TabsContent>
-        <TabsContent value="Boughts">
-          {loading ? (
-            <ProductsSkeleton />
-          ) : (
-            <ModalListing modals={filterByQuery(filterByTab(modals, tab), query)} />
+            <ModalListing modals={filterByQuery(filterByTab(qquery.data!, tab), query)} />
           )}
         </TabsContent>
       </Tabs>
     </>
   );
 }
-function filterByQuery(items: UserProduct[], q: string) {
+function filterByQuery(items: DesignResType[], q: string) {
   const s = q.trim().toLowerCase();
   if (!s) return items;
-  return items.filter((it) => it.name.toLowerCase().includes(s));
+  return items.filter((it) => it.title.toLowerCase().includes(s));
 }
-function filterByTab(items: UserProduct[], tab: string) {
-  switch (tab) {
-    case "Sellings":
-      return items.filter((it) => it.kind === "selling");
-    case "Auctions":
-      return items.filter((it) => it.kind === "auction");
-    case "Boughts":
-      return items.filter((it) => it.kind === "bought");
-    default:
+function filterByTab(items: DesignResType[], tab: string) {
+  // switch (tab) {
+  //   case "Sellings":
+  //     return items.filter((it) => it.kind === "selling");
+  //   case "Auctions":
+  //     return items.filter((it) => it.kind === "auction");
+  //   case "Boughts":
+  //     return items.filter((it) => it.kind === "bought");
+  //   default:
       return items;
-  }
+  // }
 }
 function ProductsSkeleton() {
   return (
@@ -132,7 +127,7 @@ function ProductsSkeleton() {
     </div>
   );
 }
-function ModalListing({ modals }: { modals: UserProduct[] }) {
+function ModalListing({ modals }: { modals: DesignResType[] }) {
   return (
     <div className="grid grid-cols-3 grid-flow-row gap-4 w-full">
       {modals.map((m, index) => (
@@ -142,15 +137,15 @@ function ModalListing({ modals }: { modals: UserProduct[] }) {
   );
 }
 
-function Modal({ name, thumbUrl }: UserProduct) {
+function Modal({ title, imageUrl }: DesignResType) {
   return (
     <Card className="w-full overflow-hidden py-0 ">
       <div className="flex flex-col">
         <div className="relative">
-          <img src={thumbUrl} alt="Thumb" className="w-full h-48" />
+          <img src={imageUrl} alt="Thumb" className="w-full h-48" />
         </div>
         <div className="px-4 py-2">
-          <h3>{name}</h3>
+          <h3>{title}</h3>
         </div>
       </div>
     </Card>

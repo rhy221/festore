@@ -1,5 +1,5 @@
 import http from "@/lib/http";
-import { UserProfileResType } from "@/schema/user.schema";
+import { UserProfileResType, UserProfileStaticsResType } from "@/schema/user.schema";
 
 
 // const MOCK_KEY = "fe_mock_user_me";
@@ -31,28 +31,20 @@ import { UserProfileResType } from "@/schema/user.schema";
 
 const userAction = {
   getMe: async () => {
-    // if (useMockEnv) {
-    //   return Promise.resolve(readMock());
-    // }
-
-    // try {
-    //   const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
-    //   const res = await http.get("/user/me", { headers: { Authorization: token ? `Bearer ${token}` : "" } });
-    //   // persist a copy locally for offline/mock fallback
-    //   try { writeMock(res.data); } catch {}
-    //   return res.data;
-    // } catch (err) {
-    //   // fallback to mock data if backend unavailable
-    //   return readMock();
-    // }
-
-    const response = await http.get<UserProfileResType>("/users/profile");
+    const response = await http.get<UserProfileResType>("/users/profile?opt=basics");
     return response.data;
   
   },
 
+  getStatics: async () => {
+    const response = await http.get<UserProfileStaticsResType>("/users/profile?opt=statics");
+    return response.data;
+  
+  },
+
+
   updateMe: async (body: FormData) => {
-      const response = await http.patch<UserProfileResType>("/user/me", body);
+      const response = await http.patch<UserProfileResType>("/users/profile", body);
       return response.data;
   }
 };

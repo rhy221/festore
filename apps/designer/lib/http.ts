@@ -32,6 +32,10 @@ class Http {
 
     this.instance.interceptors.request.use(
       (config) => {
+        
+        if (config.data instanceof FormData) {
+            config.headers["Content-Type"] = "multipart/form-data";
+          }
         const token = localStorage.getItem("accessToken");
 
         if (token) {

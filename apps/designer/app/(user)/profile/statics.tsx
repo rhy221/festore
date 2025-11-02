@@ -1,3 +1,4 @@
+"use client"
 import { Card } from "@workspace/ui/components/card";
 import {
   Car,
@@ -10,6 +11,7 @@ import {
   UserRoundPlus,
 } from "lucide-react";
 import { Skeleton } from "@workspace/ui/components/skeleton";
+import { useUserProfileStatics } from "@/queries/useUser";
 type UserStatic = {
   name: string;
   value: number;
@@ -36,29 +38,39 @@ export function StaticsSkeleton() {
   );
 }
 export default function Statics({ loading = false }: StaticsProps) {
-  if (loading) return <StaticsSkeleton />;
+  const query = useUserProfileStatics();
+
+  if (query.isLoading) return <StaticsSkeleton />;
   return (
     <Card>
       <div>
-        {userStatics.map((u, index) => (
+    
           <UserStaticsRow
-            key={index}
-            name={u.name}
-            value={u.value}
-            icon={u.icon}
-          />
-        ))}
+            name={"Rating"}
+            value={query.data?.rating!}
+            icon={Star}
+          /> 
+          <UserStaticsRow
+            name={"Followers"}
+            value={query.data?.followerCount!}
+            icon={UserPlus}
+          /> 
+          <UserStaticsRow
+            name={"Likes"}
+            value={query.data?.likeCount!}
+            icon={ThumbsUp}
+          /> 
+      
       </div>
     </Card>
   );
 }
 
-let userStatics: UserStatic[] = [
-  { name: "Rating", value: 4.0, icon: Star },
-  { name: "Followers", value: 20, icon: UserPlus },
-  { name: "Followings", value: 5, icon: UserRoundPlus },
-  { name: "Likes", value: 100, icon: ThumbsUp },
-];
+// let userStatics: UserStatic[] = [
+//   { name: "Rating", value: 4.0, icon: Star },
+//   { name: "Followers", value: 20, icon: UserPlus },
+//   { name: "Likes", value: 100, icon: ThumbsUp },
+// ];
 
 function UserStaticsRow({ name, value, icon: Icon }: UserStatic) {
   return (
