@@ -11,7 +11,7 @@ export default function NTK_BDashboard() {
         {/* Main */}
         <main className="space-y-6 overflow-hidden">
           <MonthlyReport />
-          <CategoryAnalysis />
+          {/* <CategoryAnalysis /> */}
         </main>
 
         {/* Right panel */}

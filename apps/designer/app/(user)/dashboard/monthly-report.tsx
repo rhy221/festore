@@ -16,7 +16,7 @@ import { useDashboardQueries } from "../../../queries/useDashboard";
 import { MonthlyReportSkeleton } from "./skeletons";
 
 export default function MonthlyReport() {
-  const [selectedMonth, setSelectedMonth] = useState("07/2025");
+  const [selectedMonth, setSelectedMonth] = useState("11/2025");
   const { data, isLoading, error } = useDashboardQueries.useMonthlyReport(selectedMonth);
 
   if (isLoading) return <MonthlyReportSkeleton />;
@@ -39,9 +39,9 @@ export default function MonthlyReport() {
           onChange={(e) => setSelectedMonth(e.target.value)}
           className="border rounded-full px-4 py-2"
         >
-          <option>07/2025</option>
-          <option>06/2025</option>
-          <option>05/2025</option>
+          <option>09/2025</option>
+          <option>10/2025</option>
+          <option>11/2025</option>
         </select>
       </div>
 
@@ -57,10 +57,10 @@ export default function MonthlyReport() {
               {formatCurrency(data.totalRevenue)}
             </div>
           </div>
-          <div className="flex items-center gap-1 text-green-600 mt-2 text-xs font-medium">
+          {/* <div className="flex items-center gap-1 text-green-600 mt-2 text-xs font-medium">
             <TrendingUp className="w-4 h-4" />
             +{data.growthRate}% so với tháng trước
-          </div>
+          </div> */}
         </div>
 
         <div className="border rounded-lg p-4 shadow-sm">

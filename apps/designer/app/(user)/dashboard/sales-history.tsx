@@ -70,7 +70,7 @@ export default function SalesHistory() {
         <table className="w-full text-xs border-collapse">
           <thead>
             <tr className="bg-gray-200 text-left">
-              {["Mẫu thiết kế", "Người mua", "Loại bán", "Giá bán", "Ngày bán", "Trạng thái"].map(
+              {["Mẫu thiết kế", "Loại bán", "Giá bán", "Ngày bán",].map(
                 (h) => (
                   <th key={h} className="p-2 whitespace-nowrap">
                     {h}
@@ -80,25 +80,26 @@ export default function SalesHistory() {
             </tr>
           </thead>
           <tbody>
-            {data.map((s) => (
-              <tr key={s.id} className="border-b hover:bg-gray-100">
+            {data.data.map( (i) => (
+              i.items.map((s) => (
+                <tr key={s.designId} className="border-b hover:bg-gray-100">
                 <td className="p-2 flex items-center gap-2">
                   <Image
-                    src={s.designImage}
-                    alt={s.designName}
+                    src={s.imageUrl}
+                    alt={s.title}
                     width={32}
                     height={32}
                     className="w-8 h-8 object-cover rounded"
                   />
-                  <span className="truncate">{s.designName}</span>
+                  <span className="truncate">{s.title}</span>
                 </td>
-                <td className="p-2 truncate">{s.buyerName}</td>
+                {/* <td className="p-2 truncate">{s.buyerName}</td> */}
                 <td className="p-2 truncate">
-                  {s.saleType === "direct" ? "Bán trực tiếp" : "Đấu giá"}
+                  {s.type === "fixed" ? "Bán trực tiếp" : "Đấu giá"}
                 </td>
                 <td className="p-2 truncate">{formatCurrency(s.price)}</td>
-                <td className="p-2 truncate">{formatDate(s.date)}</td>
-                <td className="p-2">
+                <td className="p-2 truncate">{formatDate(i.orderDate)}</td>
+                {/* <td className="p-2">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap flex items-center gap-1 ${getStatusClass(
                       s.status
@@ -107,16 +108,20 @@ export default function SalesHistory() {
                     {getStatusIcon(s.status)}
                     {getStatusText(s.status)}
                   </span>
-                </td>
+                </td> */}
               </tr>
+              ))
             ))}
+              
+            
+              
           </tbody>
         </table>
-        {data.length === 0 && (
+        {/* {data.length === 0 && (
           <div className="mt-3 text-center text-xs text-gray-500">
             — Không có dữ liệu —
           </div>
-        )}
+        )} */}
       </div>
     </aside>
   );

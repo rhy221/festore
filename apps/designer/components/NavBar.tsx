@@ -1,3 +1,5 @@
+"use client"
+
 import React from 'react'
 import {
   NavigationMenu,
@@ -52,7 +54,7 @@ const NavBar = () => {
             <div className='flex items-center gap-2'>
                 <Link href="/profile">
                    <Avatar className="">
-                        <AvatarImage src="https://picsum.photos/seed/picsum/200/300"/>
+                        <AvatarImage src={localStorage.getItem("userAvatar") ?? ""}/>
                         <AvatarFallback>Avatar</AvatarFallback>
                     </Avatar> 
                 </Link> 
