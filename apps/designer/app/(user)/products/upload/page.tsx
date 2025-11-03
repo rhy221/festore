@@ -61,7 +61,7 @@ export default function ProductUpload() {
     <div>
       <main className="container mx-auto px-8 py-8">
         <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
-          Đăng tải mẫu
+          Thêm mẫu
         </h1>
 
         <div className="max-w-5xl mx-auto">

@@ -64,7 +64,7 @@ export default function DirectSaleModal({
               className="w-40 h-40 object-contain"
               onError={(e) => {
                 e.currentTarget.src =
-                  "https://via.placeholder.com/200x200/f0f0f0/999999?text=" +
+                  "https://picsum.photos/id/1/200" +
                   encodeURIComponent(product.name);
               }}
             />

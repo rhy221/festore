@@ -24,6 +24,7 @@ export interface Product {
     | "auction"
     | "sold"
     | "archived";
+  isPublic?: boolean; // Privacy setting: true = "Công khai", false = "Riêng tư"
   createdAt: string;
   updatedAt: string;
   // Direct sale specific
