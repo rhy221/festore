@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import productsAction, { type UserProduct } from "@/api/products.api";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import {
   Tabs,
@@ -22,7 +21,7 @@ import {
   UserRoundPlus,
 } from "lucide-react";
 import { useProducts } from "@/queries/useProduct";
-import { DesignResType } from "@/schema/design.schema";
+import { DesignResType } from "@/schema/product.schema";
 
 export default function Products() {
 
@@ -137,12 +136,12 @@ function ModalListing({ modals }: { modals: DesignResType[] }) {
   );
 }
 
-function Modal({ title, imageUrl }: DesignResType) {
+function Modal({ title, imagesUrl }: DesignResType) {
   return (
     <Card className="w-full overflow-hidden py-0 ">
       <div className="flex flex-col">
         <div className="relative">
-          <img src={imageUrl} alt="Thumb" className="w-full h-48" />
+          <img src={imagesUrl[0]} alt="Thumb" className="w-full h-48" />
         </div>
         <div className="px-4 py-2">
           <h3>{title}</h3>

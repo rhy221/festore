@@ -11,7 +11,7 @@ function decodeJwtPayload(token: string) {
   }
 }
 
-function isTokenExpired(token: string) {
+export function isTokenExpired(token: string) {
   const payload = decodeJwtPayload(token);
   if (!payload?.exp) return true;
   const now = Math.floor(Date.now() / 1000);

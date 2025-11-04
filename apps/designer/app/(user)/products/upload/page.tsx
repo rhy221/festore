@@ -1,60 +1,90 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { Input } from "@workspace/ui/components/input";
+import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@workspace/ui/components/button";
-import { Textarea } from "@workspace/ui/components/textarea";
+import { Controller, FormProvider, useForm, useFormContext } from "react-hook-form";
+import { uploadDesignSchema, UploadDesignType } from "@/schema/product.schema";
+import { Infor } from "./infor";
+import { UploadFiles, UploadImages, UploadModel } from "./upload-files";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useUploadProduct } from "@/queries/useProduct";
 
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@workspace/ui/components/select";
-
-import UploadBox from "@/components/UploadBox";
-
-interface FormValues {
-  tenMau: string;
-  moTa: string;
-  theLoai: string;
-  file?: File | null;
-}
 
 export default function ProductUpload() {
-  const [form, setForm] = useState<FormValues>({
-    tenMau: "",
-    moTa: "",
-    theLoai: "",
+  
+  const form = useForm<UploadDesignType>({
+    resolver: zodResolver(uploadDesignSchema),
+    defaultValues: {
+    title: "",
+    description: "",
+    images: [],
+    model: null,
+    categoryId: "",
+    type: "fixed",
+    price: 0,
+    },
   });
+  const mutation = useUploadProduct();
+  // const [form, setForm] = useState<FormValues>({
+  //   tenMau: "",
+  //   moTa: "",
+  //   theLoai: "",
+  // });
 
-  const [preview, setPreview] = useState<string | null>(null);
+  // const [preview, setPreview] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!form.file) {
-      setPreview(null);
-      return;
-    }
-    const url = URL.createObjectURL(form.file);
-    setPreview(url);
-    return () => URL.revokeObjectURL(url);
-  }, [form.file]);
+  // useEffect(() => {
+  //   if (!form.file) {
+  //     setPreview(null);
+  //     return;
+  //   }
+  //   const url = URL.createObjectURL(form.file);
+  //   setPreview(url);
+  //   return () => URL.revokeObjectURL(url);
+  // }, [form.file]);
 
   function onFileChange(file: File | null) {
-    setForm((s) => ({ ...s, file }));
+    // setForm((s) => ({ ...s, file }));
   }
 
-  function submitForm(e: React.FormEvent) {
-    e.preventDefault();
+  const onSubmit = async (data: UploadDesignType) => {
+    // e.preventDefault();
 
-    if (!form.tenMau) return alert("Vui lòng nhập tên mẫu");
-    if (!form.file) return alert("Vui lòng chọn ảnh");
+    // if (!form.tenMau) return alert("Vui lòng nhập tên mẫu");
+    // if (!form.file) return alert("Vui lòng chọn ảnh");
 
-    const fd = new FormData();
-    fd.append("tenMau", form.tenMau);
-    fd.append("moTa", form.moTa);
-    fd.append("theLoai", form.theLoai);
-    if (form.file) fd.append("file", form.file);
+    // const fd = new FormData();
+    // fd.append("tenMau", form.tenMau);
+    // fd.append("moTa", form.moTa);
+    // fd.append("theLoai", form.theLoai);
+    // if (form.file) fd.append("file", form.file);
+
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("description", data.description ?? "");
+    formData.append("categoryId", data.categoryId);
+    formData.append("price", String(data.price));
+    formData.append("type", data.type);
+    // formData.append("title", data.title);
+    if(data.model) 
+      formData.append("model", data.model);
+
+    data.images.map((file) => {
+      formData.append("images", file);
+    });
+
+    data.tags?.map((tag) => {
+      formData.append("tags", tag);
+    });
+
+    if(mutation.isPending) return;
+    try{
+      const result = await mutation.mutateAsync(formData);
+      form.reset();
+      console.log(result);
+    } catch(error) {
+      console.log(error);
+    }
+
   }
 
   return (
@@ -65,67 +95,24 @@ export default function ProductUpload() {
         </h1>
 
         <div className="max-w-5xl mx-auto">
+          <FormProvider {... form}>
           <form
-            onSubmit={submitForm}
+            method="POST"
+            onSubmit={form.handleSubmit(onSubmit)}
             className="grid md:grid-cols-2 gap-12 items-start"
           >
             {/* left fields */}
-            <div className="space-y-6">
-              {/* tên mẫu */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Tên mẫu
-                </label>
-                <Input
-                  value={form.tenMau}
-                  onChange={(e) => setForm({ ...form, tenMau: e.target.value })}
-                  className="w-full"
-                  placeholder="Nhập tên mẫu thiết kế"
-                />
-              </div>
-
-              {/* mô tả */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Mô tả
-                </label>
-                <Textarea
-                  value={form.moTa}
-                  onChange={(e) => setForm({ ...form, moTa: e.target.value })}
-                  rows={6}
-                  className="w-full resize-none"
-                  placeholder="Mô tả chi tiết về mẫu thiết kế..."
-                />
-              </div>
-
-              {/* Select thể loại */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Thể loại
-                </label>
-
-                <Select
-                  value={form.theLoai}
-                  onValueChange={(value) =>
-                    setForm((f) => ({ ...f, theLoai: value }))
-                  }
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Chọn thể loại" />
-                  </SelectTrigger>
-
-                  <SelectContent>
-                    <SelectItem value="ao">Áo</SelectItem>
-                    <SelectItem value="quan">Quần</SelectItem>
-                    <SelectItem value="dam">Đầm</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+           
+            <Infor />
+            
+            <UploadFiles />
 
             {/* image upload */}
             <div className="space-y-4">
-              <UploadBox value={preview ?? null} onChange={onFileChange} />
+              {/* <UploadBox value={preview ?? null} onChange={onFileChange} /> */}
+              {/* <UploadImages />
+              <UploadModel /> */}
+              {/* <UploadFile /> */}
             </div>
 
             {/* buttons */}
@@ -146,8 +133,12 @@ export default function ProductUpload() {
               </Button>
             </div>
           </form>
+          </FormProvider>
+         
         </div>
       </main>
     </div>
   );
 }
+
+

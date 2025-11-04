@@ -61,7 +61,6 @@ export const dashboardApi = {
 
   getSalesHistory: async () => {
     const response = await http.get<SalesHistoryData>("analytics/sales-history?page=1&limit=10"); // Simulate delay
-    console.log(response.data)
     return response.data;
     // return [
     //   {

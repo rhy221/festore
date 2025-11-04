@@ -32,7 +32,6 @@ export default function LoginForm() {
       //   description: "Login successful!",
       // });
       localStorage.setItem("accessToken", result.accessToken);
-      localStorage.setItem("userAvatar", result.avatarUrl);
 
 
       // localStorage.setItem("refresh_token", result.refreshToken);

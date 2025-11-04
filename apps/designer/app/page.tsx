@@ -1,6 +1,22 @@
-import { Button } from "@workspace/ui/components/button"
-import { redirect } from "next/navigation";
+"use client";
+
+import { isTokenExpired } from "@/lib/http";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Page() {
-  redirect("/auth/login");
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+
+    if (!token || isTokenExpired(token)) {
+      localStorage.removeItem("accessToken");
+      router.replace("/auth/login");
+    } else {
+      router.replace("/dashboard");
+    }
+  }, [router]);
+
+  return null; // or a loading spinner
 }

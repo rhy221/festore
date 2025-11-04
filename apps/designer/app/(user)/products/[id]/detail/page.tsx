@@ -1,21 +1,25 @@
-"use client";
-import { useState } from "react";
 import Image from "next/image";
-import Infor from "./Infor";
 import Rating from "./rating";
+import Infor from "./infor";
+import Images from "./images";
 
-export default function DesignDetail() {
+export default function DesignDetail({params}: {params: {id: string}}) {
  
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex flex-col items-center gap-4 mt-10">
       {/* Content */}
-      <main className="flex flex-col md:flex-row max-w-5xl mx-auto p-10 gap-10">
+      {/* <main className="flex justify-between w-[80%] p-0">
+        <Images />
         <Infor />
-      </main>
+      </main> */}
+
+      <Infor id={params.id}/>
 
       {/* Ratings */}
-      <Rating />
+      <section className="w-[80%]">
+        <Rating id={params.id}/>
+      </section>
     </div>
   );
 }

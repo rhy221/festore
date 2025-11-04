@@ -1,566 +1,497 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  getFilteredRowModel,
+  flexRender,
+  ColumnDef,
+  SortingState,
+  ColumnFiltersState,
+} from "@tanstack/react-table";
 import { Button } from "@workspace/ui/components/button";
 import {
-  ProductActionModal,
-  SalesTypeModal,
-  DirectSaleModal,
-  AuctionModal,
-  Product,
-  DirectSaleData,
-  AuctionSetupData,
-} from "../../../components/product-modals";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@workspace/ui/components/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@workspace/ui/components/dropdown-menu";
+import { Switch } from "@workspace/ui/components/switch";
+import { MoreHorizontal, Package, Plus } from "lucide-react";
+import { useProducts } from "@/queries/useProduct";
+import { DesignResType } from "@/schema/product.schema";
+import { useRouter } from "next/navigation";
+import { Skeleton } from "@workspace/ui/components/skeleton";
 
-// ==================== API DATA INTERFACES ====================
-// Interfaces are now imported from components/product-modals/types.ts
+// Types
+interface Designer {
+  id: string;
+  name: string;
+  email: string;
+}
 
-// Function to get saleType display text based on status
-const getSaleTypeDisplay = (status: Product["status"]): string => {
+interface AuctionDetails {
+  startingPrice: number;
+  bidIncrement: number;
+  startTime: string;
+  endTime: string;
+  currentPrice?: number;
+  totalBids?: number;
+  isActive: boolean;
+}
+
+// interface Product {
+//   id: string;
+//   name: string;
+//   description: string;
+//   category: string;
+//   material: string;
+//   images: string[];
+//   mainImage: string;
+//   designerId: string;
+//   designer: Designer;
+//   status: "available" | "direct-sale" | "auction";
+//   salePrice?: number;
+//   auctionDetails?: AuctionDetails;
+//   isPublic: boolean;
+//   createdAt: string;
+//   updatedAt: string;
+// }
+
+// Helper function
+const getSaleTypeDisplay = (status: DesignResType["type"]): string => {
   switch (status) {
-    case "direct-sale":
+    case "fixed":
       return "Bán trực tiếp";
     case "auction":
       return "Bán đấu giá";
-    case "available":
     default:
-      return "Chọn hình thức";
+      return "Bán trực tiếp";
+  }
+};
+
+const getSaleTypeColor = (status: DesignResType["type"]): string => {
+  switch (status) {
+    case "fixed":
+      return "text-red-600";
+    case "auction":
+      return "text-orange-600";
+    default:
+      return "text-red-600";
   }
 };
 
 export default function ProductListScreen() {
-  // ==================== API INTEGRATION GUIDE ====================
-  //
-  // ELEMENTS POPULATED FROM API DATA:
-  //
-  // 1. PRODUCT LIST TABLE:
-  //    - products[] array → Full product list with pagination
-  //    - product.id → Unique product identifier
-  //    - product.name → Product display name
-  //    - product.mainImage/images[0] → Product thumbnail
-  //    - product.status → Sale status (draft, available, direct-sale, auction, sold)
-  //    - product.salePrice → Direct sale price (if applicable)
-  //    - product.auctionDetails → Auction info (if applicable)
-  //    - product.createdAt → Product creation date
-  //    - product.designer → Designer information
-  //
-  // 2. DIRECT SALE MODAL:
-  //    - selectedProduct.name → Product name display
-  //    - selectedProduct.mainImage → Product image in modal
-  //    - salePrice input → Price to be sent to API
-  //
-  // 3. AUCTION SETUP MODAL:
-  //    - selectedProduct.name → Product name display
-  //    - selectedProduct.mainImage → Product image in modal
-  //    - startingPrice input → Starting bid amount
-  //    - bidIncrement input → Minimum bid increment
-  //    - startTime input → Auction start time
-  //    - endTime input → Auction end time
-  //
-  // 4. PRODUCT ACTIONS:
-  //    - View → Navigate to product details page
-  //    - Edit → Navigate to product edit page
-  //    - Delete → Remove product (with confirmation)
-  //
-  // API FUNCTIONS TO IMPLEMENT:
-  // const [products, setProducts] = useState<Product[]>([]);
-  // const [loading, setLoading] = useState(true);
-  // const [error, setError] = useState<string | null>(null);
-  // const [pagination, setPagination] = useState({ page: 1, totalPages: 1, totalCount: 0 });
-  //
-  // - fetchProducts(page?: number, filters?: object): Promise<ProductListApiResponse>
-  // - createDirectSale(data: DirectSaleData): Promise<ProductActionApiResponse>
-  // - createAuction(data: AuctionSetupData): Promise<ProductActionApiResponse>
-  // - updateProduct(id: string, data: Partial<Product>): Promise<ProductActionApiResponse>
-  // - deleteProduct(id: string): Promise<{ success: boolean; message?: string }>
-  // - uploadProductImage(file: File): Promise<{ success: boolean; url: string }>
-  //
-  // REAL-TIME UPDATES NEEDED:
-  // - Product status changes (when auctions start/end)
-  // - Auction current prices (live bidding updates)
-  // - New products added by designer
-  // - Product availability changes
-  //
-  // PAGINATION & FILTERING:
-  // - Page-based pagination for large product lists
-  // - Status filtering (all, available, on-sale, in-auction)
-  // - Date range filtering (created date)
-  // - Search by product name
-  // ============================================================
+  // const [products, setProducts] = useState<Product[]>([
+  //   {
+  //     id: "prod_001",
+  //     name: "Giày thể thao",
+  //     description: "Giày thể thao nam chất lượng cao",
+  //     category: "Giày dép",
+  //     material: "Da thật, cao su",
+  //     images: ["/images/shoe.png", "/images/shoe_2.png"],
+  //     mainImage: "/images/shoe.png",
+  //     designerId: "designer_001",
+  //     designer: {
+  //       id: "designer_001",
+  //       name: "Nhà thiết kế A",
+  //       email: "designer_a@example.com",
+  //     },
+  //     status: "available",
+  //     isPublic: true,
+  //     createdAt: "2024-01-15T10:00:00Z",
+  //     updatedAt: "2024-01-15T10:00:00Z",
+  //   },
+  //   {
+  //     id: "prod_002",
+  //     name: "Giày thể thao 2",
+  //     description: "Mẫu giày thể thao phong cách",
+  //     category: "Giày dép",
+  //     material: "Vải, cao su",
+  //     images: ["/images/shoe2.png"],
+  //     mainImage: "/images/shoe2.png",
+  //     designerId: "designer_001",
+  //     designer: {
+  //       id: "designer_001",
+  //       name: "Nhà thiết kế A",
+  //       email: "designer_a@example.com",
+  //     },
+  //     status: "available",
+  //     isPublic: false,
+  //     createdAt: "2024-01-16T10:00:00Z",
+  //     updatedAt: "2024-01-16T10:00:00Z",
+  //   },
+  //   {
+  //     id: "prod_003",
+  //     name: "Áo thun Premium",
+  //     description: "Áo thun chất lượng cao cấp",
+  //     category: "Quần áo",
+  //     material: "Cotton 100%",
+  //     images: ["/images/tshirt.png"],
+  //     mainImage: "/images/tshirt.png",
+  //     designerId: "designer_001",
+  //     designer: {
+  //       id: "designer_001",
+  //       name: "Nhà thiết kế A",
+  //       email: "designer_a@example.com",
+  //     },
+  //     status: "direct-sale",
+  //     salePrice: 250000,
+  //     isPublic: true,
+  //     createdAt: "2024-01-17T10:00:00Z",
+  //     updatedAt: "2024-01-17T10:00:00Z",
+  //   },
+  //   {
+  //     id: "prod_004",
+  //     name: "Quần jean cao cấp",
+  //     description: "Quần jean chất lượng cao",
+  //     category: "Quần áo",
+  //     material: "Denim",
+  //     images: ["/images/jeans.png"],
+  //     mainImage: "/images/jeans.png",
+  //     designerId: "designer_001",
+  //     designer: {
+  //       id: "designer_001",
+  //       name: "Nhà thiết kế A",
+  //       email: "designer_a@example.com",
+  //     },
+  //     status: "auction",
+  //     auctionDetails: {
+  //       startingPrice: 500000,
+  //       bidIncrement: 50000,
+  //       startTime: "2024-01-20T09:00:00Z",
+  //       endTime: "2024-01-22T18:00:00Z",
+  //       currentPrice: 650000,
+  //       totalBids: 12,
+  //       isActive: true,
+  //     },
+  //     isPublic: false,
+  //     createdAt: "2024-01-18T10:00:00Z",
+  //     updatedAt: "2024-01-18T10:00:00Z",
+  //   },
+  // ]);
 
-  // Mock data with API-ready structure - moved to state declaration below
+  const query = useProducts();
+  const router = useRouter();
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
-  const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
-  const [showActionModal, setShowActionModal] = useState(false);
-  const [showSalesTypeModal, setShowSalesTypeModal] = useState(false);
-  const [selectedProductForSales, setSelectedProductForSales] = useState<
-    string | null
-  >(null);
-  const [showDirectSaleModal, setShowDirectSaleModal] = useState(false);
-  const [showAuctionModal, setShowAuctionModal] = useState(false);
-  const [products, setProducts] = useState<Product[]>([
-    {
-      id: "prod_001",
-      name: "Giày thể thao",
-      description: "Giày thể thao nam chất lượng cao",
-      category: "Giày dép",
-      material: "Da thật, cao su",
-      images: ["/images/shoe.png", "/images/shoe_2.png"],
-      mainImage: "/images/shoe.png",
-      designerId: "designer_001",
-      designer: {
-        id: "designer_001",
-        name: "Nhà thiết kế A",
-        email: "designer_a@example.com",
-      },
-      status: "available",
-      isPublic: true,
-      createdAt: "2024-01-15T10:00:00Z",
-      updatedAt: "2024-01-15T10:00:00Z",
-    },
-    {
-      id: "prod_002",
-      name: "Giày thể thao 2",
-      description: "Mẫu giày thể thao phong cách",
-      category: "Giày dép",
-      material: "Vải, cao su",
-      images: ["/images/shoe2.png"],
-      mainImage: "/images/shoe2.png",
-      designerId: "designer_001",
-      designer: {
-        id: "designer_001",
-        name: "Nhà thiết kế A",
-        email: "designer_a@example.com",
-      },
-      status: "available",
-      isPublic: false,
-      createdAt: "2024-01-16T10:00:00Z",
-      updatedAt: "2024-01-16T10:00:00Z",
-    },
-    {
-      id: "prod_003",
-      name: "Áo thun Premium",
-      description: "Áo thun chất lượng cao cấp",
-      category: "Quần áo",
-      material: "Cotton 100%",
-      images: ["/images/tshirt.png"],
-      mainImage: "/images/tshirt.png",
-      designerId: "designer_001",
-      designer: {
-        id: "designer_001",
-        name: "Nhà thiết kế A",
-        email: "designer_a@example.com",
-      },
-      status: "direct-sale",
-      salePrice: 250000,
-      isPublic: true,
-      createdAt: "2024-01-17T10:00:00Z",
-      updatedAt: "2024-01-17T10:00:00Z",
-    },
-    {
-      id: "prod_004",
-      name: "Quần jean cao cấp",
-      description: "Quần jean chất lượng cao",
-      category: "Quần áo",
-      material: "Denim",
-      images: ["/images/jeans.png"],
-      mainImage: "/images/jeans.png",
-      designerId: "designer_001",
-      designer: {
-        id: "designer_001",
-        name: "Nhà thiết kế A",
-        email: "designer_a@example.com",
-      },
-      status: "auction",
-      auctionDetails: {
-        startingPrice: 500000,
-        bidIncrement: 50000,
-        startTime: "2024-01-20T09:00:00Z",
-        endTime: "2024-01-22T18:00:00Z",
-        currentPrice: 650000,
-        totalBids: 12,
-        isActive: true,
-      },
-      isPublic: false,
-      createdAt: "2024-01-18T10:00:00Z",
-      updatedAt: "2024-01-18T10:00:00Z",
-    },
-  ]);
-
-  // Handle Escape key to close modal
-  useEffect(() => {
-    const handleEscapeKey = (event: KeyboardEvent) => {
-      if (
-        event.key === "Escape" &&
-        (showActionModal ||
-          showSalesTypeModal ||
-          showDirectSaleModal ||
-          showAuctionModal)
-      ) {
-        closeModal();
-        closeSalesTypeModal(true);
-        closeDirectSaleModal();
-        closeAuctionModal();
-      }
-    };
-
-    document.addEventListener("keydown", handleEscapeKey);
-    return () => document.removeEventListener("keydown", handleEscapeKey);
-  }, [
-    showActionModal,
-    showSalesTypeModal,
-    showDirectSaleModal,
-    showAuctionModal,
-  ]);
-
-  const handleAddProduct = () => {
-    window.location.href = "/products/upload";
-  };
-
-  // Handle privacy toggle
+  // Handler functions
   const handleTogglePrivacy = (productId: string) => {
-    setProducts((prevProducts) =>
-      prevProducts.map((product) =>
-        product.id === productId
-          ? { ...product, isPublic: !product.isPublic }
-          : product
-      )
-    );
-
-    // Update product privacy here
-  };
-
-  const handleViewDetails = (productId: string) => {
-    setSelectedProduct(productId);
-    setShowActionModal(true);
-  };
-
-  const closeModal = () => {
-    setShowActionModal(false);
-    setSelectedProduct(null);
-  };
-
-  const closeSalesTypeModal = (clearSelection: boolean = true) => {
-    setShowSalesTypeModal(false);
-    if (clearSelection) {
-      setSelectedProductForSales(null);
-    }
-  };
-
-  const closeDirectSaleModal = () => {
-    setShowDirectSaleModal(false);
-  };
-
-  const closeAuctionModal = () => {
-    setShowAuctionModal(false);
+    // setProducts((prevProducts) =>
+    //   prevProducts.map((product) =>
+    //     product.id === productId
+    //       ? { ...product, isPublic: !product.isPublic }
+    //       : product
+    //   )
+    // );
   };
 
   const handleSalesTypeClick = (productId: string) => {
-    setSelectedProductForSales(productId);
-    setShowSalesTypeModal(true);
+    console.log("Open sales type modal for:", productId);
+    // TODO: Open SalesTypeModal
   };
 
-  const handleAction = (action: "view" | "edit" | "delete") => {
-    console.log(`${action} product:`, selectedProduct);
-    closeModal();
-
-    if (action === "view") {
-      // TODO: Navigate to product details page
-    } else if (action === "edit") {
-      // TODO: Navigate to product edit page
-    } else if (action === "delete") {
-      // TODO: Call delete product API
+  const handleAction = (action: "view" | "edit" | "delete", productId: string) => {
+    if(action === "view") {
+      router.push(`products/${productId}/detail`)
     }
+    // TODO: Implement actions
   };
+
+  // Define columns
+  const columns: ColumnDef<DesignResType>[] = [
+    {
+      accessorKey: "name",
+      header: "Mẫu",
+      cell: ({ row }) => {
+        const product = row.original;
+        return (
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200">
+              <img className="w-6 h-6 text-gray-400" src={product.imagesUrl[0]} alt="img"/>
+            </div>
+            <div className="flex flex-col">
+              <span className="font-medium text-gray-900">{product.title}</span>
+              {/* <span className="text-xs text-gray-500">{product.category}</span> */}
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "type",
+      header: "Hình thức bán",
+      cell: ({ row }) => {
+        const product = row.original;
+        // const isAvailable = product.status === "available";
+        
+        return (
+          <div className="flex justify-center">
+            <span
+              // onClick={() => isAvailable && handleSalesTypeClick(product.id)}
+              // className={`text-sm font-medium ${
+              //   isAvailable ? "cursor-pointer hover:underline" : "cursor-default"
+              // } ${getSaleTypeColor(product.status)}`}
+            >
+              {getSaleTypeDisplay(product.type)}
+            </span>
+          </div>
+        );
+      },
+    },
+    // {
+    //   accessorKey: "isPublic",
+    //   header: "Trạng thái",
+    //   cell: ({ row }) => {
+    //     const product = row.original;
+    //     return (
+    //       <div className="flex items-center justify-center gap-2">
+    //         <span
+    //           className={`text-xs font-medium ${
+    //             product.isPublic ? "text-green-600" : "text-gray-500"
+    //           }`}
+    //         >
+    //           {product.isPublic ? "Công khai" : "Riêng tư"}
+    //         </span>
+    //         <Switch
+    //           checked={product.isPublic}
+    //           onCheckedChange={() => handleTogglePrivacy(product.id)}
+    //           className="data-[state=checked]:bg-green-600"
+    //         />
+    //       </div>
+    //     );
+    //   },
+    // },
+    {
+      id: "actions",
+      header: "Thao tác",
+      cell: ({ row }) => {
+        const product = row.original;
+        return (
+          <div className="flex justify-center">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Mở menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => handleAction("view", product._id)}
+                >
+                  Xem chi tiết
+                </DropdownMenuItem>
+                {/* <DropdownMenuItem
+                  onClick={() => handleAction("edit", product._id)}
+                >
+                  Chỉnh sửa
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => handleAction("delete", product._id)}
+                  className="text-red-600"
+                >
+                  Xóa
+                </DropdownMenuItem> */}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        );
+      },
+    },
+  ];
+  // Initialize table
+  
+    
+  const table = useReactTable({
+    data: query.data!,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    state: {
+      sorting,
+      columnFilters,
+    },
+    initialState: {
+      pagination: {
+        pageSize: 10,
+      },
+    },
+  });
 
   return (
-    <div>
-      {/* Click outside overlay - invisible but captures clicks */}
-      {showActionModal && (
-        <div className="fixed inset-0 z-40" onClick={closeModal}></div>
-      )}
-      {/* Main content with blur effect when modals are open */}
-      <div
-        className={`${
-          showSalesTypeModal || showDirectSaleModal || showAuctionModal
-            ? "blur-sm"
-            : ""
-        } transition-all duration-300 pt-24`}
-      >
-        <main className="container mx-auto px-8 py-8">
-          {/* Title and Add Button */}
-          <div className="flex justify-between items-center mb-8 mt-4">
-            <h1 className="text-3xl font-black text-gray-800 flex-shrink-0">
-              Danh sách mẫu
-            </h1>
-            <Button
-              onClick={handleAddProduct}
-              className="px-6 py-3 text-white rounded-full font-medium shadow-md transition-all duration-200 cursor-pointer"
-              style={{ backgroundColor: "#000080" }}
-            >
-              Thêm mẫu
-            </Button>
-          </div>
-
-          {/* Product Table */}
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden relative mb-8">
-            {/* Table Header */}
-            <div className="grid grid-cols-4 bg-gray-100 border-b border-gray-200">
-              <div className="p-4 font-semibold text-gray-700 text-center">
-                Mẫu
-              </div>
-              <div className="p-4 font-semibold text-gray-700 text-center border-l border-gray-200">
-                Hình thức bán
-              </div>
-              <div className="p-4 font-semibold text-gray-700 text-center border-l border-gray-200">
-                Trạng thái
-              </div>
-              <div className="p-4 font-semibold text-gray-700 text-center border-l border-gray-200">
-                Thao tác
-              </div>
-            </div>
-
-            {/* Table Body - Scrollable */}
-            <div className="overflow-y-auto max-h-96">
-              {products.map((product) => (
-                <div
-                  key={product.id}
-                  className="grid grid-cols-4 border-b border-gray-200 hover:bg-gray-50 transition-colors"
-                >
-                  {/* Product Column */}
-                  <div className="p-4 flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center">
-                      {/* Shoe Icon - You can replace with actual product image */}
-                      <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        className="text-gray-600"
-                      >
-                        <path
-                          d="M2 18h20l-2-6H4l-2 6zM6 12V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v6"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </div>
-                    <span className="font-medium text-gray-800">
-                      {product.name}
-                    </span>
-                  </div>
-
-                  {/* Sales Type Column */}
-                  <div className="p-4 flex items-center justify-center border-l border-gray-200">
-                    <span
-                      {...(product.status === "available" && {
-                        onClick: () => handleSalesTypeClick(product.id),
-                      })}
-                      className={`text-sm font-medium ${
-                        product.status === "available"
-                          ? "cursor-pointer"
-                          : "cursor-default"
-                      } ${
-                        product.status === "direct-sale" ||
-                        product.status === "auction"
-                          ? "text-red-600"
-                          : "text-blue-600"
-                      }`}
-                    >
-                      {getSaleTypeDisplay(product.status)}
-                    </span>
-                  </div>
-
-                  {/* Privacy Toggle Column */}
-                  <div className="p-4 flex items-center justify-center border-l border-gray-200">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`text-xs font-medium ${
-                          product.isPublic ? "text-green-600" : "text-gray-500"
-                        }`}
-                      >
-                        {product.isPublic ? "Công khai" : "Riêng tư"}
-                      </span>
-                      <button
-                        onClick={() => handleTogglePrivacy(product.id)}
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                          product.isPublic ? "bg-green-600" : "bg-gray-200"
-                        }`}
-                        role="switch"
-                        aria-checked={product.isPublic}
-                      >
-                        <span
-                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                            product.isPublic ? "translate-x-6" : "translate-x-1"
-                          }`}
-                        />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Actions Column */}
-                  <div className="p-4 flex items-center justify-center border-l border-gray-200 relative">
-                    <button
-                      onClick={() => handleViewDetails(product.id)}
-                      className="text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors cursor-pointer"
-                    >
-                      Chi tiết
-                    </button>
-
-                    {/* Dropdown Modal */}
-                    <ProductActionModal
-                      isOpen={showActionModal && selectedProduct === product.id}
-                      onClose={closeModal}
-                      onAction={handleAction}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Empty State (if no products) */}
-            {products.length === 0 && (
-              <div className="p-12 text-center text-gray-500">
-                <div className="mb-4">
-                  <svg
-                    width="48"
-                    height="48"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    className="mx-auto text-gray-300"
-                  >
-                    <path
-                      d="M20 7H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1zM4 5h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                    />
-                  </svg>
-                </div>
-                <p className="text-lg font-medium mb-2">
-                  Chưa có mẫu thiết kế nào
-                </p>
-                <p className="text-sm mb-4">
-                  Thêm mẫu thiết kế đầu tiên của bạn
-                </p>
-                <Button
-                  onClick={handleAddProduct}
-                  className="px-6 py-2 text-white rounded-full font-medium"
-                  style={{ backgroundColor: "#000080" }}
-                >
-                  Thêm mẫu
-                </Button>
-              </div>
-            )}
-          </div>
-        </main>
+    <div className="container mx-auto px-8 py-8 pt-24">
+        {query.isLoading ? 
+       (<TableSkeleton />):(
+        <>
+        {/* Header */}
+      <div className="flex justify-between items-center mb-8 mt-4">
+        <h1 className="text-3xl font-bold text-gray-800">Danh sách mẫu</h1>
+        <Button
+          onClick={() => (window.location.href = "/products/upload")}
+          className="bg-[#000080] hover:bg-[#000066]"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Thêm mẫu
+        </Button>
       </div>
 
-      {/* Sales Type Selection Modal */}
-      <SalesTypeModal
-        isOpen={showSalesTypeModal}
-        onClose={() => closeSalesTypeModal(true)}
-        onConfirm={(salesType) => {
-          if (salesType === "direct") {
-            closeSalesTypeModal(false);
-            setShowDirectSaleModal(true);
-          } else if (salesType === "auction") {
-            closeSalesTypeModal(false);
-            setShowAuctionModal(true);
-          }
-        }}
-      />
+      {/* Table */}
+      <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id} className="bg-gray-50">
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id} className="text-center font-semibold">
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  className="hover:bg-gray-50"
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-64 text-center"
+                >
+                  <div className="flex flex-col items-center justify-center text-gray-500">
+                    <Package className="w-12 h-12 mb-4 text-gray-300" />
+                    <p className="text-lg font-medium mb-2">
+                      Chưa có mẫu thiết kế nào
+                    </p>
+                    <p className="text-sm mb-4">
+                      Thêm mẫu thiết kế đầu tiên của bạn
+                    </p>
+                    <Button
+                      onClick={() => (window.location.href = "/products/upload")}
+                      className="bg-[#000080] hover:bg-[#000066]"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Thêm mẫu
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
 
-      {/* Direct Sale Modal */}
-      <DirectSaleModal
-        isOpen={showDirectSaleModal}
-        product={products.find((p) => p.id === selectedProductForSales) || null}
-        onClose={closeDirectSaleModal}
-        onConfirm={(price) => {
-          console.log(
-            `Direct sale price set: ${price} VND for product:`,
-            selectedProductForSales
-          );
-
-          // TODO: Call API to set up direct sale
-          // const directSaleData: DirectSaleData = {
-          //   productId: selectedProductForSales!,
-          //   price: parseFloat(price.replace(/,/g, '')),
-          //   currency: 'VND'
-          // };
-          //
-          // createDirectSale(directSaleData)
-          //   .then(response => {
-          //     if (response.success) {
-          //       // Update local product list
-          //       setProducts(prev => prev.map(p =>
-          //         p.id === selectedProductForSales
-          //           ? { ...p, status: 'direct-sale', salePrice: directSaleData.price }
-          //           : p
-          //       ));
-          //       // Show success message
-          //       closeDirectSaleModal();
-          //     }
-          //   })
-          //   .catch(error => {
-          //     // Show error message
-          //     console.error('Direct sale setup failed:', error);
-          //   });
-
-          closeDirectSaleModal();
-        }}
-      />
-
-      {/* Auction Modal */}
-      <AuctionModal
-        isOpen={showAuctionModal}
-        product={products.find((p) => p.id === selectedProductForSales) || null}
-        onClose={closeAuctionModal}
-        onConfirm={({ startingPrice, bidIncrement, startTime, endTime }) => {
-          console.log(
-            `Auction setup - Starting Price: ${startingPrice} VND, Bid Increment: ${bidIncrement} VND, Start: ${startTime}, End: ${endTime} for product:`,
-            selectedProductForSales
-          );
-
-          // TODO: Call API to set up auction
-          // const auctionData: AuctionSetupData = {
-          //   productId: selectedProductForSales!,
-          //   startingPrice: parseFloat(startingPrice.replace(/,/g, '')),
-          //   bidIncrement: parseFloat(bidIncrement.replace(/,/g, '')),
-          //   startTime: `${startTime}:00`, // Convert to full datetime
-          //   endTime: `${endTime}:00`     // Convert to full datetime
-          // };
-          //
-          // createAuction(auctionData)
-          //   .then(response => {
-          //     if (response.success) {
-          //       // Update local product list
-          //       setProducts(prev => prev.map(p =>
-          //         p.id === selectedProductForSales
-          //           ? {
-          //               ...p,
-          //               status: 'auction',
-          //               auctionDetails: {
-          //                 ...auctionData,
-          //                 currentPrice: auctionData.startingPrice,
-          //                 totalBids: 0,
-          //                 isActive: false // Will be activated at startTime
-          //               }
-          //             }
-          //           : p
-          //       ));
-          //       // Show success message
-          //       closeAuctionModal();
-          //     }
-          //   })
-          //   .catch(error => {
-          //     // Show error message
-          //     console.error('Auction setup failed:', error);
-          //   });
-
-          closeAuctionModal();
-        }}
-      />
+      {/* Pagination */}
+      {table.getPageCount() > 1 && (
+        <div className="flex items-center justify-between mt-4">
+          <div className="text-sm text-gray-600">
+            Hiển thị {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} -{" "}
+            {Math.min(
+              (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
+              query.data?.length!
+            )}{" "}
+            trong tổng số {query.data?.length} mẫu
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              Trang trước
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              Trang sau
+            </Button>
+          </div>
+        </div>
+      )}
+        </>
+       ) }
+      
     </div>
   );
+}
+
+export function TableSkeleton() {
+  return (
+    <div className="w-full">
+      {/* HEADER SKELETON */}
+      <div className="flex justify-between items-center mb-8 mt-4">
+        <Skeleton className="h-9 w-48" /> {/* Title */}
+        <Skeleton className="h-10 w-28" /> {/* Button */}
+      </div>
+
+      {/* TABLE SKELETON */}
+      <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+        <Table>
+          {/* Table Header */}
+          <TableHeader>
+            <TableRow className="bg-gray-50">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <TableHead key={i}>
+                  <Skeleton className="h-6 w-full" />
+                </TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+
+          {/* Table Body */}
+          <TableBody>
+            {Array.from({ length: 6 }).map((_, rowIndex) => (
+              <TableRow key={rowIndex}>
+                {Array.from({ length: 5 }).map((_, colIndex) => (
+                  <TableCell key={colIndex}>
+                    <Skeleton className="h-6 w-full" />
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  )
 }
