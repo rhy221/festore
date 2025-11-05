@@ -31,12 +31,15 @@ export default function LoginForm() {
       // toast("Success", {
       //   description: "Login successful!",
       // });
-      localStorage.setItem("accessToken", result.accessToken);
+      if(result.accessToken) {
+        localStorage.setItem("accessToken", result.accessToken);
 
 
       // localStorage.setItem("refresh_token", result.refreshToken);
       // localStorage.setItem("user", JSON.stringify(result));
       router.push("/dashboard");
+      }
+      
     } catch (error) {
       console.log(error);
     }

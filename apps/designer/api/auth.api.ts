@@ -27,7 +27,7 @@ const authAction = {
   },
 
   forgotPassword: async (body: ForgotPasswordBodyType) => {
-    const response = await http.post("auth/forgot-password", body);
+    const response = await http.post("auth/forgot-password", {...body, origin: process.env.NEXT_PUBLIC_URL + "/auth/changepassword"});
     return response.data;
   },
 

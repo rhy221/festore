@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { useProducts } from "@/queries/useProduct";
 import { DesignResType } from "@/schema/product.schema";
+import Link from "next/link";
 
 export default function Products() {
 
@@ -130,15 +131,16 @@ function ModalListing({ modals }: { modals: DesignResType[] }) {
   return (
     <div className="grid grid-cols-3 grid-flow-row gap-4 w-full">
       {modals.map((m, index) => (
-        <Modal key={index} {...m} />
+        <Modal key={m._id} {...m} />
       ))}
     </div>
   );
 }
 
-function Modal({ title, imagesUrl }: DesignResType) {
+function Modal({ title, imagesUrl, _id }: DesignResType) {
   return (
     <Card className="w-full overflow-hidden py-0 ">
+      <Link href={`/products/${_id}/detail`}>
       <div className="flex flex-col">
         <div className="relative">
           <img src={imagesUrl[0]} alt="Thumb" className="w-full h-48" />
@@ -147,6 +149,8 @@ function Modal({ title, imagesUrl }: DesignResType) {
           <h3>{title}</h3>
         </div>
       </div>
+      </Link>
+      
     </Card>
   );
 }

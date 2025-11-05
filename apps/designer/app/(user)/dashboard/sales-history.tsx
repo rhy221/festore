@@ -2,9 +2,12 @@ import { Clock, CheckCircle, XCircle, History } from "lucide-react";
 import { useDashboardQueries } from "../../../queries/useDashboard";
 import { SalesHistorySkeleton } from "./skeletons";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function SalesHistory() {
   const { data, isLoading, error } = useDashboardQueries.useSalesHistory();
+  const router = useRouter();
 
   if (isLoading) return <SalesHistorySkeleton />;
   if (error) return <div className="text-red-500">Lỗi tải dữ liệu</div>;
@@ -82,7 +85,8 @@ export default function SalesHistory() {
           <tbody>
             {data.data.map( (i) => (
               i.items.map((s) => (
-                <tr key={s.designId} className="border-b hover:bg-gray-100">
+                
+                <tr key={s.designId} className="border-b hover:bg-gray-100" onClick={() => router.push(`products/${s.designId}/detail`)}>
                 <td className="p-2 flex items-center gap-2">
                   <Image
                     src={s.imageUrl}
@@ -110,6 +114,7 @@ export default function SalesHistory() {
                   </span>
                 </td> */}
               </tr>
+                
               ))
             ))}
               
