@@ -30,6 +30,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from '@workspace/ui/compone
 import { Input } from "@workspace/ui/components/input";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { useQueryClient } from "@tanstack/react-query";
+import { Spinner } from "@workspace/ui/components/spinner";
 
 function ProfileSkeleton() {
   return (
@@ -330,7 +331,11 @@ export default function Profile() {
             ) : (
               <div className="flex items-center gap-2">
                 <Button onClick={onSave} disabled={isSaving} type="submit">
-                  {isSaving ? "Saving..." : "Save"}
+                  {mutation.isPending ? (
+              <Spinner />
+            ) : (
+              <span>Save</span>
+            )}
                 </Button>
                 <Button onClick={onCancel} variant="ghost">
                   Cancel

@@ -4,9 +4,13 @@ import http from '@/lib/http';
 import { useMutation } from '@tanstack/react-query';
 import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent, CardFooter } from '@workspace/ui/components/card';
+import { Spinner } from '@workspace/ui/components/spinner';
 import { useRouter, useSearchParams } from 'next/navigation'
 import React from 'react'
 
+type VerifyEmailResType = {
+  token: string;
+}
 
 const page = () => {
 
@@ -18,7 +22,7 @@ const page = () => {
       router.push("/auth/register");
 
     const verifyEmail = async() => {
-      const response = await http.post(`/auth/verify`, {token: token});
+      const response = await http.post<VerifyEmailResType>(`/auth/verify`, {token: token});
       return response.data;
     }
     const verifyMutation = useMutation({
@@ -29,10 +33,10 @@ const page = () => {
       if(verifyMutation.isPending) return;
       try {
         const result = await verifyMutation.mutateAsync();
-        console.log(result);
-        router.push("/auth/login");
+        localStorage.setItem("accessToken", result.token);
+        router.push("/");
       } catch(error) {
-
+        console.log(error); 
       }
     }
   return (
@@ -43,7 +47,12 @@ const page = () => {
         </CardContent>
         <CardFooter>
           <div className='flex justify-end w-full'>
-            <Button onClick={onClick}>Verify</Button>
+            <Button onClick={onClick}>
+              {verifyMutation.isPending ? (
+              <Spinner />
+            ) : (
+              <span>Verify email</span>
+            )}</Button>
           </div>
         </CardFooter>
       </Card>

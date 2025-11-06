@@ -7,7 +7,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@workspace/ui/components/field";
 import { Input } from "@workspace/ui/components/input";
+import { Spinner } from "@workspace/ui/components/spinner";
 import { cn } from "@workspace/ui/lib/utils";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 
@@ -96,8 +98,11 @@ export default function RegisterForm({ onChangeRegisted }: RegisterFormProps) {
                   type="password"
                   required>
                 </Input>
-                {fieldState.invalid && (
+                {fieldState.invalid  && (
                     <FieldError errors={[fieldState.error]} />
+                  )}
+                  {registerMutation.isError && (
+                    <FieldError errors={[{message: registerMutation.isError ? "Tài khoản đã tồn tại" : ""}]} />
                   )}
               </Field>
             )}>
@@ -105,26 +110,30 @@ export default function RegisterForm({ onChangeRegisted }: RegisterFormProps) {
         </FieldGroup>
         <Field>
           <Button type="submit" className="w-full">
-            Register
+            {registerMutation.isPending ? (
+              <Spinner />
+            ) : (
+              <span>Register</span>
+            )}
           </Button>
         </Field>
         
         <div className="text-center text-sm">
           <p className="text-muted-foreground text-sm">
             Already have an account?{" "}
-            <a href="/auth/login" className="underline underline-offset-4">
+            <Link href="/auth/login" className="underline underline-offset-4">
               Login
-            </a>
+            </Link>
           </p>
           <p className="text-muted-foreground text-sm text-balance">
             By registering, you agree to our{" "}
-            <a href="#" className="underline underline-offset-4">
+            <Link href="#" className="underline underline-offset-4">
               Terms of Service
-            </a>{" "}
+            </Link>{" "}
             and{" "}
-            <a href="#" className="underline underline-offset-4">
+            <Link href="#" className="underline underline-offset-4">
               Privacy Policy
-            </a>
+            </Link>
           </p>
         </div>
       </form>

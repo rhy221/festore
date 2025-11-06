@@ -12,8 +12,13 @@ import http from "@/lib/http";
 
 const authAction = {
   login: async (body: LoginBodyType) => {
-    const response = await http.post<LoginResType>("/auth/login", body);
+    try {
+       const response = await http.post<LoginResType>("/auth/login", body);
     return response.data;
+    } catch(error) {
+      throw error;
+    }
+   
   },
 
   register: async (body: RegisterType) => {

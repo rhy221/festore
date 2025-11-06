@@ -9,6 +9,7 @@ import { Button } from "@workspace/ui/components/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { changePasswordSchema, ChangePasswordType } from "@/schema/auth.schema";
 import { useChangePasswordMutation } from "@/queries/useAuth";
+import { Spinner } from "@workspace/ui/components/spinner";
 
 
 export default function ChangePasswordForm()
@@ -103,7 +104,11 @@ export default function ChangePasswordForm()
   
           <Field>
             <Button type="submit" className="w-full">
-              Change Password
+              {mutation.isPending ? (
+              <Spinner />
+            ) : (
+              <span>Change Password</span>
+            )}
             </Button>
           </Field>
         </form> 

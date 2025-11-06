@@ -58,7 +58,7 @@ const productsAction = {
     return response.data;
   },
   upload: async (body: FormData) => {
-    const response = await http.post<DesignResType>(`/products/create`, body);
+    const response = await http.post<DesignResType>(`/products/create`, body, {timeout: 90000});
     return response.data;
   },
   getOneComments: async (id: string) => {

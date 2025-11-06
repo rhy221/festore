@@ -44,7 +44,7 @@ const userAction = {
 
 
   updateMe: async (body: FormData) => {
-      const response = await http.patch<UserProfileResType>("/users/profile", body);
+      const response = await http.patch<UserProfileResType>("/users/profile", body, {timeout: 90000});
       return response.data;
   }
 };

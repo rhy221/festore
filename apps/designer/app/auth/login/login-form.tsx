@@ -7,7 +7,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@workspace/ui/components/field";
 import { Input } from "@workspace/ui/components/input";
+import { Spinner } from "@workspace/ui/components/spinner";
 import { cn } from "@workspace/ui/lib/utils";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 
@@ -37,7 +39,7 @@ export default function LoginForm() {
 
       // localStorage.setItem("refresh_token", result.refreshToken);
       // localStorage.setItem("user", JSON.stringify(result));
-      router.push("/dashboard");
+      router.push("/");
       }
       
     } catch (error) {
@@ -98,8 +100,8 @@ export default function LoginForm() {
                   type="password"
                   required>
                 </Input>
-                {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
+                {loginMutation.isError && (
+                    <FieldError errors={[{message: "Tài khoản hoặc mật khẩu sai"}]} />
                   )}
               </Field>
             )}>
@@ -107,21 +109,25 @@ export default function LoginForm() {
         </FieldGroup>
         <Field>
           <Button type="submit" className="w-full">
-            Login
+            {loginMutation.isPending ? (
+              <Spinner />
+            ) : (
+              <span>Login</span>
+            )}
           </Button>
         </Field>
         
         <div className="flex flex-col gap-1 text-center text-sm">
           <p>
               Don&apos;t have an account?{" "}
-            <a href="/auth/register" className="underline underline-offset-4">
+            <Link href="/auth/register" className="underline underline-offset-4">
               Sign up
-            </a>
+            </Link>
           </p>
           
-          <a href="/auth/forgotpassword" className="underline underline-offset-4">
+          <Link href="/auth/forgotpassword" className="underline underline-offset-4">
             Forgot password ?
-          </a>
+          </Link>
         </div>
       </form>
   );

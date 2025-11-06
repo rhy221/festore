@@ -8,7 +8,7 @@ export default function RegisterPage() {
   const [isRegisted, setRegisted] = useState(false);
 
   return (
-    <div className="w-full max-w-xl">
+    <div className="w-full max-w-xs">
       {!isRegisted ? <RegisterForm onChangeRegisted={setRegisted} /> : <SendVerifyEmailForm />}
     </div>
   );

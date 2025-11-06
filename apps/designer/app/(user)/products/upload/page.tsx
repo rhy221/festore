@@ -7,6 +7,8 @@ import { Infor } from "./infor";
 import { UploadFiles, UploadImages, UploadModel } from "./upload-files";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUploadProduct } from "@/queries/useProduct";
+import { Spinner } from "@workspace/ui/components/spinner";
+import { useRouter } from "next/navigation";
 
 
 export default function ProductUpload() {
@@ -24,6 +26,7 @@ export default function ProductUpload() {
     },
   });
   const mutation = useUploadProduct();
+  const router = useRouter();
   // const [form, setForm] = useState<FormValues>({
   //   tenMau: "",
   //   moTa: "",
@@ -80,6 +83,7 @@ export default function ProductUpload() {
     try{
       const result = await mutation.mutateAsync(formData);
       form.reset();
+      router.back();
       console.log(result);
     } catch(error) {
       console.log(error);
@@ -119,7 +123,7 @@ export default function ProductUpload() {
             <div className="md:col-span-2 flex justify-end gap-6">
               <Button
                 type="button"
-                onClick={() => window.history.back()}
+                onClick={() => router.back()}
                 className="px-8 py-3 bg-red-500 hover:bg-red-600 text-white rounded-full font-medium text-sm min-w-[120px] shadow-md transition-all duration-200"
               >
                 Hủy
@@ -129,7 +133,11 @@ export default function ProductUpload() {
                 type="submit"
                 className="px-8 py-3 text-white rounded-full font-medium text-sm min-w-[120px] shadow-md transition-all duration-200"
               >
-                Hoàn tất
+                {mutation.isPending ? (
+              <Spinner />
+            ) : (
+              <span>Hoàn tất</span>
+            )}
               </Button>
             </div>
           </form>

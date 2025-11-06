@@ -13,6 +13,8 @@ import { Input } from '@workspace/ui/components/input';
 import { Button } from '@workspace/ui/components/button';
 import { forgotPasswordBodySchema, ForgotPasswordBodyType } from '@/schema/auth.schema';
 import { useForgotPasswordMutation } from '@/queries/useAuth';
+import { Spinner } from '@workspace/ui/components/spinner';
+import Link from 'next/link';
 
 
 export default function ForgotPasswordForm() {
@@ -69,6 +71,7 @@ export default function ForgotPasswordForm() {
                         {fieldState.invalid && (
                             <FieldError errors={[fieldState.error]} />
                           )}
+                          {mutation.isSuccess && <span>{"Đã gửi email đổi mật khẩu"}</span>}
                       </Field>
                     )}>
                   </Controller>
@@ -76,9 +79,20 @@ export default function ForgotPasswordForm() {
         
                 <Field>
                   <Button type="submit" className="w-full">
-                    Send Email
+                    {mutation.isPending ? (
+              <Spinner />
+            ) : (
+              <span>Send Email</span>
+            )}
                   </Button>
                 </Field>
+
+                <div className="flex flex-col gap-1 text-center text-sm">
+          
+          {/* <Link href="/auth/register" className="underline underline-offset-4">
+            Back
+          </Link> */}
+        </div>
               </form>
     );
 }

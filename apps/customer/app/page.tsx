@@ -17,9 +17,9 @@ export default function Home() {
       {/* HERO SECTION */}
       <div
         className="
-          relative w-full h-[100vh] 
-          overflow-hidden 
-          bg-[url('/home_bg3.png')] bg-no-repeat bg-cover bg-center
+        relative w-full aspect-[16/9] md:h-[700px]          bg-[url('/home_bg3.png')] bg-no-repeat bg-cover bg-center
+
+          
         "
       >
         {/* LEFT MAIN TITLE */}
@@ -28,7 +28,7 @@ export default function Home() {
             absolute flex flex-col 
             left-6 top-10
             sm:left-10 sm:top-20
-            md:left-16 md:top-24
+            md:left-16 md:top-24 
             lg:left-20 lg:top-20
             text-4xl sm:text-5xl md:text-6xl lg:text-7xl 
             font-bruno-ace 
@@ -66,11 +66,13 @@ export default function Home() {
         {/* MAIN CHARACTER IMAGE */}
         <div
           className="
-            absolute left-1/2 bottom-[-80px] 
-            -translate-x-1/2 
-            sm:bottom-[-110px]
-            md:bottom-[-130px]
-            lg:bottom-[-150px]
+            absolute right-[0%] bottom-[-80px] 
+             md:w-[800px]
+             min-w-[300px]
+             min-h-[400px]
+             w-auto
+             md:h-[700px]
+             overflow-hidden
             z-0
           "
         >
@@ -78,21 +80,17 @@ export default function Home() {
             src="/home_bg1.png"
             alt="bg"
             width={800}
-            height={1000}
+            height={800}
             className="
-              w-[260px] 
-              sm:w-[380px] 
-              md:w-[520px] 
-              lg:w-[700px] 
-              xl:w-[800px] 
-              h-auto
+                 
+            
             "
           />
         </div>
       </div>
 
       {/* RIGHT DESCRIPTION TEXT */}
-      <div
+      {/* <div
         className="
           absolute 
           w-[260px] sm:w-[300px] md:w-[350px]
@@ -107,10 +105,10 @@ export default function Home() {
           <span className="font-bold">Step into a new realm of fashion</span> 
           {" "}with our collection of digital clothes, where imagination meets technology
         </p>
-      </div>
+      </div> */}
 
       {/* FOOTER */}
-      <div className="w-full mt-20">
+      <div className="w-full mt-20 ">
         <Footer />
       </div>
     </div>
