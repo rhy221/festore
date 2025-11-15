@@ -62,22 +62,35 @@ const NavBar = () => {
                  <NavigationMenuList>        
                      <NavigationMenuItem>
                         <NavigationMenuLink asChild>
-                            <Link href='/dashboard' > <span className='text-2xl'>Gallery</span> </Link>
+                            <Link href='/gallery' > <span className='text-2xl'>Gallery</span> </Link>
                         </NavigationMenuLink>
                     </NavigationMenuItem>
                      <NavigationMenuItem>
                         <NavigationMenuLink asChild>
-                            <Link href='/products'><span className='text-2xl'>Store</span></Link>
+                            <Link href='/store'><span className='text-2xl'>Store</span></Link>
+                        </NavigationMenuLink>
+                    </NavigationMenuItem>
+                     <NavigationMenuItem>
+                        <NavigationMenuLink asChild>
+                            <Link href='/auction'><span className='text-2xl'>Auction</span></Link>
                         </NavigationMenuLink>
                     </NavigationMenuItem>
                   </NavigationMenuList>
                 </NavigationMenu>
             </div>     
 
+            <div>
+                <Link href={"auction/create-auction"}>
+                <Button >
+                    Upload
+                </Button>
+                </Link>
+                
+            </div>
              {/*cart*/}
             <div>
-                <Button>
-                    <ShoppingCart />
+                <Button size={"icon-lg"}>
+                    <ShoppingCart fill='white' stroke='white' />
                 </Button>
             </div>
 

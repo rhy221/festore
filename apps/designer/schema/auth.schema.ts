@@ -110,3 +110,8 @@ export type ChangePasswordBodyType = {
   password: string,
 }
 export type LogoutResType = z.TypeOf<typeof LogoutResSchema>;
+
+export type JwtPayload = {
+  userId: string,
+  email: string
+}
