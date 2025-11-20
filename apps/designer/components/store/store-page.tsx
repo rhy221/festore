@@ -5,6 +5,7 @@ import { GalleryHeader } from '@/components/gallery/header';
 import { StoreHeader } from './store-header';
 import { StoreFilters } from './store-filters';
 import { StoreGrid, StoreItem } from './store-grid';
+import { useGetStoreItems } from '@/queries/useProduct';
 // import { useToast } from '@/hooks/use-toast';
 
 const mockStoreItems: StoreItem[] = [
@@ -159,6 +160,7 @@ export function StorePage() {
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState('featured');
 //   const { toast } = useToast();
+  const {data: store, isLoading: storeLoading} = useGetStoreItems();
 
   const filteredItems = mockStoreItems.filter((item) =>
     item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -171,23 +173,30 @@ export function StorePage() {
     //   description: `${item.title} has been added to your cart.`,
     // });
   };
+if(storeLoading) 
+    return (<>
+    Loading ...</>)
+
+  if(!store) 
+    return (<>
+    Check your connection</>)
 
   return (
     <div className="min-h-screen bg-black">
-      <GalleryHeader />
+      {/* <GalleryHeader /> */}
 
-      {/* <StoreHeader searchQuery={searchQuery} onSearchChange={setSearchQuery} /> */}
+      <StoreHeader searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
       <StoreFilters
         activeFilters={activeFilters}
         onFilterChange={setActiveFilters}
         sortBy={sortBy}
         onSortChange={setSortBy}
-        itemCount={filteredItems.length}
+        itemCount={store.length}
       />
 
       <main className="container mx-auto px-4 py-12">
-        <StoreGrid items={filteredItems} onAddToCart={handleAddToCart} />
+        <StoreGrid  store={store}/>
 
         <div className="mt-16 flex justify-center">
           <button className="px-8 py-3 rounded-lg border border-white/20 text-white hover:bg-white/10 transition-colors">

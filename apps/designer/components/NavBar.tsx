@@ -80,11 +80,9 @@ const NavBar = () => {
             </div>     
 
             <div>
-                <Link href={"auction/create-auction"}>
-                <Button >
-                    Upload
-                </Button>
-                </Link>
+                <Button asChild>
+  <Link href="/upload">Upload</Link>
+</Button>
                 
             </div>
              {/*cart*/}

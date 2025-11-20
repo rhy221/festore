@@ -11,9 +11,9 @@ export function UploadFiles() {
     
     return (
         <div className="flex flex-col gap-4">
-            <h2>Ảnh</h2>
+            <h2>Images</h2>
             <UploadImages />
-            <h2>Thiết kế</h2>
+            <h2>Model</h2>
             <UploadModel />
         </div>
     )
@@ -73,23 +73,33 @@ export function UploadImages() {
 export function UploadModel() {
 
   const {setValue, watch} = useFormContext();
-   const model = watch("model");  
-  const [preview, setPreview] = useState<string>("");
+   const models = watch("models");  
+  const [previews, setPreviews] = useState<string[]>([]);
   const fileRef = useRef<HTMLInputElement | null>(null);
 
   const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selected = e.target.files?.item(0);
-    setValue("model", selected || null);
+    // const selected = e.target.files?.item(0);
+    // setValue("models", selected || null);
+    const selected = Array.from(e.target.files || []);
+    setValue("models", [...selected]); 
   };
 
   useEffect(() => {
-    if (!model) {
-      URL.revokeObjectURL(preview);
-      setPreview("");
-    } else {
-      setPreview(model.name);
+    if (!models || models.length === 0) {
+      previews.forEach((url) => URL.revokeObjectURL(url));
+      setPreviews([]);
+      return;
     }
-  }, [model]);
+
+    const urls = models.map((f: File) => f.name);
+    setPreviews(urls);
+    // if (!model) {
+    //   URL.revokeObjectURL(preview);
+    //   setPreview("");
+    // } else {
+    //   setPreview(model.name);
+    // }
+  }, [models]);
 
   return (
     <div className="flex gap-3 flex-wrap">
@@ -108,13 +118,13 @@ export function UploadModel() {
   onClick={() => fileRef.current?.click()}
   className="w-40 h-40 bg-white"
 >
-  {!preview ? (
+  {!previews ? (
     <Plus />
   ) : (
     <div className="flex flex-col w-full items-center justify-center text-center px-1">
       <File />
       <span className="block max-w-[90%] truncate text-xs mt-1">
-        {preview}
+        {previews}
       </span>
     </div>
   )}

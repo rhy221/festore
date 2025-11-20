@@ -1,5 +1,5 @@
 import http from "@/lib/http";
-import { CategoryType, CommentType, DesignResType, UploadDesignType } from "@/schema/product.schema";
+import { CategoryType, CommentType, DesignResType, GetGalleryItemsResType, GetStoreItemsResType, UploadDesignType, UploadProductType } from "@/schema/product.schema";
 
 // export type ProductKind = "selling" | "auction" | "bought";
 // export type UserProduct = {
@@ -54,11 +54,20 @@ const productsAction = {
     return response.data;
   },
   getOne: async (id: string) => {
-    const response = await http.get<DesignResType>(`/products/${id}`);
+    const response = await http.get<DesignResType>(`/products/detail/${id}`);
     return response.data;
   },
   upload: async (body: FormData) => {
-    const response = await http.post<DesignResType>(`/products/create`, body, {timeout: 90000});
+    const response = await http.post<UploadProductType>(`/products/create`, body, {timeout: 90000});
+    return response.data;
+  },
+  getGalleryItems: async () => {
+    const response = await http.get<GetGalleryItemsResType>('/products/gallery');
+    console.log(response.data);
+    return response.data;
+  },
+  getStoreItems: async () => {
+    const response = await http.get<GetStoreItemsResType>('/products/store');
     return response.data;
   },
   getOneComments: async (id: string) => {
@@ -68,6 +77,14 @@ const productsAction = {
   getCategories: async () => {
     const response = await http.get<CategoryType[]>("/products/list/categories");
     return response.data;
-  }
+  },
+  likeDesign: async (designId: string) => {
+    const response = await http.post("/products/like", {designId});
+    return response.data;
+  },
+  followDesigner: async (designerId: string) => {
+    const response = await http.post("/products/follow-designer", {designerId});
+    return response.data;
+  },
 };
 export default productsAction;

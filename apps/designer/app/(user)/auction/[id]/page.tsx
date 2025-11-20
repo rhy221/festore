@@ -44,7 +44,7 @@ export default function AuctionDetailClient({ mockAuctionData }: AuctionDetailCl
     newSocket.emit('joinAuction', auctionId);
 
     newSocket.on('newBid', (bid: AuctionBidType) => {
-      if(auction){
+      if(bid){
          queryClient.setQueryData(["auctionBids"], (oldData: AuctionBidType[]) => {
           if(!oldData)
             return oldData;

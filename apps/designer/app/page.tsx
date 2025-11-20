@@ -14,7 +14,15 @@ export default function Home() {
       <div className="sticky w-full top-0 z-50">
         <NavBar />
       </div>
-
+{/* <model-viewer
+             src={"C:/Projects/backup/backup/be-store/uploads/models/1763385872608-3480991.glb"}
+      alt="3D model"
+      auto-rotate
+      camera-controls
+      ar
+      style={{ width: "1000px", height: "1000px" }}>
+              
+            </model-viewer> */}
       {/* HERO SECTION */}
       <div
         className="

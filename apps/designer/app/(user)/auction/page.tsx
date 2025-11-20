@@ -63,7 +63,7 @@ export default function AuctionsPage() {
         return 0;
     }
   });
-
+  
   return (
     <div className=" px-10 py-8">
       {/* Header */}
@@ -141,7 +141,7 @@ export default function AuctionsPage() {
             </div>
           ))}
         </div>
-      ) : auctions.length === 0 ? (
+      ) : !auctions  ? (
         <div className="text-center py-16">
           <div className="text-6xl mb-4">📦</div>
           <h2 className="text-2xl font-semibold mb-2">No auctions found</h2>
@@ -158,9 +158,9 @@ export default function AuctionsPage() {
               <div className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300">
                 {/* Image */}
                 <div className="relative aspect-square bg-gray-100 overflow-hidden">
-                  {auction.images.length > 0 ? (
+                  {auction.imageUrls.length > 0 ? (
                     <Image
-                      src={auction.images[0]!}
+                      src={auction.imageUrls[0]!}
                       alt={auction.title}
                       fill
                       className="object-cover group-hover:scale-110 transition-transform duration-300"

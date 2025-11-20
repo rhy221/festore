@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { GalleryHeader } from './header';
 import { GalleryFilters } from './gallery-filters';
 import { GalleryGrid } from './gallery-grid';
-import { GalleryItemModal } from './gallery-item-modal';
+// import { GalleryItemModal } from './gallery-item-modal';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@workspace/ui/components/tabs';
+import { useGetGalleryItems } from '@/queries/useProduct';
 
 const mockGalleryItems = [
   {
@@ -124,12 +125,20 @@ export function GalleryPage() {
   const [sortBy, setSortBy] = useState('featured');
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [creatorTab, setCreatorTab] = useState('gallery');
-
+const {data: gallery, isLoading: galleryLoading} = useGetGalleryItems();
   const filteredItems = mockGalleryItems.filter((item) =>
     item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.creator.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+    if(galleryLoading) 
+    return (<>
+    Loading...
+    </>)
+  if(!gallery)
+    return(<>
+    Check your connection.
+    </>)
   return (
     <div className="min-h-screen bg-black">
       {/* <GalleryHeader /> */}
@@ -149,10 +158,11 @@ export function GalleryPage() {
           onSearchChange={setSearchQuery}
           sortBy={sortBy}
           onSortChange={setSortBy}
+          itemCount={gallery.length}
         />
 
         <div className="mt-12">
-          <GalleryGrid items={filteredItems} onItemClick={setSelectedItem} />
+          <GalleryGrid gallery={gallery}/>
         </div>
 
         <div className="mt-12 flex justify-center">
@@ -162,12 +172,12 @@ export function GalleryPage() {
         </div>
       </main>
 
-      {selectedItem && (
+      {/* {selectedItem && (
         <GalleryItemModal
           item={selectedItem}
           onClose={() => setSelectedItem(null)}
         />
-      )}
+      )} */}
     </div>
   );
 }

@@ -15,6 +15,8 @@ import { AuctionGallery } from './auction-gallery';
 import CountUp from '../CountUp';
 import { jwtDecode } from "jwt-decode";
 import { JwtPayload } from '@/schema/auth.schema';
+import { Spinner } from '@workspace/ui/components/spinner';
+import DisplayModelViewer from '../ModelViewer';
 
 
 interface AuctionDetailsProps {
@@ -45,7 +47,6 @@ interface AuctionDetailsProps {
 export function AuctionDetails({auctionId, viewerCount} : {auctionId: string, viewerCount:number}) {
   const [isLiked, setIsLiked] = useState(false);
   const [isOpen, setIsOpen] = useState(false)
-  const [bidding, setBidding] = useState(false);
   const [bidAmount, setBidAmount] = useState(0);
   const {data: auction, isLoading: auctionLoading} = useAuctionQuery(auctionId);
   const previousPrice = useRef(0);
@@ -56,7 +57,7 @@ export function AuctionDetails({auctionId, viewerCount} : {auctionId: string, vi
         setFirstLoad(false);
         const token = localStorage.getItem("accessToken");
         const userId = token ? jwtDecode<JwtPayload>(token).userId : "";
-        if(userId === auction.sellerId)
+        if(userId === auction.designerId)
           setIsSeller(true);
       
         setBidAmount(auction.currentPrice + (auction.bidIncrement || 1));
@@ -69,14 +70,12 @@ export function AuctionDetails({auctionId, viewerCount} : {auctionId: string, vi
 
     const handlePlaceBid = async () => {
     if (!auction) return;
-    setBidding(true);
 
     try {
       await placeBidMutation.mutateAsync({ auctionId: auction._id, body: {amount: bidAmount} });
     } catch (error: any) {
       alert(error?.message || 'Failed to place bid');
     } finally {
-      setBidding(false);
     }
   };
 
@@ -87,7 +86,15 @@ export function AuctionDetails({auctionId, viewerCount} : {auctionId: string, vi
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <AuctionGallery images={auction?.images} title={auction.title} />
+              <div>
+                  <AuctionGallery images={auction?.imageUrls} title={auction.title} />
+                  {/* {auction.displayModelUrl && 
+                  <div className='h-[800px] w-full bg-amber-200'>
+                    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
+
+                    </div>
+                  } */}
+              </div>
     
                 <div className="space-y-6">
       <div className="flex items-start justify-between">
@@ -97,10 +104,10 @@ export function AuctionDetails({auctionId, viewerCount} : {auctionId: string, vi
                   <Eye />
                   <span> {viewerCount} watching</span>
               </div>
-              <div className='flex gap-2'>
+              {/* <div className='flex gap-2'>
                   <ChartColumn />
                   <span> {auction.totalBids} bids</span>
-              </div>
+              </div> */}
             </div>
           {/* <p className="text-sm text-zinc-500 font-medium mb-2">{category}</p> */}
           <h1 className="text-5xl font-bold text-zinc-900">{auction.title}</h1>
@@ -147,13 +154,16 @@ export function AuctionDetails({auctionId, viewerCount} : {auctionId: string, vi
         </span> */}
       </div>
 
+      
       <div className="bg-zinc-50 rounded-lg p-4 space-y-3">
-        <div className="flex items-center gap-3">
+        {auction.currentWinnerId ? (
+             <div className="flex items-center gap-3">
           <Avatar className="w-8 h-8">
             <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white text-xs font-bold">
               MR
             </AvatarFallback>
           </Avatar>
+         
           <div className="flex-1">
             <p className="text-sm text-zinc-600">Highest bid by</p>
             <p className="font-semibold text-zinc-900 flex items-center gap-1">
@@ -172,6 +182,10 @@ export function AuctionDetails({auctionId, viewerCount} : {auctionId: string, vi
             </p> */}
           </div>
         </div>
+          ) : (<>
+          No one has bid yet
+          </>)}
+       
       </div>
 
       <div className="space-y-4">
@@ -216,10 +230,11 @@ export function AuctionDetails({auctionId, viewerCount} : {auctionId: string, vi
                 </div>
                 <button
                 onClick={handlePlaceBid}
-                disabled={bidding || bidAmount < auction.currentPrice + (auction.bidIncrement || 1)}
+                disabled={placeBidMutation.isPending || bidAmount < auction.currentPrice + (auction.bidIncrement || 1)}
                 className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
               >
-                {bidding ? 'Placing Bid...' : 'Place Bid'}
+                {placeBidMutation.isPending ? 
+                (<Spinner/>) : 'Place Bid'}
               </button>
               </div>
             </div>
@@ -278,12 +293,12 @@ export function AuctionDetails({auctionId, viewerCount} : {auctionId: string, vi
             <div className="flex items-center gap-3">
               <Avatar className="w-12 h-12">
                 <AvatarFallback className="bg-gradient-to-br from-pink-500 to-orange-500 text-white font-bold">
-                  {auction.sellerId.charAt(0)}
+                  {auction.designerId.charAt(0)}
                 </AvatarFallback>
               </Avatar>
               <div>
                 <p className="font-semibold text-zinc-900 flex items-center gap-1">
-                  {auction.sellerId}
+                  {auction.designerId}
                   {/* {creator.verified && (
                     <span className="text-blue-600">✓</span>
                   )} */}

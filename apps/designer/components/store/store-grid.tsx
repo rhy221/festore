@@ -3,6 +3,9 @@
 import { ShoppingCart, Heart, Eye } from 'lucide-react';
 import { useState } from 'react';
 import Link from 'next/link';
+import { useGetStoreItems } from '@/queries/useProduct';
+import { useRouter } from 'next/navigation';
+import { DesignResType } from '@/schema/product.schema';
 
 export interface StoreItem {
   id: string;
@@ -22,10 +25,11 @@ interface StoreGridProps {
   onAddToCart: (item: StoreItem) => void;
 }
 
-export function StoreGrid({ items, onAddToCart }: StoreGridProps) {
+export function StoreGrid({store} : {store: DesignResType[]}) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [likedItems, setLikedItems] = useState<Set<string>>(new Set());
 
+  const router = useRouter();
   const toggleLike = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setLikedItems((prev) => {
@@ -39,29 +43,35 @@ export function StoreGrid({ items, onAddToCart }: StoreGridProps) {
     });
   };
 
+  const onItemClick = (id: string) => {
+    router.push(`/detail/${id}`);
+  }
+  
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-      {items.map((item) => (
+      {store.map((item) => (
         <div
-          key={item.id}
+          key={item._id}
           className="group"
-          onMouseEnter={() => setHoveredId(item.id)}
+          onMouseEnter={() => setHoveredId(item._id)}
           onMouseLeave={() => setHoveredId(null)}
+          onClick={() => {onItemClick(item._id)}}
         >
           <div className="relative bg-zinc-900 rounded-lg overflow-hidden cursor-pointer aspect-[3/4]">
             <img
-              src={item.image}
+              src={item.imageUrls[0]}
               alt={item.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
 
-            {hoveredId === item.id && (
+            {hoveredId === item._id && (
               <>
                 <div className="absolute inset-0 bg-black/40 transition-opacity" />
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onAddToCart(item);
+                    // onAddToCart(item);
                   }}
                   className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white text-black rounded-full p-3 hover:bg-white/90 transition-colors"
                 >
@@ -69,12 +79,12 @@ export function StoreGrid({ items, onAddToCart }: StoreGridProps) {
                 </button>
 
                 <button
-                  onClick={(e) => toggleLike(item.id, e)}
+                  onClick={(e) => toggleLike(item._id, e)}
                   className="absolute top-3 right-3 bg-white/10 hover:bg-white/20 backdrop-blur rounded-full p-2 transition-colors"
                 >
                   <Heart
                     className={`w-4 h-4 ${
-                      likedItems.has(item.id)
+                      likedItems.has(item._id)
                         ? 'fill-white text-white'
                         : 'text-white'
                     }`}
@@ -83,24 +93,24 @@ export function StoreGrid({ items, onAddToCart }: StoreGridProps) {
               </>
             )}
 
-            {item.isFree && (
+            {/* {item.isFree && (
               <div className="absolute top-2 left-2 bg-black/70 px-2 py-1 rounded text-white text-xs font-medium">
                 FREE
               </div>
-            )}
+            )} */}
           </div>
 
           <div className="mt-3 space-y-2">
             <div className="flex items-center gap-2">
               <div className="w-5 h-5 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex-shrink-0" />
-              <p className="text-white/60 text-xs truncate">{item.creatorBadge}</p>
+              {/* <p className="text-white/60 text-xs truncate">{item.creatorBadge}</p> */}
             </div>
 
             <h3 className="text-white text-sm font-medium line-clamp-2">
               {item.title}
             </h3>
 
-            {!item.isFree && item.price !== null && (
+            {/* {!item.isFree && item.price !== null && (
               <p className="text-white font-semibold text-sm">
                 ${item.price.toFixed(2)}
               </p>
@@ -108,16 +118,16 @@ export function StoreGrid({ items, onAddToCart }: StoreGridProps) {
 
             {item.isFree && (
               <p className="text-white font-semibold text-sm">FREE</p>
-            )}
+            )} */}
 
             <div className="flex items-center gap-3 text-white/50 text-xs">
               <div className="flex items-center gap-1">
                 <Eye className="w-3 h-3" />
-                {item.views}
+                {item.viewCount}
               </div>
               <div className="flex items-center gap-1">
                 <Heart className="w-3 h-3" />
-                {item.likes}
+                {item.likeCount}
               </div>
             </div>
           </div>

@@ -4,14 +4,16 @@ export type AuctionType = {
    _id: string;
   title: string;
   description: string;
-  images: string[];
+  imageUrls: string[];
+  modelUrls?: string[];
+  displayModelUrl?: string;
   currentPrice: number;
   startingPrice: number;
   bidIncrement: number;
   endTime: string;
   status: AuctionStatus;
   totalBids: number;
-  sellerId: string;
+  designerId: string;
   viewCount: number;
   currentViewerCount?: number;
   currentWinnerId?: string;

@@ -12,6 +12,7 @@ interface GalleryFiltersProps {
   onSearchChange: (query: string) => void;
   sortBy: string;
   onSortChange: (sort: string) => void;
+  itemCount: number;
 }
 
 const tabs = ['All', "Curator's Pick", 'Contest Winners', 'Following', 'Popular'];
@@ -23,6 +24,7 @@ export function GalleryFilters({
   onSearchChange,
   sortBy,
   onSortChange,
+  itemCount
 }: GalleryFiltersProps) {
   return (
     <div className="space-y-6">
@@ -70,7 +72,7 @@ export function GalleryFilters({
         </select>
 
         <div className="text-white/60 text-sm whitespace-nowrap">
-          40,006 Items
+          {`${itemCount} Items`}
         </div>
       </div>
     </div>

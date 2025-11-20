@@ -1,5 +1,5 @@
 import http from "@/lib/http"
-import { GetAuctionBidsResType, GetAuctionResType, GetAuctionsResType, PlaceAcutionBidResType, PlaceAuctionBidBodyType } from "@/schema/auction.schema";
+import { AuctionType, GetAuctionBidsResType, GetAuctionResType, GetAuctionsResType, PlaceAcutionBidResType, PlaceAuctionBidBodyType } from "@/schema/auction.schema";
 import { string } from "zod";
 
 
@@ -33,5 +33,10 @@ export const auctionAction = {
     placeAuctionBid: async ({auctionId, body}: {auctionId: string, body: PlaceAuctionBidBodyType}) => {
         const response = await http.post<PlaceAcutionBidResType>(`http://localhost:3003/auctions/${auctionId}/bid`, body);
         return response.data;
+    },
+
+    uploadAuction: async () => {
+        const response = await http.post<AuctionType>(`http://localhost:3003/auctions`);
+        return response.data
     }
 }

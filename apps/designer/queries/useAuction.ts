@@ -29,3 +29,9 @@ export const usePlaceAuctionBidMutation = () => {
         mutationFn: auctionAction.placeAuctionBid
     });
 }
+
+export const useUploadAuction = () => {
+    return useMutation({
+        mutationFn: auctionAction.uploadAuction
+    });
+}

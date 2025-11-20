@@ -4,7 +4,7 @@ import { Button } from "@workspace/ui/components/button";
 import { Controller, FormProvider, useForm, useFormContext } from "react-hook-form";
 import { uploadDesignSchema, UploadDesignType } from "@/schema/product.schema";
 import { Infor } from "./infor";
-import { UploadFiles, UploadImages, UploadModel } from "./upload-files";
+import { UploadFiles, UploadImages, UploadModel } from "../../../../components/upload-files";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUploadProduct } from "@/queries/useProduct";
 import { Spinner } from "@workspace/ui/components/spinner";

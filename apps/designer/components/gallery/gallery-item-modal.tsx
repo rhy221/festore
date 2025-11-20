@@ -4,6 +4,7 @@ import { X, Heart, Bookmark, Share2, Download, Info } from 'lucide-react';
 import { Button } from '@workspace/ui/components/button';
 import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 import { useState } from 'react';
+import { useFollowDesignerMutation, useLikeDesignMutation, useProduct } from '@/queries/useProduct';
 
 interface GalleryItem {
   id: string;
@@ -20,99 +21,130 @@ interface GalleryItemModalProps {
   onClose: () => void;
 }
 
-export function GalleryItemModal({ item, onClose }: GalleryItemModalProps) {
+export  function GalleryItemModal({id} : {id: string}) {
   const [isLiked, setIsLiked] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const [likeCount, setLikeCount] = useState(item.likes);
+  // const [likeCount, setLikeCount] = useState(item.likes);
 
-  const handleLike = () => {
-    setIsLiked(!isLiked);
-    setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
+  const likeMutation = useLikeDesignMutation(id);
+  const followMutation = useFollowDesignerMutation();
+
+
+  const {data: design, isLoading: designLoading} = useProduct(id);
+
+  const handleLike = async () => {
+    if(likeMutation.isPending) return;
+
+    try{
+      const result = await likeMutation.mutateAsync(id);
+      console.log(result);
+    }catch(err) {
+      console.log(err);
+    }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4">
-      <button
-        onClick={onClose}
-        className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors z-10"
-      >
-        <X className="w-6 h-6" />
-      </button>
+  const handleFollow = async () => {
+    if(likeMutation.isPending) return;
 
-      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 flex items-center justify-center">
-          <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-zinc-900">
-            <img
-              src={item.image}
-              alt={item.title}
-              className="w-full h-full object-cover"
-            />
+    try{
+      const result = await followMutation.mutateAsync(design?.designerId || "");
+      console.log(result);
+    }catch(err) {
+      console.log(err);
+    }
+  };
+
+  if(designLoading)
+    return (<>
+    Loading ...</>)
+
+  if(!design)
+     return (<>
+    Check your connection</>)
+
+  return (
+    // <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 overflow-auto">
+    //   <button
+    //     // onClick={onClose}
+    //     className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors z-10"
+    //   >
+    //     <X className="w-6 h-6" />
+    //   </button>
+    
+      <div className=" top-6 w-full max-w-6xl grid grid-cols-1 lg:grid-cols-3 gap-6" >
+        <div className="lg:col-span-2 flex flex-col origin-top">
+            {/* <div className=" w-full rounded-lg "> */}
+              <img
+                src={design.imageUrls[0]}
+                alt={design.title}
+                className="w-full h-auto  object-cover " 
+              />
+            {/* </div> */}
           </div>
-        </div>
 
         <div className="flex flex-col gap-6">
           <div className="space-y-4">
             <div className="flex items-start justify-between">
               <div>
                 <h2 className="text-2xl font-bold text-white mb-2">
-                  {item.title}
+                  {design.title}
                 </h2>
-                <p className="text-white/60">{item.category}</p>
+                {/* <p className="text-white/60">{design.categoryId}</p> */}
               </div>
             </div>
 
             <div className="flex items-center gap-3 pt-4 border-t border-zinc-800">
               <Avatar className="w-12 h-12">
                 <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-blue-500 text-white font-bold">
-                  {item.creator.charAt(0)}
+                  {design.designerId.charAt(0)}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <p className="text-white font-medium">{item.creator}</p>
+                <p className="text-white font-medium">{design.designerId}</p>
                 <p className="text-white/60 text-sm">Creator</p>
               </div>
               <Button
-                variant="outline"
+                onClick={handleFollow}
                 size="sm"
                 className="border-white/20 text-white hover:bg-white/10"
               >
-                Follow
+                {design.isDesignerFollowed ? "Following" : "Follow"}
               </Button>
             </div>
 
             <div className="grid grid-cols-3 gap-4 pt-4 border-t border-zinc-800">
               <div className="text-center">
                 <p className="text-2xl font-bold text-white">
-                  {likeCount.toLocaleString()}
+                  {design.likeCount.toLocaleString()}
                 </p>
                 <p className="text-white/60 text-xs">Likes</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-white">
-                  {item.views.toLocaleString()}
+                  {design.viewCount.toLocaleString()}
                 </p>
                 <p className="text-white/60 text-xs">Views</p>
               </div>
-              <div className="text-center">
+              {/* <div className="text-center">
                 <p className="text-2xl font-bold text-white">28</p>
                 <p className="text-white/60 text-xs">Downloads</p>
-              </div>
+              </div> */}
             </div>
 
             <div className="flex gap-2 pt-4">
-              <button
+              <Button
                 onClick={handleLike}
-                className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg transition-colors ${
-                  isLiked
+                className={`flex-1 flex items-center justify-center gap-2 py-2  transition-colors ${
+                  design.isLiked
                     ? 'bg-red-500/20 text-red-500 border border-red-500/30'
                     : 'bg-white/5 text-white border border-white/10 hover:bg-white/10'
                 }`}
               >
-                <Heart className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
+                <Heart className={`w-4 h-4 ${design.isLiked ? 'fill-current' : ''}`} />
                 Like
-              </button>
+              </Button>
 
-              <button
+              <Button
                 onClick={() => setIsBookmarked(!isBookmarked)}
                 className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg transition-colors ${
                   isBookmarked
@@ -122,18 +154,74 @@ export function GalleryItemModal({ item, onClose }: GalleryItemModalProps) {
               >
                 <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-current' : ''}`} />
                 Save
-              </button>
+              </Button>
 
-              <button className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-white/5 text-white border border-white/10 hover:bg-white/10 transition-colors">
+              <Button className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-white/5 text-white border border-white/10 hover:bg-white/10 transition-colors">
                 <Share2 className="w-4 h-4" />
                 Share
-              </button>
+              </Button>
             </div>
 
-            <button className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-cyan-500 hover:bg-cyan-600 text-black font-semibold transition-colors">
+                 <div className="space-y-4">
+                   <div>
+                    {design.price && (
+                    <p className="text-white text-4xl font-bold mb-4">
+                       $ {design.price.toFixed(2)}
+                     </p> 
+                    )}
+                     
+
+                      <div className="flex items-center gap-4 mb-6">
+                      {/* <button
+                        // onClick={() => setLicenseType('basic')}
+                        className={`flex items-center gap-2 ${
+                          licenseType === 'basic' ? 'text-cyan-400' : 'text-white/60'
+                        }`}
+                      >
+                        <div
+                          className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                            licenseType === 'basic'
+                              ? 'border-cyan-400'
+                              : 'border-white/60'
+                          }`}
+                        >
+                          {licenseType === 'basic' && (
+                            <div className="w-2 h-2 rounded-full bg-cyan-400" />
+                          )}
+                        </div>
+                        Basic
+                      </button> */}
+                    
+                      {/* <button
+                        onClick={() => setLicenseType('extended')}
+                        className={`flex items-center gap-2 ${
+                          licenseType === 'extended' ? 'text-cyan-400' : 'text-white/60'
+                        }`}
+                      >
+                        <div
+                          className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                            licenseType === 'extended'
+                              ? 'border-cyan-400'
+                              : 'border-white/60'
+                          }`}
+                        >
+                          {licenseType === 'extended' && (
+                            <div className="w-2 h-2 rounded-full bg-cyan-400" />
+                          )}
+                        </div>
+                        Extended
+                      </button>
+                     */}
+              <Button className="w-full bg-white text-black hover:bg-white/90 font-semibold py-6 rounded-full">
+                    ADD TO CART
+                  </Button>
+                      <Info className="w-4 h-4 text-white/60" />
+                    </div> 
+                 </div>
+            {/* <button className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-cyan-500 hover:bg-cyan-600 text-black font-semibold transition-colors">
               <Download className="w-4 h-4" />
               Download
-            </button>
+            </button> */}
 
             <div className="bg-white/5 border border-white/10 rounded-lg p-4 space-y-3">
               <div className="flex items-center justify-between">
@@ -156,6 +244,6 @@ export function GalleryItemModal({ item, onClose }: GalleryItemModalProps) {
           </div>
         </div>
       </div>
-    </div>
+    // </div>
   );
 }
