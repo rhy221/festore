@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
-import { Input } from "../components/ui/input";
-import { Button, CircleButton } from "../components/ui/button";
-import { CategoryCard, ProductCard } from "../components/ui/card";
+import { Input } from "../../../../packages/ui/src/components/input";
+import { Button, CircleButton } from "../../../../packages/ui/src/components/button";
+import { CategoryCard, ProductCard } from "../../../../packages/ui/src/components/card";
 
 export default function AdminCategoryDashboard() {
   const [search, setSearch] = useState("");

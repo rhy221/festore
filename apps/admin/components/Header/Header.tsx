@@ -16,12 +16,12 @@ export default function Header({ role = "admin", name = "ABC" }: HeaderProps) {
           height={80}
           className="w-16 h-16 md:w-[127px] md:h-[127px]"
         />
-        <span className="text-2xl sm:text-3xl md:text-[44px] font-extrabold">HHCLOSET</span>
+        <span className="text-2xl sm:text-3xl md:text-[44px] font-extrabold text-black">HHCLOSET</span>
       </div>
       <div className="truncate max-w-[52%] text-right">
-        <span className="text-xl sm:text-2xl md:text-4xl font-black italic pr-32">
+        <span className="text-xl sm:text-2xl md:text-4xl font-black italic pr-32 text-black">
           Xin chào {role}: {name}
-          </span>
+        </span>
       </div>
     </header>
   );

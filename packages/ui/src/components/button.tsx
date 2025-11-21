@@ -57,4 +57,37 @@ function Button({
   )
 }
 
-export { Button, buttonVariants }
+function CircleButton({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<"button">) {
+  return (
+    <button
+      className={cn(
+        "w-8 h-8 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-800 transition-colors",
+        className
+      )}
+      {...props}
+    >
+      {children || (
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M8 3.5V12.5M3.5 8H12.5"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        </svg>
+      )}
+    </button>
+  )
+}
+
+export { Button, CircleButton, buttonVariants }

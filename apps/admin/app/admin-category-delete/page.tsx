@@ -1,6 +1,7 @@
 "use client";
-import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
-import { Button } from "../components/ui/button";
+import { AlertTriangle } from "lucide-react";
+import { Button } from "../../../../packages/ui/src/components/button";
+
 export default function AdminCategoryDeletePopup({
   onClose,
 }: {
@@ -8,9 +9,9 @@ export default function AdminCategoryDeletePopup({
 }) {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg">
+      <div className="bg-white p-6 rounded-lg shadow-lg text-black">
         <div className="flex flex-col bg-white justify-between items-center">
-          <ExclamationTriangleIcon className="w-16 h-16 text-black mx-auto fill-yellow-300" />
+          <AlertTriangle className="w-16 h-16 text-yellow-500 mx-auto" />
           <p className="font-bold text-2xl pb-3">Xoá thể loại thời trang</p>
           <p>Bạn có chắc chắn muốn xóa thể loại thời trang này?</p>
           <p>Hành động này sẽ không thể hoàn tác.</p>

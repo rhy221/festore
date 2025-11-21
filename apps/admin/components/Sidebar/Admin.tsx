@@ -1,4 +1,4 @@
-"use client";
+ "use client";
 import Link from "next/link";
 
 const menuItems = [
@@ -13,7 +13,7 @@ const menuItems = [
 
 export default function Sidebar() {
   return (
-    <aside className="fixed top-32 left-0 h-screen max-w-[296px] bg-[#000080] text-white flex flex-col ">
+    <aside className="fixed top-32 left-0 h-[calc(100vh-128px)] w-[296px] bg-[#000080] text-white flex flex-col overflow-y-auto">
       {menuItems.map((item, index) => (
         <div key={index}>
           <Link
