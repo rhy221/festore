@@ -1,6 +1,6 @@
 "use client";
 
-import { ReportCard } from "../components/ui/card";
+import { ReportCard } from "@/components/card";
 import {
   Siren,
   User,
@@ -9,10 +9,12 @@ import {
   Filter,
   EyeIcon,
 } from "lucide-react";
-import { Input } from "../components/ui/input";
+import { Input } from "@workspace/ui/components/input";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "../components/ui/button";
+import { Button } from "@workspace/ui/components/button";
 import AdminReportDetailPopup from "../admin-report-detail/page";
+import Header from "@/components/Header/Header";
+import Sidebar from "@/components/Sidebar/Admin";
 
 type User = {
   id: number;
@@ -116,166 +118,26 @@ export default function AdminReportPage() {
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       {/* Header */}
-      <header className="bg-[#F0F7FF] flex items-center justify-between px-8 py-6">
-        <div className="flex items-center gap-3">
-          <div className="rounded-full bg-white w-12 h-12 flex items-center justify-center">
-            <img src="/Logo.png" alt="Logo" className="w-12 h-12" />
-          </div>
-          <h1 className="text-4xl font-extrabold text-black">HHCLOSET</h1>
-        </div>
-        <div className="text-2xl font-extrabold italic text-black">
-          Xin chào admin: ABC
-        </div>
-      </header>
+      <Header />
 
       {/* Content layout */}
-      <div className="flex flex-1">
+      <div className="flex flex-1 pt-32">
         {/* Sidebar */}
-        <aside className="w-64 bg-blue-900 text-white p-4 space-y-4">
-          <nav className="flex flex-col px-2">
-            <button className="w-full flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-[#002a&0]">
-              <img
-                src="/homeIcon.png"
-                alt="Home"
-                className="w-6 h-6 shrink-0"
-              />
-              <span className="text-2xl font-semibold whitespace-nowrap leading-none">
-                Trang chủ
-              </span>
-            </button>
-            <hr className="-mx-2 my-2 h-px bg-white/50 border-0" />
-
-            <button className="w-full flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-[#002a70]">
-              <img
-                src="/adminManagementIcon.png"
-                alt="User Management"
-                className="w-6 h-6 shrink-0"
-              />
-              <span className="text-2xl font-semibold leading-none">
-                Quản lý admin
-              </span>
-            </button>
-            <hr className="-mx-2 my-2 h-px bg-white/50 border-0" />
-
-            <button className="w-full flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-[#002a70]">
-              <img
-                src="/userManagementIcon.png"
-                alt="User Management"
-                className="w-6 h-6 shrink-0"
-              />
-              <span className="text-2xl font-semibold leading-none">
-                Quản lý người dùng
-              </span>
-            </button>
-            <hr className="-mx-2 my-2 h-px bg-white/50 border-0" />
-
-            <button className="w-full flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-[#002a70]">
-              <img
-                src="/styleIcon.png"
-                alt="Style"
-                className="w-6 h-6 shrink-0"
-              />
-              <span className="text-2xl font-semibold whitespace-nowrap leading-none">
-                Thể loại
-              </span>
-            </button>
-            <hr className="-mx-2 my-2 h-px bg-white/50 border-0" />
-
-            <button className="w-full flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-[#002a70]">
-              <img
-                src="/reportIcon.png"
-                alt="Report"
-                className="w-6 h-6 shrink-0"
-              />
-              <span className="text-2xl font-semibold whitespace-nowrap leading-none">
-                Báo cáo
-              </span>
-            </button>
-            <hr className="-mx-2 my-2 h-px bg-white/50 border-0" />
-
-            <button className="w-full flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-[#002a70]">
-              <img
-                src="/settingIcon.png"
-                alt="Settings"
-                className="w-6 h-6 shrink-0"
-              />
-              <span className="text-2xl font-semibold whitespace-nowrap leading-none">
-                Hệ thống
-              </span>
-            </button>
-            <hr className="-mx-2 my-2 h-px bg-white/50 border-0" />
-
-            <button className="w-full flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-[#002a70] mt-2">
-              <img
-                src="/logoutIcon.png"
-                alt="Logout"
-                className="w-6 h-6 shrink-0"
-              />
-              <span className="text-2xl font-semibold whitespace-nowrap leading-none">
-                Đăng xuất
-              </span>
-            </button>
-          </nav>
-        </aside>
+        <Sidebar />
 
         {/* Main content */}
-        <main className="flex-1 bg-white p-3 overflow-y-auto text-lg">
-          <h1 className="text-2xl font-bold">Thống kê nhanh</h1>
-          <table className="table-fixed min-w-full h-43">
-            <thead>
-              <tr>
-                <th className="w-1/2"></th>
-                <th className="w-1/2"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="pr-4">
-                  <ReportCard
-                    title="Tổng số vi phạm"
-                    icon={<Siren />}
-                    number={3}
-                    color="#FF4C4C"
-                  />
-                </td>
-                <td>
-                  <ReportCard
-                    title="Số người vi phạm"
-                    icon={<User className="fill-current text-white" />}
-                    number={3}
-                    color="#FFAA00"
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td className="pr-4">
-                  <ReportCard
-                    title="Số vi phạm đang xử lý"
-                    icon={<MessageSquareWarningIcon />}
-                    number={3}
-                    color="#1E90FF"
-                  />
-                </td>
-                <td>
-                  <ReportCard
-                    title="Số vi phạm đã xử lý"
-                    icon={<CheckCircle className=" text-white" />}
-                    number={3}
-                    color="#32CD32"
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <main className="flex-1 bg-white p-3 overflow-y-auto text-lg text-black">
           <h1 className="text-2xl font-bold">Danh sách đang xử lý</h1>
           <div className="flex items-center gap-2 pt-2">
             <Input
-              className="text-base"
+              className="text-base !bg-[#ADD8E6] border-none rounded-3xl"
               placeholder="Nhập nội dung tìm kiếm"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            <Button className="bg-green-500 text-base">Tìm kiếm</Button>
+            <Button className="bg-green-500 text-base text-white rounded-3xl hover:bg-green-700">
+              Tìm kiếm
+            </Button>
           </div>
           {/* Filter Violate */}
           <div className="flex items-center gap-10 pt-4">
@@ -334,62 +196,6 @@ export default function AdminReportPage() {
                 </div>
               )}
             </div>
-            {/* Filter User Type */}
-            <div className="flex items-center gap-2 relative">
-              <p>Lọc theo loại người dùng</p>
-              <Filter
-                className="fill-black"
-                onClick={() => {
-                  setShowUserTypeDropdown(!showUserTypeDropdown);
-                  setShowUserViolateDropdown(false);
-                }}
-              />
-              {showUserTypeDropdown && (
-                <div className="absolute top-1/2 left-full translate-y-0 translate-x-0 mr-2 bg-[#EFF6FF] border rounded-lg shadow-lg z-10 w-32">
-                  <button
-                    className={`w-full text-left px-3 py-2 ${
-                      userTypeFilter === "all"
-                        ? "bg-[#EFF6FF] font-semibold"
-                        : "hover:bg-[#dee8f5]"
-                    }`}
-                    onClick={() => {
-                      setUserTypeFilter("all");
-                      setShowUserTypeDropdown(false);
-                    }}
-                  >
-                    Tất cả
-                  </button>
-                  <hr className="mx-1 my-1 h-px bg-black border-0" />
-                  <button
-                    className={`w-full text-left px-3 py-2 ${
-                      userTypeFilter === "designer"
-                        ? "bg-[#EFF6FF] font-semibold"
-                        : "hover:bg-[#dee8f5]"
-                    }`}
-                    onClick={() => {
-                      setUserTypeFilter("designer");
-                      setShowUserTypeDropdown(false);
-                    }}
-                  >
-                    Nhà thiết kế
-                  </button>
-                  <hr className="mx-1 my-1 h-px bg-black border-0" />
-                  <button
-                    className={`w-full text-left px-3 py-2 ${
-                      userTypeFilter === "customer"
-                        ? "bg-[#EFF6FF] font-semibold"
-                        : "hover:bg-[#dee8f5]"
-                    }`}
-                    onClick={() => {
-                      setUserTypeFilter("customer");
-                      setShowUserTypeDropdown(false);
-                    }}
-                  >
-                    Khách hàng
-                  </button>
-                </div>
-              )}
-            </div>
           </div>
           <UserTable users={filteredUsers} />
           {showDetailViolate && selectedUser && (
@@ -412,9 +218,6 @@ export default function AdminReportPage() {
           <tr>
             <th className="p-3 font-semibold border border-black">STT</th>
             <th className="p-3 font-semibold border border-black">Họ và tên</th>
-            <th className="p-3 font-semibold border border-black">
-              Loại người dùng
-            </th>
             <th className="p-3 font-semibold border border-black">Vi phạm</th>
             <th className="p-3 font-semibold border border-black"></th>
           </tr>
@@ -424,9 +227,6 @@ export default function AdminReportPage() {
             <tr key={u.id}>
               <td className="p-3 border border-black">{i + 1}</td>
               <td className="p-3 border border-black">{u.name}</td>
-              <td className="p-3 border border-black">
-                {displayUserType(u.type)}
-              </td>
               <td className="p-3 border border-black">
                 {displayUserViolate(u.violate)}
               </td>

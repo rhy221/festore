@@ -1,9 +1,14 @@
 "use client";
 import Link from "next/link";
+import { HomeIcon, UserIcon } from "lucide-react";
 
 const menuItems = [
   { label: "Trang chủ", icon: "/homeIcon.png", href: "/admin" },
-  { label: "Quản lý admin", icon: "/adminManageIcon.png", href: "/admin/manage/admin" },
+  {
+    label: "Quản lý admin",
+    icon: "/adminManageIcon.png",
+    href: "/admin/manage/admin",
+  },
   { label: "Quản lý người dùng", icon: "/userManageIcon.png", href: "/admin" },
   { label: "Thể loại", icon: "/categoryIcon.png", href: "/admin" },
   { label: "Báo cáo", icon: "/warningIconButWhite.png", href: "/admin" },
@@ -13,7 +18,7 @@ const menuItems = [
 
 export default function Sidebar() {
   return (
-    <aside className="fixed top-32 left-0 h-screen max-w-[296px] bg-[#000080] text-white flex flex-col ">
+    <aside className="w-[296px] bg-[#000080] text-white flex flex-col">
       {menuItems.map((item, index) => (
         <div key={index}>
           <Link

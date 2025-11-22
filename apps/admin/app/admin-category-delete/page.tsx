@@ -1,13 +1,13 @@
 "use client";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
-import { Button } from "../components/ui/button";
+import { Button } from "@workspace/ui/components/button";
 export default function AdminCategoryDeletePopup({
   onClose,
 }: {
   onClose: () => void;
 }) {
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 text-black">
       <div className="bg-white p-6 rounded-lg shadow-lg">
         <div className="flex flex-col bg-white justify-between items-center">
           <ExclamationTriangleIcon className="w-16 h-16 text-black mx-auto fill-yellow-300" />

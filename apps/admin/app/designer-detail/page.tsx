@@ -1,55 +1,59 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import DesignDetailDialog, { type Design } from "@/components/DesignDetailDialog"
+import { useState } from "react";
+import DesignDetailDialog, {
+  type Design,
+} from "@/components/DesignDetailDialog";
 
 // Designer type and data
 type Designer = {
-  fullName: string
-  gender: string
-  username: string
-  dateOfBirth: string
-  email: string
-  accountCreated: string
-  phoneNumber: string
-  status: string
-  description: string
-  avatar: string
+  fullName: string;
+  gender: string;
+  username: string;
+  dateOfBirth: string;
+  email: string;
+  accountCreated: string;
+  phoneNumber: string;
+  status: string;
+  description: string;
+  avatar: string;
   stats: {
-    designsPosted: number
-    revenue: string
-    reportedDesigns: number
-    mostAppealingDesign: string
-    followers: number
-  }
-}
+    designsPosted: number;
+    revenue: string;
+    reportedDesigns: number;
+    mostAppealingDesign: string;
+    followers: number;
+  };
+};
 
 const designer: Designer = {
   fullName: "Nguyễn Văn Tiên",
-  gender: "Nam", 
+  gender: "Nam",
   username: "ntktien98@saovang",
   dateOfBirth: "22/12/1998",
   email: "ntktien.saovang@gmail.com",
   accountCreated: "11/08/2024",
   phoneNumber: "0123456789",
   status: "Đang hoạt động",
-  description: "Nhà thiết kế thời trang số với phong cách tối giản hiện đại. Yêu thích sự kết hợp giữa công nghệ và nghệ thuật",
+  description:
+    "Nhà thiết kế thời trang số với phong cách tối giản hiện đại. Yêu thích sự kết hợp giữa công nghệ và nghệ thuật",
   avatar: "/DesignerAvatar.png",
   stats: {
     designsPosted: 13,
     revenue: "0,89 tỷ VND",
     reportedDesigns: 0,
     mostAppealingDesign: "Áo kỹ thuật số Aurora",
-    followers: 125
-  }
-}
+    followers: 125,
+  },
+};
 
 // Sample designs data
 const designs: Design[] = [
   {
     name: "Footwear Romans Cad",
     designer: "Nguyễn Văn Tiên",
-    description: "Mẫu giày lấy cảm hứng từ chiến binh La Mã với thiết kế dây đan mạnh mẽ và phong cách cổ điển hiện đại.",
+    description:
+      "Mẫu giày lấy cảm hứng từ chiến binh La Mã với thiết kế dây đan mạnh mẽ và phong cách cổ điển hiện đại.",
     category: "Giày",
     status: "Chia sẻ",
     datePosted: "15/09/2024",
@@ -60,18 +64,19 @@ const designs: Design[] = [
         startingPrice: "X",
         priceStep: "X",
         finalPrice: "X",
-        winner: "X"
-      }
+        winner: "X",
+      },
     },
     engagement: {
       likes: 135,
-      views: 125
-    }
+      views: 125,
+    },
   },
   {
     name: "Túi xách Flower",
     designer: "Nguyễn Văn Tiên",
-    description: "Túi xách với họa tiết hoa xinh đẹp, phù hợp cho các buổi dạo phố.",
+    description:
+      "Túi xách với họa tiết hoa xinh đẹp, phù hợp cho các buổi dạo phố.",
     category: "Túi xách",
     status: "Đang đấu giá",
     datePosted: "20/09/2024",
@@ -82,24 +87,24 @@ const designs: Design[] = [
         startingPrice: "300,000 VND",
         priceStep: "50,000 VND",
         finalPrice: "450,000 VND",
-        winner: "Nguyễn Thị B"
-      }
+        winner: "Nguyễn Thị B",
+      },
     },
     engagement: {
       likes: 89,
-      views: 156
-    }
-  }
-]
+      views: 156,
+    },
+  },
+];
 
 export default function AdminDashboard() {
-  const [selectedDesign, setSelectedDesign] = useState<Design | null>(null)
-  const [showDialog, setShowDialog] = useState(false)
+  const [selectedDesign, setSelectedDesign] = useState<Design | null>(null);
+  const [showDialog, setShowDialog] = useState(false);
 
   const handleDesignClick = (design: Design) => {
-    setSelectedDesign(design)
-    setShowDialog(true)
-  }
+    setSelectedDesign(design);
+    setShowDialog(true);
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -122,44 +127,86 @@ export default function AdminDashboard() {
         <aside className="w-64 bg-blue-900 text-white p-4 space-y-4">
           <nav className="flex flex-col px-2">
             <button className="w-full flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-[#002a70]">
-              <img src="/homeIcon.png" alt="Home" className="w-8 h-8 shrink-0" />
-              <span className="text-2xl font-semibold whitespace-nowrap leading-none">Trang chủ</span>
+              <img
+                src="/homeIcon.png"
+                alt="Home"
+                className="w-8 h-8 shrink-0"
+              />
+              <span className="text-2xl font-semibold whitespace-nowrap leading-none">
+                Trang chủ
+              </span>
             </button>
             <hr className="-mx-2 my-2 h-px bg-white/50 border-0" />
 
             <button className="w-full flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-[#002a70]">
-              <img src="/adminManagementIcon.png" alt="Admin Management" className="w-8 h-8 shrink-0" />
-              <span className="text-2xl font-semibold whitespace-nowrap leading-none">Quản lý admin</span>
+              <img
+                src="/adminManagementIcon.png"
+                alt="Admin Management"
+                className="w-8 h-8 shrink-0"
+              />
+              <span className="text-2xl font-semibold whitespace-nowrap leading-none">
+                Quản lý admin
+              </span>
             </button>
             <hr className="-mx-2 my-2 h-px bg-white/50 border-0" />
 
             <button className="w-full flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-[#002a70]">
-              <img src="/userManagementIcon.png" alt="User Management" className="w-8 h-8 shrink-0" />
-              <span className="text-2xl font-semibold leading-none">Quản lý người dùng</span>
+              <img
+                src="/userManagementIcon.png"
+                alt="User Management"
+                className="w-8 h-8 shrink-0"
+              />
+              <span className="text-2xl font-semibold leading-none">
+                Quản lý người dùng
+              </span>
             </button>
             <hr className="-mx-2 my-2 h-px bg-white/50 border-0" />
 
             <button className="w-full flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-[#002a70]">
-              <img src="/styleIcon.png" alt="Style" className="w-8 h-8 shrink-0" />
-              <span className="text-2xl font-semibold whitespace-nowrap leading-none">Thể loại</span>
+              <img
+                src="/styleIcon.png"
+                alt="Style"
+                className="w-8 h-8 shrink-0"
+              />
+              <span className="text-2xl font-semibold whitespace-nowrap leading-none">
+                Thể loại
+              </span>
             </button>
             <hr className="-mx-2 my-2 h-px bg-white/50 border-0" />
 
             <button className="w-full flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-[#002a70]">
-              <img src="/reportIcon.png" alt="Report" className="w-8 h-8 shrink-0" />
-              <span className="text-2xl font-semibold whitespace-nowrap leading-none">Báo cáo</span>
+              <img
+                src="/reportIcon.png"
+                alt="Report"
+                className="w-8 h-8 shrink-0"
+              />
+              <span className="text-2xl font-semibold whitespace-nowrap leading-none">
+                Báo cáo
+              </span>
             </button>
             <hr className="-mx-2 my-2 h-px bg-white/50 border-0" />
 
             <button className="w-full flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-[#002a70]">
-              <img src="/settingIcon.png" alt="Settings" className="w-8 h-8 shrink-0" />
-              <span className="text-2xl font-semibold whitespace-nowrap leading-none">Hệ thống</span>
+              <img
+                src="/settingIcon.png"
+                alt="Settings"
+                className="w-8 h-8 shrink-0"
+              />
+              <span className="text-2xl font-semibold whitespace-nowrap leading-none">
+                Hệ thống
+              </span>
             </button>
             <hr className="-mx-2 my-2 h-px bg-white/50 border-0" />
 
             <button className="w-full flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-[#002a70] mt-2">
-              <img src="/logoutIcon.png" alt="Logout" className="w-8 h-8 shrink-0" />
-              <span className="text-2xl font-semibold whitespace-nowrap leading-none">Đăng xuất</span>
+              <img
+                src="/logoutIcon.png"
+                alt="Logout"
+                className="w-8 h-8 shrink-0"
+              />
+              <span className="text-2xl font-semibold whitespace-nowrap leading-none">
+                Đăng xuất
+              </span>
             </button>
           </nav>
         </aside>
@@ -182,7 +229,10 @@ export default function AdminDashboard() {
               <InfoRow label="Tên đăng nhập" value={designer.username} />
               <InfoRow label="Ngày sinh" value={designer.dateOfBirth} />
               <InfoRow label="Địa chỉ email" value={designer.email} />
-              <InfoRow label="Ngày tạo tài khoản" value={designer.accountCreated} />
+              <InfoRow
+                label="Ngày tạo tài khoản"
+                value={designer.accountCreated}
+              />
               <InfoRow label="Số điện thoại" value={designer.phoneNumber} />
               <InfoRow label="Trạng thái" value={designer.status} />
               <div className="col-span-2">
@@ -193,11 +243,36 @@ export default function AdminDashboard() {
 
           {/* Stat Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 text-white">
-            <StatCard color="bg-teal-600" iconSrc="/numberOfDesignPostedIcon.png" label="Số mẫu đã đăng" value={designer.stats.designsPosted.toString()} />
-            <StatCard color="bg-pink-600" iconSrc="/revenueIcon.png" label="Doanh thu" value={designer.stats.revenue} />
-            <StatCard color="bg-red-600" iconSrc="/numberOfWarningIcon.png" label="Số mẫu bị báo cáo" value={designer.stats.reportedDesigns.toString()} />
-            <StatCard color="bg-blue-600" iconSrc="/mostAppealDesignIcon.png" label="Mẫu thu hút nhất" value={designer.stats.mostAppealingDesign} />
-            <StatCard color="bg-gray-700" iconSrc="/numberOfFollowerIcon.png" label="Số người theo dõi" value={designer.stats.followers.toString()} />
+            <StatCard
+              color="bg-teal-600"
+              iconSrc="/numberOfDesignPostedIcon.png"
+              label="Số mẫu đã đăng"
+              value={designer.stats.designsPosted.toString()}
+            />
+            <StatCard
+              color="bg-pink-600"
+              iconSrc="/revenueIcon.png"
+              label="Doanh thu"
+              value={designer.stats.revenue}
+            />
+            <StatCard
+              color="bg-red-600"
+              iconSrc="/numberOfWarningIcon.png"
+              label="Số mẫu bị báo cáo"
+              value={designer.stats.reportedDesigns.toString()}
+            />
+            <StatCard
+              color="bg-blue-600"
+              iconSrc="/mostAppealDesignIcon.png"
+              label="Mẫu thu hút nhất"
+              value={designer.stats.mostAppealingDesign}
+            />
+            <StatCard
+              color="bg-gray-700"
+              iconSrc="/numberOfFollowerIcon.png"
+              label="Số người theo dõi"
+              value={designer.stats.followers.toString()}
+            />
           </div>
 
           {/* Search + Filters */}
@@ -207,7 +282,7 @@ export default function AdminDashboard() {
                 placeholder="Nhập nội dung tìm kiếm"
                 className="bg-[#BFE3F3] flex-1 rounded-full px-4 py-2 border text-lg"
               />
-              <button className="px-4 py-2 bg-green-500 rounded-full text-white font-semibold">
+              <button className="px-4 py-2 bg-green-500 rounded-full text-white font-semibold hover:bg-green-700">
                 Tìm kiếm
               </button>
             </div>
@@ -241,13 +316,13 @@ export default function AdminDashboard() {
       </div>
 
       {/* Use the reusable component */}
-      <DesignDetailDialog 
+      <DesignDetailDialog
         design={selectedDesign}
         open={showDialog}
         onOpenChange={setShowDialog}
       />
     </div>
-  )
+  );
 }
 
 /* --- Components --- */
@@ -257,7 +332,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
       <span className="font-semibold">{label}: </span>
       {value}
     </p>
-  )
+  );
 }
 
 function StatCard({
@@ -266,10 +341,10 @@ function StatCard({
   label,
   value,
 }: {
-  color: string
-  iconSrc: string
-  label: string
-  value: string
+  color: string;
+  iconSrc: string;
+  label: string;
+  value: string;
 }) {
   return (
     <div
@@ -281,7 +356,7 @@ function StatCard({
       </span>
       <span className="font-bold text-xl whitespace-nowrap">{value}</span>
     </div>
-  )
+  );
 }
 
 function DesignCard({
@@ -290,13 +365,13 @@ function DesignCard({
   status,
   onClick,
 }: {
-  image: string
-  title: string
-  status: string
-  onClick: () => void
+  image: string;
+  title: string;
+  status: string;
+  onClick: () => void;
 }) {
   return (
-    <div 
+    <div
       className="rounded-lg border border-[#6a360e] p-4 shadow-sm hover:shadow-md bg-[#faf0e6] text-black flex flex-col items-center text-center h-72 justify-center cursor-pointer transition-shadow"
       onClick={onClick}
     >
@@ -310,5 +385,5 @@ function DesignCard({
         Trạng thái: <span className="font-bold">{status}</span>
       </p>
     </div>
-  )
+  );
 }

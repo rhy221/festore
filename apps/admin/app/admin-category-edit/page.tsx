@@ -1,7 +1,7 @@
 "use client";
 import { BackspaceIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
-import { Button } from "../components/ui/button";
+import { Button } from "@workspace/ui/components/button";
 export default function AdminCategoryEditPopup({
   onClose,
 }: {
@@ -10,7 +10,7 @@ export default function AdminCategoryEditPopup({
   console.log("AdminCategoryEditPopup rendered");
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg">
+      <div className="bg-white p-6 rounded-lg shadow-lg text-black">
         <div className="flex flex-row bg-white justify-between gap-70">
           <p className="font-bold text-2xl pb-3">Chỉnh sửa thể loại</p>
           <BackspaceIcon className="w-8 h-8 pt-1" onClick={onClose} />
@@ -35,7 +35,7 @@ export default function AdminCategoryEditPopup({
                 <p className="font-semibold pb-2">Ảnh mô tả (nếu có)</p>
                 <div className="w-60 h-40 border-1 border-black flex items-center justify-center cursor-pointer mx-auto">
                   <Image
-                    src="/image13.png"
+                    src="https://picsum.photos/220/140"
                     alt="Category Image"
                     className="object-cover"
                     width={220}
