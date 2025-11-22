@@ -9,7 +9,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from "@workspace/ui/components/alert-dialog";
 
 interface BlockDeleteAlertProps {
   isOpen: boolean;
@@ -46,13 +46,23 @@ export default function BlockDeleteAlert({
         </AlertDialogHeader>
         <AlertDialogFooter className="sm:justify-center">
           <div className="flex gap-4">
-          <AlertDialogAction onClick={onClose} className="text-2xl font-bold bg-[#0057FF] w-[173px] h-[55px] rounded-[45px] hover:bg-blue-700 px-8">
-            Huỷ
-          </AlertDialogAction>
-          <AlertDialogAction onClick={onConfirm} className={`text-2xl font-bold ${type === "unblock" ? "bg-[#00C853] hover:bg-green-700" : "bg-[#FF5E5E] hover:bg-red-700"} w-[173px] h-[55px] rounded-[45px] px-8`}>
-            {type === "block" ? "Chặn" : type === "delete" ? "Xoá" : "Bỏ chặn"}
-          </AlertDialogAction>
-            </div>
+            <AlertDialogAction
+              onClick={onClose}
+              className="text-2xl font-bold bg-[#0057FF] w-[173px] h-[55px] rounded-[45px] hover:bg-blue-700 px-8"
+            >
+              Huỷ
+            </AlertDialogAction>
+            <AlertDialogAction
+              onClick={onConfirm}
+              className={`text-2xl font-bold ${type === "unblock" ? "bg-[#00C853] hover:bg-green-700" : "bg-[#FF5E5E] hover:bg-red-700"} w-[173px] h-[55px] rounded-[45px] px-8`}
+            >
+              {type === "block"
+                ? "Chặn"
+                : type === "delete"
+                  ? "Xoá"
+                  : "Bỏ chặn"}
+            </AlertDialogAction>
+          </div>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

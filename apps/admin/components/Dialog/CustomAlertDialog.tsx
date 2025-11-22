@@ -9,7 +9,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from "@workspace/ui/components/alert-dialog";
 
 interface CustomAlertDialogProps {
   isOpen: boolean;
@@ -28,11 +28,7 @@ export default function CustomAlertDialog({
     <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent className="w-fit h-[345px] rounded-[45px]">
         <AlertDialogHeader className="flex flex-col items-center">
-          <img
-            src={"/warningIcon.png"}
-            alt="Warning"
-            className="w-[50px]"
-          />
+          <img src={"/warningIcon.png"} alt="Warning" className="w-[50px]" />
           <AlertDialogTitle className="text-center text-[28px] font-extrabold">
             {title}
           </AlertDialogTitle>

@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import UnlockHistoryDialog, { type User } from "./UnlockHistoryDialog";
+import { BackspaceIcon } from "@heroicons/react/24/solid";
+import { CheckCircle2Icon, MinusCircle } from "lucide-react";
 
 type UnlockRequest = {
   id: number;
@@ -9,7 +11,7 @@ type UnlockRequest = {
   reason: string;
   date: string;
   status: "pending" | "processed";
-}
+};
 
 interface UnlockRequestDialogProps {
   request: UnlockRequest | null;
@@ -17,12 +19,16 @@ interface UnlockRequestDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export default function UnlockRequestDialog({ request, open, onOpenChange }: UnlockRequestDialogProps) {
+export default function UnlockRequestDialog({
+  request,
+  open,
+  onOpenChange,
+}: UnlockRequestDialogProps) {
   const [action, setAction] = useState<"unlock" | "reject" | null>(null);
   const [warnLast, setWarnLast] = useState(false);
   const [sendCommitment, setSendCommitment] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
-  
+
   // State for unlock history dialog
   const [showHistoryDialog, setShowHistoryDialog] = useState(false);
 
@@ -34,11 +40,12 @@ export default function UnlockRequestDialog({ request, open, onOpenChange }: Unl
       const user: User = {
         fullName: "Trịnh Mai Cường",
         role: "Nhà thiết kế",
-        email: "maicuong123@gmail.com", 
+        email: "maicuong123@gmail.com",
         phone: "0123456789",
         status: "Đang bị khoá",
         lockDate: "10/07/2025",
-        lockReason: "Tài khoản bị khóa do đăng mẫu thiết kế bị báo cáo vi phạm bản quyền quá 3 lần trong vòng 7 ngày.",
+        lockReason:
+          "Tài khoản bị khóa do đăng mẫu thiết kế bị báo cáo vi phạm bản quyền quá 3 lần trong vòng 7 ngày.",
         appealReason: "Tài khoản bị khoá nhầm",
         processingHistory: [
           {
@@ -46,16 +53,16 @@ export default function UnlockRequestDialog({ request, open, onOpenChange }: Unl
             processor: "Nguyễn Thị Bình",
             processDate: "15/07/2025",
             action: "Từ chối",
-            note: "Vi phạm 1 lần trước đó, chưa gỡ mẫu vi phạm."
+            note: "Vi phạm 1 lần trước đó, chưa gỡ mẫu vi phạm.",
           },
           {
             id: 2,
-            processor: "Nguyễn Văn An", 
+            processor: "Nguyễn Văn An",
             processDate: "24/07/2025",
             action: "Từ chối",
-            note: "Đề nghị khoá vĩnh viễn."
-          }
-        ]
+            note: "Đề nghị khoá vĩnh viễn.",
+          },
+        ],
       };
 
       return (
@@ -86,7 +93,8 @@ export default function UnlockRequestDialog({ request, open, onOpenChange }: Unl
     phone: "0123456789",
     status: "Đang bị khoá",
     lockDate: "10/07/2025",
-    lockReason: "Tài khoản bị khóa do đăng mẫu thiết kế bị báo cáo vi phạm bản quyền quá 3 lần trong vòng 7 ngày.",
+    lockReason:
+      "Tài khoản bị khóa do đăng mẫu thiết kế bị báo cáo vi phạm bản quyền quá 3 lần trong vòng 7 ngày.",
     appealReason: request.reason,
     processingHistory: [
       {
@@ -94,9 +102,9 @@ export default function UnlockRequestDialog({ request, open, onOpenChange }: Unl
         processor: "Nguyễn Thị Bình",
         processDate: "15/07/2025",
         action: "Từ chối",
-        note: "Vi phạm 1 lần trước đó, chưa gỡ mẫu vi phạm."
-      }
-    ]
+        note: "Vi phạm 1 lần trước đó, chưa gỡ mẫu vi phạm.",
+      },
+    ],
   };
 
   const handleSubmit = () => {
@@ -119,13 +127,11 @@ export default function UnlockRequestDialog({ request, open, onOpenChange }: Unl
             </h2>
 
             {/* top-right close pill */}
-            <button
+            <BackspaceIcon
               onClick={() => onOpenChange(false)}
               aria-label="Đóng"
-              className="absolute right-6 top-4 inline-flex items-center justify-center w-9 h-9 hover:bg-gray-100 rounded"
-            >
-              <img src="/xButtonIcon.png" alt="Close" className="w-5 h-5" />
-            </button>
+              className="absolute right-6 top-4 inline-flex items-center justify-center w-9 h-9 text-black"
+            ></BackspaceIcon>
           </div>
 
           {/* Content */}
@@ -142,8 +148,15 @@ export default function UnlockRequestDialog({ request, open, onOpenChange }: Unl
 
             {/* Reasons */}
             <div className="mt-6 text-slate-900">
-              <ReasonSection label="Lý do khoá tài khoản" value={user.lockReason} />
-              <ReasonSection label="Lý do khiếu nại" value={user.appealReason} className="mt-4" />
+              <ReasonSection
+                label="Lý do khoá tài khoản"
+                value={user.lockReason}
+              />
+              <ReasonSection
+                label="Lý do khiếu nại"
+                value={user.appealReason}
+                className="mt-4"
+              />
             </div>
 
             {/* History table */}
@@ -154,21 +167,41 @@ export default function UnlockRequestDialog({ request, open, onOpenChange }: Unl
                 <table className="w-full table-fixed border-collapse text-sm">
                   <thead>
                     <tr className="bg-white text-left text-slate-700">
-                      <th className="py-3 px-3 border border-slate-200 w-12">STT</th>
-                      <th className="py-3 px-3 border border-slate-200">Người xử lý</th>
-                      <th className="py-3 px-3 border border-slate-200 w-40">Ngày xử lý</th>
-                      <th className="py-3 px-3 border border-slate-200 w-32">Hành động</th>
-                      <th className="py-3 px-3 border border-slate-200">Ghi chú</th>
+                      <th className="py-3 px-3 border border-slate-200 w-12">
+                        STT
+                      </th>
+                      <th className="py-3 px-3 border border-slate-200">
+                        Người xử lý
+                      </th>
+                      <th className="py-3 px-3 border border-slate-200 w-40">
+                        Ngày xử lý
+                      </th>
+                      <th className="py-3 px-3 border border-slate-200 w-32">
+                        Hành động
+                      </th>
+                      <th className="py-3 px-3 border border-slate-200">
+                        Ghi chú
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {user.processingHistory.map((record) => (
                       <tr key={record.id}>
-                        <td className="py-3 px-3 border border-slate-200">{record.id}</td>
-                        <td className="py-3 px-3 border border-slate-200">{record.processor}</td>
-                        <td className="py-3 px-3 border border-slate-200">{record.processDate}</td>
-                        <td className="py-3 px-3 border border-slate-200">{record.action}</td>
-                        <td className="py-3 px-3 border border-slate-200">{record.note}</td>
+                        <td className="py-3 px-3 border border-slate-200">
+                          {record.id}
+                        </td>
+                        <td className="py-3 px-3 border border-slate-200">
+                          {record.processor}
+                        </td>
+                        <td className="py-3 px-3 border border-slate-200">
+                          {record.processDate}
+                        </td>
+                        <td className="py-3 px-3 border border-slate-200">
+                          {record.action}
+                        </td>
+                        <td className="py-3 px-3 border border-slate-200">
+                          {record.note}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -180,74 +213,78 @@ export default function UnlockRequestDialog({ request, open, onOpenChange }: Unl
             <div className="mt-6">
               <p className="font-semibold mb-4">Hành động xử lý</p>
 
-              {/* Radio style - inline */}
-              <div className="flex items-center gap-8 mb-4">
-                <label className="flex items-center gap-3">
-                  <input
-                    type="radio"
-                    name="action"
-                    checked={action === "unlock"}
-                    onChange={() => setAction("unlock")}
-                    className="w-5 h-5 text-blue-600"
+              {/* Two-column layout: left = controls, right = rejection reason */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                {/* Left column: radios + checkboxes */}
+                <div className="space-y-4">
+                  <div className="flex items-start gap-6">
+                    <label className="flex-1 flex items-center justify-between bg-white/60 border border-slate-200 rounded-lg p-3">
+                      <div className="flex items-center gap-3">
+                        <span className="inline-flex items-center justify-center rounded-full">
+                          <CheckCircle2Icon className=" fill-green-600 text-white  w-8 h-8 " />
+                        </span>
+                        <span className="text-base font-medium">Mở khoá</span>
+                      </div>
+                      <input
+                        type="radio"
+                        name="action"
+                        checked={action === "unlock"}
+                        onChange={() => setAction("unlock")}
+                        aria-label="Mở khoá"
+                        className="appearance-none w-5 h-5 border-2 border-gray-300 rounded-sm checked:bg-green-600 checked:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-200"
+                      />
+                    </label>
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <label className="flex items-center gap-3 text-base">
+                      <input
+                        type="checkbox"
+                        checked={warnLast}
+                        onChange={(e) => setWarnLast(e.target.checked)}
+                        className="w-4 h-4 accent-green-600 border-gray-300 rounded-sm focus:ring-2 focus:ring-green-200"
+                      />
+                      <span>Cảnh báo lần cuối cùng.</span>
+                    </label>
+
+                    <label className="flex items-center gap-3 text-base">
+                      <input
+                        type="checkbox"
+                        checked={sendCommitment}
+                        onChange={(e) => setSendCommitment(e.target.checked)}
+                        className="w-4 h-4 accent-green-600 border-gray-300 rounded-sm focus:ring-2 focus:ring-green-200"
+                      />
+                      <span>Gửi cam kết qua email.</span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Right column: rejection reason textarea */}
+                <div className="space-y-2">
+                  <label className="flex-1 flex items-center justify-between bg-white/60 border border-slate-200 rounded-lg p-3">
+                    <div className="flex items-center gap-3">
+                      <span className="inline-flex items-center justify-center rounded-full">
+                        <MinusCircle className="w-8 h-8 fill-red-500 text-white" />
+                      </span>
+                      <span className="text-base font-medium">Từ chối</span>
+                    </div>
+                    <input
+                      type="radio"
+                      name="action"
+                      checked={action === "reject"}
+                      onChange={() => setAction("reject")}
+                      aria-label="Từ chối"
+                      className="appearance-none w-5 h-5 border-2 border-gray-300 rounded-sm checked:bg-red-400 checked:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-200"
+                    />
+                  </label>
+                  <p className="font-semibold mb-2">Lý do từ chối</p>
+                  <textarea
+                    value={rejectReason}
+                    onChange={(e) => setRejectReason(e.target.value)}
+                    placeholder=""
+                    className="w-full resize-y bg-transparent border-0 border-b-2 border-slate-300 focus:outline-none focus:border-slate-400 py-2 text-base min-h-[120px]"
                   />
-                  <span className="flex items-center gap-2 text-base">
-                    Mở khoá
-                    <span className="inline-flex items-center justify-center rounded bg-green-600 text-white w-6 h-6 text-xs">
-                      ✓
-                    </span>
-                  </span>
-                </label>
-
-                <label className="flex items-center gap-3">
-                  <input
-                    type="radio"
-                    name="action"
-                    checked={action === "reject"}
-                    onChange={() => setAction("reject")}
-                    className="w-5 h-5 text-red-600"
-                  />
-                  <span className="flex items-center gap-2 text-base">
-                    Từ chối
-                    <span className="inline-flex items-center justify-center rounded bg-red-400 text-white w-6 h-6 text-xs">
-                      ⊖
-                    </span>
-                  </span>
-                </label>
-              </div>
-
-              {/* Small checkboxes */}
-              <div className="flex flex-col gap-2 mb-6">
-                <label className="flex items-center gap-3 text-base">
-                  <input
-                    type="checkbox"
-                    checked={warnLast}
-                    onChange={(e) => setWarnLast(e.target.checked)}
-                    className="w-4 h-4"
-                  />
-                  Cảnh báo lần cuối cùng.
-                </label>
-
-                <label className="flex items-center gap-3 text-base">
-                  <input
-                    type="checkbox"
-                    checked={sendCommitment}
-                    onChange={(e) => setSendCommitment(e.target.checked)}
-                    className="w-4 h-4"
-                  />
-                  Gửi cam kết qua email.
-                </label>
-              </div>
-
-              <div className="mb-4">
-                <p className="font-semibold mb-2">Lý do từ chối</p>
-
-                {/* Underline style textarea */}
-                <textarea
-                  value={rejectReason}
-                  onChange={(e) => setRejectReason(e.target.value)}
-                  placeholder=""
-                  className="w-full resize-y bg-transparent border-0 border-b-2 border-slate-300 focus:outline-none focus:border-slate-400 py-2 text-base min-h-[56px]"
-                />
+                </div>
               </div>
             </div>
 
@@ -274,24 +311,24 @@ function InfoRow({ label, value }: { label: string; value: string }) {
       <p className="text-base font-semibold">{label}</p>
       <p className="mt-1 text-base">{value}</p>
     </div>
-  )
+  );
 }
 
-function ReasonSection({ 
-  label, 
-  value, 
-  className 
-}: { 
-  label: string; 
-  value: string; 
-  className?: string 
+function ReasonSection({
+  label,
+  value,
+  className,
+}: {
+  label: string;
+  value: string;
+  className?: string;
 }) {
   return (
     <div className={className}>
       <p className="font-semibold text-base">{label}</p>
       <p className="mt-2 text-base">{value}</p>
     </div>
-  )
+  );
 }
 
-export type { UnlockRequest }
+export type { UnlockRequest };

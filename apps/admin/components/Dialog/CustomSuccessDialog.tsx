@@ -5,7 +5,7 @@ import {
   AlertDialog,
   AlertDialogContent,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from "@workspace/ui/components/alert-dialog";
 
 interface CustomSuccessDialogProps {
   isOpen: boolean;
