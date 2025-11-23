@@ -1,27 +1,43 @@
-"use client"
+"use client";
+
+import Header from "@/components/Header/Header";
+import Sidebar from "@/components/Sidebar/Admin";
+import {
+  ShoppingCart,
+  Shirt,
+  UserCheck,
+  CircleDollarSign,
+  MessageSquareWarning,
+  Trophy,
+  Heart,
+  MessageCircle,
+  Users,
+  Gavel,
+} from "lucide-react";
+import { BackspaceIcon } from "@heroicons/react/24/solid";
 
 // Customer type and data
 type Customer = {
-  fullName: string
-  gender: string
-  username: string
-  dateOfBirth: string
-  email: string
-  accountCreated: string
-  phoneNumber: string
-  status: string
-  description: string
-  avatar: string
+  fullName: string;
+  gender: string;
+  username: string;
+  dateOfBirth: string;
+  email: string;
+  accountCreated: string;
+  phoneNumber: string;
+  status: string;
+  description: string;
+  avatar: string;
   stats: {
-    totalPurchases: number
-    auctionParticipations: number
-    auctionWins: number
-    likedDesigns: number
-    reviewsComments: number
-    warnings: number
-    followers: number
-  }
-}
+    totalPurchases: number;
+    auctionParticipations: number;
+    auctionWins: number;
+    likedDesigns: number;
+    reviewsComments: number;
+    warnings: number;
+    followers: number;
+  };
+};
 
 const customer: Customer = {
   fullName: "Trịnh Văn Dương",
@@ -33,7 +49,7 @@ const customer: Customer = {
   phoneNumber: "0987654321",
   status: "Đang hoạt động",
   description: "Tìm kiếm các mẫu thiết kế độc lạ.",
-  avatar: "/customerAvatar.png",
+  avatar: "/nonexistent-avatar.png",
   stats: {
     totalPurchases: 5,
     auctionParticipations: 2,
@@ -42,14 +58,14 @@ const customer: Customer = {
     reviewsComments: 25,
     warnings: 0,
     followers: 12,
-  }
-}
+  },
+};
 
 export default function CustomerDashboard() {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen bg-gray-100 text-black">
       {/* Header */}
-      <header className="bg-[#F0F7FF] flex items-center justify-between px-8 py-6">
+      {/* <header className="bg-[#F0F7FF] flex items-center justify-between px-8 py-6">
         <div className="flex items-center gap-3">
           <div className="rounded-full bg-white w-12 h-12 flex items-center justify-center">
             <img src="/Logo.png" alt="Logo" className="w-12 h-12" />
@@ -59,12 +75,13 @@ export default function CustomerDashboard() {
         <div className="text-2xl font-extrabold italic text-black">
           Xin chào admin: ABC
         </div>
-      </header>
+      </header> */}
+      <Header />
 
       {/* Content layout */}
       <div className="flex flex-1">
         {/* Sidebar */}
-        <aside className="w-64 bg-blue-900 text-white p-4 space-y-4">
+        {/* <aside className="w-64 bg-blue-900 text-white p-4 space-y-4">
           <nav className="flex flex-col px-2">
             <button className="w-full flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-[#002a70]">
               <img src="/homeIcon.png" alt="Home" className="w-8 h-8 shrink-0" />
@@ -107,7 +124,8 @@ export default function CustomerDashboard() {
               <span className="text-2xl font-semibold whitespace-nowrap leading-none">Đăng xuất</span>
             </button>
           </nav>
-        </aside>
+        </aside> */}
+        <Sidebar />
 
         {/* Main content */}
         <main className="flex-1 bg-white p-6 overflow-y-auto text-lg">
@@ -118,6 +136,16 @@ export default function CustomerDashboard() {
                 src={customer.avatar}
                 alt="Avatar"
                 className="w-48 h-48 rounded-full border mb-3"
+                onError={(e) => {
+                  e.currentTarget.src = "https://picsum.photos/id/237/200/300";
+                }}
+                onLoad={(e) => {
+                  const img = e.currentTarget;
+                  // Check if the image has valid dimensions
+                  if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+                    img.src = "https://picsum.photos/id/237/200/300";
+                  }
+                }}
               />
               <h2 className="text-2xl font-bold text-black">KHÁCH HÀNG</h2>
             </div>
@@ -127,7 +155,10 @@ export default function CustomerDashboard() {
               <InfoRow label="Tên đăng nhập" value={customer.username} />
               <InfoRow label="Ngày sinh" value={customer.dateOfBirth} />
               <InfoRow label="Địa chỉ email" value={customer.email} />
-              <InfoRow label="Ngày tạo tài khoản" value={customer.accountCreated} />
+              <InfoRow
+                label="Ngày tạo tài khoản"
+                value={customer.accountCreated}
+              />
               <InfoRow label="Số điện thoại" value={customer.phoneNumber} />
               <InfoRow label="Trạng thái" value={customer.status} />
               <div className="col-span-2">
@@ -139,18 +170,53 @@ export default function CustomerDashboard() {
           {/* Stat Cards */}
           <h2 className="font-bold text-xl mb-4">Thống kê hoạt động</h2>
           <div className="grid grid-cols-2 gap-4 mb-6">
-            <StatCard color="bg-yellow-600" iconSrc="/numberOfDesignBoughtIcon.png" label="Tổng số mẫu đã mua" value={customer.stats.totalPurchases.toString()} />
-            <StatCard color="bg-blue-800" iconSrc="/numberOfAuctionJoinedIcon.png" label="Tổng số lần tham gia đấu giá" value={customer.stats.auctionParticipations.toString()} />
-            <StatCard color="bg-teal-600" iconSrc="/numberOfAuctionWonIcon.png" label="Số mẫu đã thắng đấu giá" value={customer.stats.auctionWins.toString()} />
-            <StatCard color="bg-green-800" iconSrc="/numberOfDeisgnLikedIcon.png" label="Số mẫu đã thích" value={customer.stats.likedDesigns.toString()} />
-            <StatCard color="bg-purple-700" iconSrc="/numberOfCommentIcon.png" label="Số lượt đánh giá, bình luận" value={customer.stats.reviewsComments.toString()} />
-            <StatCard color="bg-red-600" iconSrc="/numberOfWarningIcon.png" label="Số lần bị cảnh báo" value={customer.stats.warnings.toString()} />
-            <StatCard color="bg-gray-700" iconSrc="/numberOfFollowerIcon.png" label="Số người đang theo dõi" value={customer.stats.followers.toString()} />
+            <StatCard
+              color="bg-yellow-600"
+              icon={ShoppingCart}
+              label="Tổng số mẫu đã mua"
+              value={customer.stats.totalPurchases.toString()}
+            />
+            <StatCard
+              color="bg-blue-800"
+              icon={Gavel}
+              label="Tổng số lần tham gia đấu giá"
+              value={customer.stats.auctionParticipations.toString()}
+            />
+            <StatCard
+              color="bg-teal-600"
+              icon={Trophy}
+              label="Số mẫu đã thắng đấu giá"
+              value={customer.stats.auctionWins.toString()}
+            />
+            <StatCard
+              color="bg-green-800"
+              icon={Heart}
+              label="Số mẫu đã thích"
+              value={customer.stats.likedDesigns.toString()}
+            />
+            <StatCard
+              color="bg-purple-700"
+              icon={MessageCircle}
+              label="Số lượt đánh giá, bình luận"
+              value={customer.stats.reviewsComments.toString()}
+            />
+            <StatCard
+              color="bg-red-600"
+              icon={MessageSquareWarning}
+              label="Số lần bị cảnh báo"
+              value={customer.stats.warnings.toString()}
+            />
+            <StatCard
+              color="bg-gray-700"
+              icon={Users}
+              label="Số người đang theo dõi"
+              value={customer.stats.followers.toString()}
+            />
           </div>
         </main>
       </div>
     </div>
-  )
+  );
 }
 
 /* --- Components --- */
@@ -160,29 +226,29 @@ function InfoRow({ label, value }: { label: string; value: string }) {
       <span className="font-semibold">{label}: </span>
       {value}
     </p>
-  )
+  );
 }
 
 function StatCard({
   color,
-  iconSrc,
+  icon: Icon,
   label,
   value,
 }: {
-  color: string
-  iconSrc: string
-  label: string
-  value: string
+  color: string;
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
 }) {
   return (
     <div
       className={`${color} rounded-full flex items-center gap-4 px-5 py-4 min-h-[92px] h-full min-w-0 shadow-md text-white`}
     >
-      <img src={iconSrc} alt={label} className="w-8 h-8 shrink-0" />
+      <Icon className="w-8 h-8 shrink-0" />
       <span className="flex-1 font-semibold leading-tight whitespace-nowrap overflow-hidden text-ellipsis">
         {label}
       </span>
       <span className="font-bold text-xl whitespace-nowrap">{value}</span>
     </div>
-  )
+  );
 }

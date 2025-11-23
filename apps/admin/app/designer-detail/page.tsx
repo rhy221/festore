@@ -4,6 +4,15 @@ import { useState } from "react";
 import DesignDetailDialog, {
   type Design,
 } from "@/components/DesignDetailDialog";
+import Header from "@/components/Header/Header";
+import Sidebar from "@/components/Sidebar/Admin";
+import {
+  ShoppingCart,
+  Shirt,
+  UserCheck,
+  CircleDollarSign,
+  MessageSquareWarning,
+} from "lucide-react";
 
 // Designer type and data
 type Designer = {
@@ -107,9 +116,9 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen bg-gray-100 text-black">
       {/* Header */}
-      <header className="bg-[#F0F7FF] flex items-center justify-between px-8 py-6">
+      {/* <header className="bg-[#F0F7FF] flex items-center justify-between px-8 py-6">
         <div className="flex items-center gap-3">
           <div className="rounded-full bg-white w-12 h-12 flex items-center justify-center">
             <img src="/Logo.png" alt="Logo" className="w-12 h-12" />
@@ -119,12 +128,13 @@ export default function AdminDashboard() {
         <div className="text-2xl font-extrabold italic text-black">
           Xin chào admin: ABC
         </div>
-      </header>
+      </header> */}
+      <Header />
 
       {/* Content layout */}
       <div className="flex flex-1">
         {/* Sidebar */}
-        <aside className="w-64 bg-blue-900 text-white p-4 space-y-4">
+        {/* <aside className="w-64 bg-blue-900 text-white p-4 space-y-4">
           <nav className="flex flex-col px-2">
             <button className="w-full flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-[#002a70]">
               <img
@@ -209,7 +219,8 @@ export default function AdminDashboard() {
               </span>
             </button>
           </nav>
-        </aside>
+        </aside> */}
+        <Sidebar />
 
         {/* Main content */}
         <main className="flex-1 bg-white p-6 overflow-y-auto text-lg">
@@ -220,6 +231,16 @@ export default function AdminDashboard() {
                 src={designer.avatar}
                 alt="Avatar"
                 className="w-48 h-48 rounded-full border mb-3"
+                onError={(e) => {
+                  e.currentTarget.src = "https://picsum.photos/id/237/200/300";
+                }}
+                onLoad={(e) => {
+                  const img = e.currentTarget;
+                  // Check if the image has valid dimensions
+                  if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+                    img.src = "https://picsum.photos/id/237/200/300";
+                  }
+                }}
               />
               <h2 className="text-2xl font-bold text-black">NHÀ THIẾT KẾ</h2>
             </div>
@@ -242,34 +263,34 @@ export default function AdminDashboard() {
           </div>
 
           {/* Stat Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 text-white">
+          <div className="grid grid-cols-2 gap-4 mb-6 text-white">
             <StatCard
               color="bg-teal-600"
-              iconSrc="/numberOfDesignPostedIcon.png"
+              icon={Shirt}
               label="Số mẫu đã đăng"
               value={designer.stats.designsPosted.toString()}
             />
             <StatCard
               color="bg-pink-600"
-              iconSrc="/revenueIcon.png"
+              icon={CircleDollarSign}
               label="Doanh thu"
               value={designer.stats.revenue}
             />
             <StatCard
               color="bg-red-600"
-              iconSrc="/numberOfWarningIcon.png"
+              icon={MessageSquareWarning}
               label="Số mẫu bị báo cáo"
               value={designer.stats.reportedDesigns.toString()}
             />
             <StatCard
               color="bg-blue-600"
-              iconSrc="/mostAppealDesignIcon.png"
+              icon={ShoppingCart}
               label="Mẫu thu hút nhất"
               value={designer.stats.mostAppealingDesign}
             />
             <StatCard
               color="bg-gray-700"
-              iconSrc="/numberOfFollowerIcon.png"
+              icon={UserCheck}
               label="Số người theo dõi"
               value={designer.stats.followers.toString()}
             />
@@ -337,12 +358,12 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 
 function StatCard({
   color,
-  iconSrc,
+  icon: Icon,
   label,
   value,
 }: {
   color: string;
-  iconSrc: string;
+  icon: React.ComponentType<{ className?: string }>;
   label: string;
   value: string;
 }) {
@@ -350,7 +371,7 @@ function StatCard({
     <div
       className={`${color} rounded-full flex items-center gap-4 px-5 py-4 min-h-[92px] h-full min-w-0 shadow-md`}
     >
-      <img src={iconSrc} alt={label} className="w-8 h-8 shrink-0" />
+      <Icon className="w-8 h-8 shrink-0" />
       <span className="flex-1 font-semibold leading-tight whitespace-nowrap overflow-hidden text-ellipsis">
         {label}
       </span>
@@ -379,6 +400,16 @@ function DesignCard({
         src={image}
         alt={title}
         className="w-40 h-40 object-cover rounded-md mb-4 border border-white/20"
+        onError={(e) => {
+          e.currentTarget.src = "https://picsum.photos/id/237/200/300";
+        }}
+        onLoad={(e) => {
+          const img = e.currentTarget;
+          // Check if the image has valid dimensions
+          if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+            img.src = "https://picsum.photos/id/237/200/300";
+          }
+        }}
       />
       <p className="font-semibold text-lg">{title}</p>
       <p className="font-semibold text-lg mt-1">

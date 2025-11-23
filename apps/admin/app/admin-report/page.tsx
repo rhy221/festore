@@ -121,7 +121,7 @@ export default function AdminReportPage() {
       <Header />
 
       {/* Content layout */}
-      <div className="flex flex-1 pt-32">
+      <div className="flex flex-1">
         {/* Sidebar */}
         <Sidebar />
 

@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@workspace/ui/components/dialog";
+import { BackspaceIcon } from "@heroicons/react/24/solid";
 
 type Design = {
   name: string;
@@ -41,18 +42,21 @@ export default function DesignWarningDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl p-6" showCloseButton={false}>
+      <DialogContent
+        className="max-w-4xl p-6 bg-white text-black"
+        showCloseButton={false}
+      >
         {/* Header */}
         <div className="flex items-center justify-between">
-          <DialogTitle className="text-xl font-bold">Cảnh cáo</DialogTitle>
+          <DialogTitle className="text-xl font-bold text-black">
+            Cảnh cáo
+          </DialogTitle>
 
           {/* Close button with X icon image */}
-          <button
+          <BackspaceIcon
+            className="w-8 h-8 pt-1 text-black cursor-pointer"
             onClick={() => onOpenChange(false)}
-            className="flex items-center justify-center w-8 h-6 border rounded-md bg-muted hover:bg-muted/70"
-          >
-            <img src="/xButtonIcon.png" alt="Close" className="w-4 h-4" />
-          </button>
+          />
         </div>
 
         {/* Content */}
@@ -63,6 +67,9 @@ export default function DesignWarningDialog({
               src={design.image}
               alt={design.name}
               className="w-full rounded-md border"
+              onError={(e) => {
+                e.currentTarget.src = "https://picsum.photos/id/237/200/300";
+              }}
             />
           </div>
 

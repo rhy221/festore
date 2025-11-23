@@ -7,21 +7,21 @@ interface HeaderProps {
 
 export default function Header({ role = "admin", name = "ABC" }: HeaderProps) {
   return (
-    <header className="fixed top-0 left-0 w-full flex items-center justify-between h-32 bg-[#EFF6FF] shadow z-50">
-      <div className="flex items-center space-x-4 pl-7">
+    <header className="sticky top-0 w-full flex items-center justify-between h-20 bg-[#EFF6FF] shadow z-50">
+      <div className="flex items-center space-x-3 pl-6">
         <Image
           src="/logo.png"
           alt="Profile"
-          width={80}
-          height={80}
-          className="w-16 h-16 md:w-[127px] md:h-[127px]"
+          width={60}
+          height={60}
+          className="w-12 h-12 md:w-16 md:h-16"
         />
-        <span className="text-2xl sm:text-3xl md:text-[44px] font-extrabold">
+        <span className="text-lg sm:text-xl md:text-2xl font-extrabold">
           HHCLOSET
         </span>
       </div>
       <div className="truncate max-w-[52%] text-right">
-        <span className="text-xl sm:text-2xl md:text-4xl font-black italic pr-32">
+        <span className="text-sm sm:text-base md:text-lg font-black italic pr-6">
           Xin chào {role}: {name}
         </span>
       </div>

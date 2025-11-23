@@ -15,6 +15,8 @@ import {
   EyeIcon,
   Trash2,
 } from "lucide-react";
+import Sidebar from "@/components/Sidebar/Admin";
+import Header from "@/components/Header/Header";
 
 // Types
 type User = {
@@ -150,10 +152,24 @@ export default function AdminUsersPage() {
   const displayUnlockStatus = (s: string) =>
     s === "pending" ? "Đang chờ xử lý" : "Đã xử lý";
 
+  //Handle View Clicking Event
+  function handleView() {
+    //code here
+  }
+
+  //Handle Lock Clicking Event
+  function handleLock() {
+    //code here
+  }
+
+  function handleDelete() {
+    //code here
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 text-black">
       {/* Top Banner */}
-      <header className="bg-[#F0F7FF] flex items-center justify-between px-8 py-6">
+      {/* <header className="bg-[#F0F7FF] flex items-center justify-between px-8 py-6">
         <div className="flex items-center gap-3">
           <div className="rounded-full bg-white w-12 h-12 flex items-center justify-center">
             <img src="/Logo.png" alt="Logo" className="w-12 h-12" />
@@ -163,12 +179,13 @@ export default function AdminUsersPage() {
         <div className="text-2xl font-extrabold italic text-black">
           {adminInfo.greeting}: {adminInfo.name}
         </div>
-      </header>
+      </header> */}
+      <Header />
 
       {/* Main layout */}
       <div className="flex flex-1">
         {/* Sidebar */}
-        <aside className="w-64 bg-blue-900 text-white p-4 space-y-4">
+        {/* <aside className="w-64 bg-blue-900 text-white p-4 space-y-4">
           <nav className="flex flex-col px-2">
             <button className="w-full flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-[#002a70]">
               <img
@@ -253,10 +270,11 @@ export default function AdminUsersPage() {
               </span>
             </button>
           </nav>
-        </aside>
+        </aside> */}
+        <Sidebar />
 
         {/* Main content */}
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6 ml-0">
           {/* Quick stats */}
 
           <section className="mb-8">
@@ -493,13 +511,25 @@ export default function AdminUsersPage() {
                 {displayUserStatus(u.status)}
               </td>
               <td className="p-3 flex items-center gap-2">
-                <EyeIcon size={30} className="fill-black text-white"></EyeIcon>
+                <EyeIcon
+                  onClick={handleView}
+                  size={30}
+                  className="fill-black text-white"
+                ></EyeIcon>
                 {u.status === "locked" ? (
-                  <LockKeyhole size={30} className=""></LockKeyhole>
+                  <LockKeyhole
+                    onClick={handleLock}
+                    size={30}
+                    className=""
+                  ></LockKeyhole>
                 ) : (
-                  <LockKeyholeOpen size={30} className=""></LockKeyholeOpen>
+                  <LockKeyholeOpen
+                    onClick={handleLock}
+                    size={30}
+                    className=""
+                  ></LockKeyholeOpen>
                 )}
-                <Trash2 size={30} className=""></Trash2>
+                <Trash2 onClick={handleDelete} size={30} className=""></Trash2>
               </td>
             </tr>
           ))}

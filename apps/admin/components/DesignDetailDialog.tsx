@@ -7,6 +7,8 @@ import {
   DialogTitle,
 } from "@workspace/ui/components/dialog";
 import DesignWarningDialog from "@/components/DesignWarningDialog";
+import { BackspaceIcon } from "@heroicons/react/24/solid";
+
 type Design = {
   name: string;
   designer: string;
@@ -70,20 +72,21 @@ export default function DesignDetailDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-3xl p-6" showCloseButton={false}>
+        <DialogContent
+          className="max-w-3xl p-6 bg-white text-black"
+          showCloseButton={false}
+        >
           {/* Header */}
           <div className="flex items-center justify-between">
-            <DialogTitle className="text-xl font-bold">
+            <DialogTitle className="text-xl font-bold text-black">
               Xem chi tiết mẫu thiết kế
             </DialogTitle>
 
             {/* Close button with X icon image */}
-            <button
+            <BackspaceIcon
+              className="w-8 h-8 pt-1 text-black cursor-pointer"
               onClick={() => onOpenChange(false)}
-              className="flex items-center justify-center w-8 h-6 border rounded-md bg-muted hover:bg-muted/70"
-            >
-              <img src="/xButtonIcon.png" alt="Close" className="w-4 h-4" />
-            </button>
+            />
           </div>
 
           {/* Content */}
@@ -94,55 +97,79 @@ export default function DesignDetailDialog({
                 src={design.image}
                 alt={design.name}
                 className="w-full rounded-md border"
+                onError={(e) => {
+                  e.currentTarget.src = "https://picsum.photos/id/237/200/300";
+                }}
+                onLoad={(e) => {
+                  const img = e.currentTarget;
+                  // Check if the image has valid dimensions
+                  if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+                    img.src = "https://picsum.photos/id/237/200/300";
+                  }
+                }}
               />
             </div>
 
             {/* Right: Info */}
-            <div className="flex-1 space-y-2 text-sm leading-relaxed">
-              <p>
-                <span className="font-semibold">Tên mẫu thiết kế:</span>{" "}
+            <div className="flex-1 space-y-2 text-sm leading-relaxed text-black">
+              <p className="text-black">
+                <span className="font-semibold text-black">
+                  Tên mẫu thiết kế:
+                </span>{" "}
                 {design.name}
               </p>
-              <p>
-                <span className="font-semibold">Nhà thiết kế:</span>{" "}
+              <p className="text-black">
+                <span className="font-semibold text-black">Nhà thiết kế:</span>{" "}
                 {design.designer}
               </p>
-              <p>
-                <span className="font-semibold">Mô tả:</span>{" "}
+              <p className="text-black">
+                <span className="font-semibold text-black">Mô tả:</span>{" "}
                 {design.description}
               </p>
-              <p>
-                <span className="font-semibold">Thể loại:</span>{" "}
+              <p className="text-black">
+                <span className="font-semibold text-black">Thể loại:</span>{" "}
                 {design.category}
               </p>
-              <p>
-                <span className="font-semibold">Trạng thái:</span>{" "}
+              <p className="text-black">
+                <span className="font-semibold text-black">Trạng thái:</span>{" "}
                 {design.status} &nbsp;&nbsp;
-                <span className="font-semibold">Ngày đăng mẫu:</span>{" "}
+                <span className="font-semibold text-black">
+                  Ngày đăng mẫu:
+                </span>{" "}
                 {design.datePosted}
               </p>
 
-              <h4 className="mt-3 font-semibold">Thông tin bán hàng</h4>
-              <p>
-                <span className="font-semibold">Giá bán trực tiếp:</span>{" "}
+              <h4 className="mt-3 font-semibold text-black">
+                Thông tin bán hàng
+              </h4>
+              <p className="text-black">
+                <span className="font-semibold text-black">
+                  Giá bán trực tiếp:
+                </span>{" "}
                 {design.salesInfo.directPrice}
               </p>
-              <p>
-                <span className="font-semibold">Đấu giá:</span>
+              <p className="text-black">
+                <span className="font-semibold text-black">Đấu giá:</span>
               </p>
-              <ul className="list-disc list-inside pl-2">
-                <li>Giá khởi điểm: {design.salesInfo.auction.startingPrice}</li>
-                <li>Bước giá: {design.salesInfo.auction.priceStep}</li>
-                <li>
+              <ul className="list-disc list-inside pl-2 text-black">
+                <li className="text-black">
+                  Giá khởi điểm: {design.salesInfo.auction.startingPrice}
+                </li>
+                <li className="text-black">
+                  Bước giá: {design.salesInfo.auction.priceStep}
+                </li>
+                <li className="text-black">
                   Giá chốt cuối cùng: {design.salesInfo.auction.finalPrice}
                 </li>
-                <li>Người chốt: {design.salesInfo.auction.winner}</li>
+                <li className="text-black">
+                  Người chốt: {design.salesInfo.auction.winner}
+                </li>
               </ul>
 
-              <p>
-                <span className="font-semibold">Lượt thích:</span>{" "}
+              <p className="text-black">
+                <span className="font-semibold text-black">Lượt thích:</span>{" "}
                 {design.engagement.likes} &nbsp;&nbsp;
-                <span className="font-semibold">Lượt xem:</span>{" "}
+                <span className="font-semibold text-black">Lượt xem:</span>{" "}
                 {design.engagement.views}
               </p>
             </div>
