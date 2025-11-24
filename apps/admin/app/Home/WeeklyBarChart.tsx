@@ -1,5 +1,5 @@
 "use client";
-import { BarChart, Bar, CartesianGrid, XAxis, YAxis } from "recharts";
+import { BarChart, Bar, CartesianGrid, XAxis, YAxis, LegendProps } from "recharts";
 import {
   ChartContainer,
   ChartTooltip,
@@ -7,9 +7,9 @@ import {
   ChartLegend,
   ChartLegendContent,
   ChartConfig,
-} from "@/components/ui/chart";
+} from "@workspace/ui/components/chart";
+import React from 'react';
 
-// Sample data
 const chartData = [
   { week: "Tuần 1", designs: 5 },
   { week: "Tuần 2", designs: 16 },
@@ -41,15 +41,10 @@ export default function WeeklyChart({ data = chartData }: WeeklyChartProps) {
   const maxDesigns = Math.max(...data.map(d => d.designs));
   return (
     <div className="flex flex-col w-full pl-7 pt-5 mb-10">
-      {/* Header text */}
-      <h2 className="text-[32px] font-extrabold pl-3 mb-4">
-        Biểu đồ trực quan
-        </h2>
-      <p className="text-2xl font-normal mb-20 pl-16">
+      <p className="text-2xl font-normal mb-20">
         Số lượng mẫu thiết kế mới mỗi tuần
       </p>
 
-      {/* Chart area */}
       <div className="flex pl-48 w-full">
         <ChartContainer
           config={chartConfig}
@@ -77,7 +72,8 @@ export default function WeeklyChart({ data = chartData }: WeeklyChartProps) {
               
             />
             <ChartTooltip content={<ChartTooltipContent />} />
-            <ChartLegend content={<ChartLegendContent />} />
+            
+            <ChartLegend content={<ChartLegendContent/>} />
             <Bar
               dataKey="designs"
               fill="var(--color-designs)"

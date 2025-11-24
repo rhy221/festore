@@ -1,27 +1,23 @@
-import { Card, CardContent } from '@/components/ui/card'
-import Image from 'next/image'
+import { Card, CardContent } from '@workspace/ui/components/card'
+
 interface StatCardProps {
   title: string
   value: number
-  img: React.ReactNode
   bgColor: string
 }
 
-function StatCard({ title, value, img, bgColor }: StatCardProps) {
+function StatCard({ title, value, bgColor }: StatCardProps) {
   return (
-    <Card className={`${bgColor} border-0 w-61 h-33 rounded-[45px] pt-3`}>
-      <CardContent className="">
-        <h3 className="text-white text-xl font-extrabold mb-4 whitespace-nowrap text-center">
+    <Card
+      className={`${bgColor} border-0 w-[220px] h-[100px] rounded-[30px] pt-3`}
+    >
+      <CardContent className="pt-3 px-4">
+        <h3 className="text-white text-base font-extrabold mb-1 whitespace-nowrap text-center">
           {title}
         </h3>
-        <div className="flex items-center justify-center gap-7">
-          {/* Icon */}
-          <div className="text-white/90">
-            {img}
-          </div>
-          
-          {/* Number */}
-          <div className="text-white text-5xl font-extrabold">
+
+        <div className="flex items-center justify-center">
+          <div className="text-white text-3xl font-extrabold">
             {value}
           </div>
         </div>
@@ -36,60 +32,39 @@ interface QuickStatsProps {
   categoryCount?: number
 }
 
-export default function QuickStats({ 
-  userCount = 100, 
-  templateCount = 130, 
-  categoryCount = 25 
+export default function QuickStats({
+  userCount = 100,
+  templateCount = 130,
+  categoryCount = 25
 }: QuickStatsProps = {}) {
   const stats = [
     {
-      title: "Tổng số người dùng",
+      title: 'Tổng số người dùng',
       value: userCount,
-      img: (
-        <Image src="/totalUser.png"
-          alt="Total User"
-          width={50}
-          height={50}/>
-      ),
-      bgColor: "bg-[#00C853]"
+      bgColor: 'bg-[#00C853]'
     },
     {
-      title: "Tổng số mẫu thiết kế",
+      title: 'Tổng số mẫu thiết kế',
       value: templateCount,
-      img: (
-        <Image src="/totalDesign.png"
-          alt="Total Design"
-          width={50}
-          height={50}/>
-      ),
-      bgColor: "bg-[#FFD700]"
+      bgColor: 'bg-[#FFD700]'
     },
     {
-      title: "Tổng số thể loại",
+      title: 'Tổng số thể loại',
       value: categoryCount,
-      img: (
-        <Image src="/totalCategory.png"
-          alt="Total Category"
-          width={50}
-          height={50}/>
-      ),
-      bgColor: "bg-[#FF69B4]"
+      bgColor: 'bg-[#FF69B4]'
     }
   ]
 
   return (
-    <div className="pl-7 pt-5">
-      <h1 className="text-[32px] font-extrabold mb-3">
-        Thống kê nhanh
-      </h1>
-      
-      <div className="flex flex-wrap gap-6 pl-44">
+    <div className="p-4">
+      <h1 className="text-3xl font-extrabold mb-4">Thống kê nhanh</h1>
+
+      <div className="flex flex-wrap gap-6 justify-start">
         {stats.map((stat, index) => (
           <StatCard
             key={index}
             title={stat.title}
             value={stat.value}
-            img={stat.img}
             bgColor={stat.bgColor}
           />
         ))}
