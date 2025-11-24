@@ -160,30 +160,19 @@ interface ProductCardProps {
 
 function ProductCard({ title, imageUrl, href, onMenuClick }: ProductCardProps) {
   return (
-    <div className="relative bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow m-2">
+    <div className="relative bg-[#F5E6D3] rounded-2xl p-4 hover:shadow-lg transition-shadow m-2">
       <a href={href} className="block">
-        <div className="relative w-full h-48 mb-3">
+        <div className="relative w-full h-48 mb-3 rounded-xl overflow-hidden bg-white">
           <img
             src={imageUrl}
             alt={title}
-            className="w-full h-full object-cover rounded-md"
+            className="w-full h-full object-cover"
           />
         </div>
-        <h3 className="text-base font-semibold text-center truncate">
+        <h3 className="text-base font-semibold text-center text-black">
           {title}
         </h3>
       </a>
-      {onMenuClick && (
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            onMenuClick();
-          }}
-          className="absolute top-2 right-2 p-2 bg-white rounded-full shadow hover:bg-gray-100"
-        >
-          <MoreVertical className="w-5 h-5" />
-        </button>
-      )}
     </div>
   );
 }
