@@ -1,5 +1,5 @@
 import http from "@/lib/http";
-import { CategoryType, CommentType, DesignResType, GetGalleryItemsResType, GetStoreItemsResType, UploadDesignType, UploadProductType } from "@/schema/product.schema";
+import { CategoryType, CommentType, DesignResType, EditProductType, GetGalleryItemsResType, GetStoreItemsResType, UploadDesignType, UploadProductType } from "@/schema/product.schema";
 
 // export type ProductKind = "selling" | "auction" | "bought";
 // export type UserProduct = {
@@ -61,6 +61,10 @@ const productsAction = {
     const response = await http.post<UploadProductType>(`/products/create`, body, {timeout: 90000});
     return response.data;
   },
+  edit: async (body: {data: FormData, id: string}) => {
+    const response = await http.post<DesignResType>(`/products/update/${body.id}`, body.data, {timeout: 90000});
+    return response.data;
+  },
   getGalleryItems: async () => {
     const response = await http.get<GetGalleryItemsResType>('/products/gallery');
     console.log(response.data);
@@ -86,5 +90,68 @@ const productsAction = {
     const response = await http.post("/products/follow-designer", {designerId});
     return response.data;
   },
+
+  // getProducts: (params?: any) => 
+  //   apiClient.get('/products', { params }).then(res => res.data),
+  
+  getMyProducts: async (params?: any) => {
+    const response = await http.get(`/products/my-products?page=${params.page}&limit=${params.limit}`);
+    return response.data;
+  },
+  // getMyProducts: (params?: any) => 
+  //   apiClient.get('/products/my-products', { params }).then(res => res.data),
+  
+  // getProductById: (id: string) => 
+  //   apiClient.get(`/products/${id}`).then(res => res.data),
+  
+  // createProduct: (data: any) => 
+  //   apiClient.post('/products', data).then(res => res.data),
+  
+  // updateProduct: (id: string, data: any) => 
+  //   apiClient.put(`/products/${id}`, data).then(res => res.data),
+  
+  deleteProduct: async (id: string) => {
+    const response = await http.delete(`/products/${id}`);
+    return response.data;
+  },
+ 
+  
+  // likeProduct: (productId: string) => 
+  //   apiClient.post('/products/like', { productId }).then(res => res.data),
+  
+  // getLikedProducts: () => 
+  //   apiClient.get('/products/liked/all').then(res => res.data),
+  
+  // followSeller: (sellerId: string) => 
+  //   apiClient.post('/products/follow-seller', { sellerId }).then(res => res.data),
+  
+  // getFollowedSellers: () => 
+  //   apiClient.get('/products/followed-sellers/all').then(res => res.data),
+
+  getMyCollections: async () => {
+    const response = await http.get('/collections/my-collections');
+    return response.data;
+  },
+
+  getCollectionById: async (id: string) => {
+    const response = await http.get(`/collections/${id}`);
+    return response.data;
+  },
+
+  createCollection: async (data: any) => {
+    const response = await http.post('/collections/my-collections', data);
+    return response.data;
+  },
+
+  updateCollection: async (id: string, data: any) => {
+    const response = await http.put(`/collections/${id}`, data);
+    return response.data;
+  },
+
+  deleteCollection: async (id: string) => {
+    const response = await http.get(`/collections/${id}`);
+    return response.data;
+  },
+
 };
 export default productsAction;

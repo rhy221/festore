@@ -4,7 +4,7 @@ import { Button } from '@workspace/ui/components/button';
 import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 import { Badge } from '@workspace/ui/components/badge';
 // import { useState } from 'react';
-import { GalleryItemModal } from '@/components/gallery/gallery-item-modal';
+import { GalleryItemModal } from '@/components/gallery-item-modal';
 
 interface ProductModalProps {
   product: any;

@@ -116,7 +116,7 @@ export default function CreateAuctionPage() {
         alert('Auction created successfully!');
       else if (result.type === "fixed") 
         alert('Store item created successfully!')
-      
+      else
       alert('Gallery item created successfully!')
 
     } catch(error) {

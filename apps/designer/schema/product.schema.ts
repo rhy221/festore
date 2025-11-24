@@ -1,5 +1,5 @@
 import { describe } from "node:test";
-import z from "zod";
+import z, { string } from "zod";
 
 const fileSchema =
   typeof File !== "undefined" ? z.instanceof(File) : z.any();
@@ -76,13 +76,112 @@ const fileSchema =
 
 
 // Schema
+export const editProductSchema = z
+  .object({
+    title: z.string().min(1, "Title is required"),
+    description: z.string().min(1, "Description is required"),
+    type: z.enum(["fixed", "auction", "gallery"]),
+    
+    images: z
+    .array(fileSchema).optional(),
+    
+
+    oldImages: z
+    .array(z.string()),
+
+    models:  z
+    .array(fileSchema).optional(),
+
+    oldModels:  z
+    .array(z.string()),
+
+    // BỎ .positive() ở đây. Để coerce xử lý input.
+    // Nếu input rỗng "" -> thành 0. 0 là number hợp lệ (tạm thời).
+    price: z.coerce.number().optional(),
+    startingPrice: z.coerce.number().optional(),
+    bidIncrement: z.coerce.number().optional(),
+    
+    startTime: z.string().optional(),    
+    endTime: z.string().optional(),  
+  })
+  .superRefine((data, ctx) => {
+    // 1. VALIDATION CHO FIXED PRICE (STORE)
+    if (data.type === "fixed") {
+      // Kiểm tra: undefined, null, hoặc <= 0 (bao gồm cả trường hợp input rỗng bị coerce thành 0)
+      if (!data.price || data.price <= 0) {
+        ctx.addIssue({
+          path: ["price"],
+          message: "Price is required and must be positive",
+          code: z.ZodIssueCode.custom,
+        });
+      }
+    } 
+    
+    // 2. VALIDATION CHO AUCTION
+    else if (data.type === "auction") {
+      // -- Validate Starting Price --
+      if (!data.startingPrice || data.startingPrice <= 0) {
+        ctx.addIssue({
+          path: ["startingPrice"],
+          message: "Starting price is required and must be positive",
+          code: z.ZodIssueCode.custom,
+        });
+      }
+
+      // -- Validate Bid Increment --
+      if (!data.bidIncrement || data.bidIncrement <= 0) {
+        ctx.addIssue({
+          path: ["bidIncrement"],
+          message: "Bid increment is required and must be positive",
+          code: z.ZodIssueCode.custom,
+        });
+      }
+
+      // -- Validate Start Time --
+      if (!data.startTime) {
+        ctx.addIssue({
+          path: ["startTime"],
+          message: "Start time is required",
+          code: z.ZodIssueCode.custom,
+        });
+      }
+
+      // -- Validate End Time --
+      if (!data.endTime) {
+        ctx.addIssue({
+          path: ["endTime"],
+          message: "End time is required",
+          code: z.ZodIssueCode.custom,
+        });
+      }
+
+      // -- Logic so sánh ngày tháng --
+      if (data.startTime && data.endTime) {
+        const start = new Date(data.startTime);
+        const end = new Date(data.endTime);
+        const now = new Date();
+
+        // (Tuỳ chọn) Kiểm tra ngày bắt đầu không được trong quá khứ quá xa (cho phép sai số 1 chút)
+        // if (start < now) { ... }
+
+        if (end <= start) {
+          ctx.addIssue({
+            path: ["endTime"],
+            message: "End time must be after start time",
+            code: z.ZodIssueCode.custom,
+          });
+        }
+      }
+    }
+  });
+
+
 export const uploadProductSchema = z
   .object({
     title: z.string().min(1, "Title is required"),
     description: z.string().min(1, "Description is required"),
     type: z.enum(["fixed", "auction", "gallery"]),
     
-    // Giả sử fileSchema đã được định nghĩa ở đâu đó
       images: z
     .array(fileSchema)
     .min(1, "Please upload at least one image"),
@@ -171,11 +270,28 @@ export const uploadProductSchema = z
     }
   });
 
+export type DesignerProfile = {
+  name: string;
+  email: string;
+  avatarUrl: string;
+}
+
+export type ModelFile ={
+  publicId: string;
+
+  format: string;  
+
+  originalName: string;
+
+  size: number;
+}
 
 export type DesignResType =  {
     _id: string;
 
     designerId: string;
+
+    designerProfile: DesignerProfile;
 
     title: string;
 
@@ -183,7 +299,11 @@ export type DesignResType =  {
 
     imageUrls: string[];
 
-    fileUrl: string;
+    modelFiles: ModelFile[];
+
+    purchaseCount: number;
+
+    totalEarning: number;
 
     categoryId: string;
 
@@ -191,7 +311,15 @@ export type DesignResType =  {
 
     price: number;
 
-    type: "auction" | "fixed";
+    type: "auction" | "fixed" | "gallery";
+
+    startingPrice: number;
+    
+    bidIncrement: number;
+
+    startTime: string;
+
+    endTime: string;
 
     viewCount: number;
 
@@ -244,5 +372,6 @@ export const uploadDesignSchema = z.object({
 
 export type UploadDesignType = z.infer<typeof uploadDesignSchema>;
 export type UploadProductType = z.infer<typeof uploadProductSchema>;
+export type EditProductType = z.infer<typeof editProductSchema>;
 export type GetGalleryItemsResType = DesignResType[];
 export type GetStoreItemsResType = DesignResType[];

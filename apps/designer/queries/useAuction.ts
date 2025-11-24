@@ -4,7 +4,7 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 
 export const useAuctionQuery = (auctionId: string) => {
     return useQuery<GetAuctionResType>({
-        queryKey: ["auction"],
+        queryKey: ["auction", auctionId],
         queryFn: () => auctionAction.getAuction(auctionId),
     });
 }
@@ -33,5 +33,11 @@ export const usePlaceAuctionBidMutation = () => {
 export const useUploadAuction = () => {
     return useMutation({
         mutationFn: auctionAction.uploadAuction
+    });
+}
+
+export const useCancelAuction = () => {
+    return useMutation({
+        mutationFn: auctionAction.cancelAuction
     });
 }

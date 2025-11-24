@@ -19,13 +19,16 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { useRouter } from 'next/navigation'
 import { isTokenExpired } from '@/lib/http'
 import Image from 'next/image'
+import { useCart } from '@/queries/useCart'
 
 
 const NavBar = () => {
 
     
     const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    const {data: cart, isLoading: cartLoading} = useCart();
 
   useEffect(() => {
     const stored = localStorage.getItem("accessToken");
@@ -44,7 +47,7 @@ const NavBar = () => {
 
 
   return (
-    <div className='flex justify-between items-center py-4 px-8 border-b-2 bg-white'>
+    <div className='flex justify-between items-center bg-white px-8 border-b-2 sticky top-0 z-50'>
         {/*Left*/}
         <div className='flex items-center basis-[700px] gap-4'>
             {/* Title */}
@@ -87,8 +90,13 @@ const NavBar = () => {
             </div>
              {/*cart*/}
             <div>
-                <Button size={"icon-lg"}>
-                    <ShoppingCart fill='white' stroke='white' />
+                <Button size={"icon-lg"} asChild>
+                    <Link href={"/cart"} className='relative'>
+                        <ShoppingCart fill='white' stroke='white' />
+                        <span className="absolute -top-1 -right-1 bg-gray-700 text-[10px] text-white w-4 h-4 flex items-center justify-center rounded-full">
+                            {(cartLoading || !cart?.items) ? 0 : cart.items.length}
+                        </span>
+                    </Link>
                 </Button>
             </div>
 
@@ -112,7 +120,7 @@ const NavBar = () => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent sideOffset={6}  className='mr-8 w-52'>
                         <DropdownMenuItem>
-                            <Link href="/profile" className='w-full'>
+                            <Link href="/portfolio/infor" className='w-full'>
                                <div className='flex w-full gap-4'>
                                 <CircleUser />
                                 <span>Profile</span>
@@ -134,6 +142,14 @@ const NavBar = () => {
                                <div className='flex w-full gap-4'>
                                 <Box />
                                 <span>Products</span>
+                            </div>
+                            </Link> 
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                            <Link href="/purchase" className='w-full'>
+                               <div className='flex w-full gap-4'>
+                                <Box />
+                                <span>Purchase</span>
                             </div>
                             </Link> 
                         </DropdownMenuItem>
