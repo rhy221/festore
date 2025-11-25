@@ -26,7 +26,7 @@ export function Modal({ children }: { children: React.ReactNode }) {
       >
         <X className="w-6 h-6" />
       </button>
-      <div className='absolute inset-0 flex justify-center p-10'>{children}</div>
+      <div className='absolute inset-0 flex justify-center p-10 overflow-auto'>{children}</div>
       </div>
   )
 }

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useGetStoreItems } from '@/queries/useProduct';
 import { useRouter } from 'next/navigation';
 import { DesignResType } from '@/schema/product.schema';
+import { useAddToCart } from '@/queries/useCart';
 
 export interface StoreItem {
   id: string;
@@ -30,23 +31,33 @@ export function StoreGrid({store} : {store: DesignResType[]}) {
   const [likedItems, setLikedItems] = useState<Set<string>>(new Set());
 
   const router = useRouter();
-  const toggleLike = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setLikedItems((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
-      }
-      return newSet;
-    });
-  };
+  const addToCartMutation = useAddToCart();
+  // const toggleLike = (id: string, e: React.MouseEvent) => {
+  //   e.stopPropagation();
+  //   setLikedItems((prev) => {
+  //     const newSet = new Set(prev);
+  //     if (newSet.has(id)) {
+  //       newSet.delete(id);
+  //     } else {
+  //       newSet.add(id);
+  //     }
+  //     return newSet;
+  //   });
+  // };
+
 
   const onItemClick = (id: string) => {
     router.push(`/detail/${id}`);
   }
   
+  const onAddToCart = async (id: string) => {
+    if(addToCartMutation.isPending) return;
+    try {
+      const result = await addToCartMutation.mutateAsync({productId: id});
+    } catch(err)  {
+      console.log(err);
+    }
+  }
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -68,7 +79,7 @@ export function StoreGrid({store} : {store: DesignResType[]}) {
             {hoveredId === item._id && (
               <>
                 <div className="absolute inset-0 bg-black/40 transition-opacity" />
-                <button
+                {/* <button
                   onClick={(e) => {
                     e.stopPropagation();
                     // onAddToCart(item);
@@ -76,18 +87,17 @@ export function StoreGrid({store} : {store: DesignResType[]}) {
                   className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white text-black rounded-full p-3 hover:bg-white/90 transition-colors"
                 >
                   <ShoppingCart className="w-5 h-5" />
-                </button>
+                </button> */}
 
                 <button
-                  onClick={(e) => toggleLike(item._id, e)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAddToCart(item._id)
+                  }}
                   className="absolute top-3 right-3 bg-white/10 hover:bg-white/20 backdrop-blur rounded-full p-2 transition-colors"
                 >
-                  <Heart
-                    className={`w-4 h-4 ${
-                      likedItems.has(item._id)
-                        ? 'fill-white text-white'
-                        : 'text-white'
-                    }`}
+                  <ShoppingCart
+                    className="w-4 h-4 fill-white text-white hover:fill-blue-400 hover:text-blue-400"
                   />
                 </button>
               </>
@@ -101,24 +111,24 @@ export function StoreGrid({store} : {store: DesignResType[]}) {
           </div>
 
           <div className="mt-3 space-y-2">
-            <div className="flex items-center gap-2">
+            {/* <div className="flex items-center gap-2">
               <div className="w-5 h-5 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex-shrink-0" />
-              {/* <p className="text-white/60 text-xs truncate">{item.creatorBadge}</p> */}
-            </div>
+              <p className="text-white/60 text-xs truncate">{item.creatorBadge}</p> 
+            </div> */}
+
+            <p className="text-zinc-500 font-semibold text-sm">{item.designerProfile.name}</p>
 
             <h3 className="text-white text-sm font-medium line-clamp-2">
               {item.title}
             </h3>
 
-            {/* {!item.isFree && item.price !== null && (
-              <p className="text-white font-semibold text-sm">
+             {item.price !== null && (
+              <p className="text-white font-semibold">
                 ${item.price.toFixed(2)}
               </p>
             )}
 
-            {item.isFree && (
-              <p className="text-white font-semibold text-sm">FREE</p>
-            )} */}
+            
 
             <div className="flex items-center gap-3 text-white/50 text-xs">
               <div className="flex items-center gap-1">

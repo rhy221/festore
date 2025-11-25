@@ -188,6 +188,11 @@ export default function AuctionsPage() {
                         ENDED
                       </span>
                     )}
+                    {auction.status === 'cancelled' && (
+                      <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                        CANCELLED
+                      </span>
+                    )}
                   </div>
                 </div>
 

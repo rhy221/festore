@@ -38,5 +38,10 @@ export const auctionAction = {
     uploadAuction: async () => {
         const response = await http.post<AuctionType>(`http://localhost:3003/auctions`);
         return response.data
+    },
+
+     cancelAuction: async (id: string) => {
+        const response = await http.post<AuctionType>(`http://localhost:3003/auctions/${id}/cancel`);
+        return response.data
     }
 }
