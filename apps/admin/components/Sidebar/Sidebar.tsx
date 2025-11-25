@@ -2,12 +2,10 @@
 import Link from "next/link";
 
 const menuItems = [
-  { label: "Trang chủ", href: "/admin" },
-  { label: "Quản lý admin", href: "/admin/manage/admin" },
-  { label: "Quản lý người dùng", href: "/admin" },
+  { label: "Trang chủ", href: "/home" },
+  { label: "Quản lý người dùng", href: "/users" },
   { label: "Thể loại", href: "/admin" },
   { label: "Báo cáo", href: "/admin" },
-  { label: "Hệ thống", href: "/admin/manage/system" },
   { label: "Đăng xuất", href: "/admin" },
 ];
 

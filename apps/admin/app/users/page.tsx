@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
+import { Button } from "@workspace/ui/components/button";
+import { Input } from "@workspace/ui/components/input";
+import { Card } from "@workspace/ui/components/card";
 import UnlockRequestDialog, { type UnlockRequest } from "@/components/UnlockRequestDialog";
 
 // Types
