@@ -4,8 +4,8 @@ import Link from "next/link";
 const menuItems = [
   { label: "Trang chủ", href: "/home" },
   { label: "Quản lý người dùng", href: "/users" },
-  { label: "Thể loại", href: "/admin" },
-  { label: "Báo cáo", href: "/admin" },
+  { label: "Thể loại", href: "/category" },
+  { label: "Báo cáo", href: "/report" },
   { label: "Đăng xuất", href: "/admin" },
 ];
 

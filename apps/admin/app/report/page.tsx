@@ -12,9 +12,9 @@ import {
 import { Input } from "@workspace/ui/components/input";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@workspace/ui/components/button";
-import AdminReportDetailPopup from "../admin-report-detail/page";
+import AdminReportDetailPopup from "./DetailReport";
 import Header from "@/components/Header/Header";
-import Sidebar from "@/components/Sidebar/Admin";
+import Sidebar from "@/components/Sidebar/Sidebar";
 
 type User = {
   id: number;
