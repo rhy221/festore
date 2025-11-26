@@ -1,244 +1,168 @@
 "use client";
 
-import { SetStateAction, useState } from "react";
-import { Input } from "@workspace/ui/components/input";
-import { Button } from "@workspace/ui/components/button";
-import { CircleButton } from "@/components/button";
-import { CategoryCard } from "@/components/card";
+import { useState, useEffect } from "react";
+import { Input } from "../../../../packages/ui/src/components/input";
+import { Button, CircleButton } from "../../../../packages/ui/src/components/button";
+import { CategoryCard } from "../../../../packages/ui/src/components/card";
 import AdminCategoryAddPopup from "../admin-category-add/page";
 import AdminCategoryEditPopup from "../admin-category-edit/page";
 import AdminCategoryDeletePopup from "../admin-category-delete/page";
+import Sidebar from "../../components/Sidebar/Admin";
+import Header from "../../components/Header/Header";
+import { categoriesApi, Category } from "../../lib/api/categories";
+import { toast } from "sonner";
 
 export default function AdminCategoryDashboard() {
   const [search, setSearch] = useState("");
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
   const [showEditPopup, setShowEditPopup] = useState(false);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
-  // Optionally, you can track which category is being edited
-  // const [editCategory, setEditCategory] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
-  const handleEdit = () => {
+  // Load categories
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  const loadCategories = async (searchQuery?: string) => {
+    try {
+      setLoading(true);
+      const data = await categoriesApi.getAll(searchQuery);
+      setCategories(data);
+    } catch (error) {
+      console.error("Failed to load categories:", error);
+      toast.error("Không thể tải danh sách thể loại");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = () => {
+    loadCategories(search);
+  };
+
+  const handleEdit = (category: Category) => {
+    setSelectedCategory(category);
     setShowEditPopup(true);
     setShowDeletePopup(false);
-    // setEditCategory(category); // if you want to pass data
   };
-  const handleDelete = () => {
+
+  const handleDelete = (category: Category) => {
+    setSelectedCategory(category);
     setShowDeletePopup(true);
-    setShowEditPopup(false); // optional: close other popups
+    setShowEditPopup(false);
   };
+
+  const handleAddSuccess = () => {
+    setShowPopup(false);
+    loadCategories(search);
+    toast.success("Thêm thể loại thành công");
+  };
+
+  const handleEditSuccess = () => {
+    setShowEditPopup(false);
+    setSelectedCategory(null);
+    loadCategories(search);
+    toast.success("Cập nhật thể loại thành công");
+  };
+
+  const handleDeleteSuccess = () => {
+    setShowDeletePopup(false);
+    setSelectedCategory(null);
+    loadCategories(search);
+    toast.success("Xóa thể loại thành công");
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
-      {/* Header */}
-      <header className="bg-[#F0F7FF] flex items-center justify-between px-8 py-6">
-        <div className="flex items-center gap-3">
-          <div className="rounded-full bg-white w-12 h-12 flex items-center justify-center">
-            <img src="/Logo.png" alt="Logo" className="w-12 h-12" />
-          </div>
-          <h1 className="text-4xl font-extrabold text-black">HHCLOSET</h1>
+      <Header role="admin" name="ABC" />
+
+      <div className="flex flex-1 pt-32">
+        <div className="w-[296px]">
+          <Sidebar />
         </div>
-        <div className="text-2xl font-extrabold italic text-black">
-          Xin chào admin: ABC
-        </div>
-      </header>
 
-      {/* Content layout */}
-      <div className="flex flex-1">
-        {/* Sidebar */}
-        <aside className="w-64 bg-blue-900 text-white p-4 space-y-4">
-          <nav className="flex flex-col px-2">
-            <button className="w-full flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-[#002a&0]">
-              <img
-                src="/homeIcon.png"
-                alt="Home"
-                className="w-6 h-6 shrink-0"
-              />
-              <span className="text-2xl font-semibold whitespace-nowrap leading-none">
-                Trang chủ
-              </span>
-            </button>
-            <hr className="-mx-2 my-2 h-px bg-white/50 border-0" />
-
-            <button className="w-full flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-[#002a70]">
-              <img
-                src="/adminManagementIcon.png"
-                alt="User Management"
-                className="w-6 h-6 shrink-0"
-              />
-              <span className="text-2xl font-semibold leading-none">
-                Quản lý admin
-              </span>
-            </button>
-            <hr className="-mx-2 my-2 h-px bg-white/50 border-0" />
-
-            <button className="w-full flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-[#002a70]">
-              <img
-                src="/userManagementIcon.png"
-                alt="User Management"
-                className="w-6 h-6 shrink-0"
-              />
-              <span className="text-2xl font-semibold leading-none">
-                Quản lý người dùng
-              </span>
-            </button>
-            <hr className="-mx-2 my-2 h-px bg-white/50 border-0" />
-
-            <button className="w-full flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-[#002a70]">
-              <img
-                src="/styleIcon.png"
-                alt="Style"
-                className="w-6 h-6 shrink-0"
-              />
-              <span className="text-2xl font-semibold whitespace-nowrap leading-none">
-                Thể loại
-              </span>
-            </button>
-            <hr className="-mx-2 my-2 h-px bg-white/50 border-0" />
-
-            <button className="w-full flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-[#002a70]">
-              <img
-                src="/reportIcon.png"
-                alt="Report"
-                className="w-6 h-6 shrink-0"
-              />
-              <span className="text-2xl font-semibold whitespace-nowrap leading-none">
-                Báo cáo
-              </span>
-            </button>
-            <hr className="-mx-2 my-2 h-px bg-white/50 border-0" />
-
-            <button className="w-full flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-[#002a70]">
-              <img
-                src="/settingIcon.png"
-                alt="Settings"
-                className="w-6 h-6 shrink-0"
-              />
-              <span className="text-2xl font-semibold whitespace-nowrap leading-none">
-                Hệ thống
-              </span>
-            </button>
-            <hr className="-mx-2 my-2 h-px bg-white/50 border-0" />
-
-            <button className="w-full flex items-center gap-4 px-4 py-4 rounded-lg hover:bg-[#002a70] mt-2">
-              <img
-                src="/logoutIcon.png"
-                alt="Logout"
-                className="w-6 h-6 shrink-0"
-              />
-              <span className="text-2xl font-semibold whitespace-nowrap leading-none">
-                Đăng xuất
-              </span>
-            </button>
-          </nav>
-        </aside>
-
-        {/* Main content */}
-        <main className="flex-1 bg-white p-6 overflow-y-auto text-lg">
+        <main className="flex-1 bg-white p-6 overflow-y-auto text-lg text-black">
           {/* Search */}
           <div className="flex items-center gap-2">
             <Input
-              className="text-base !bg-[#ADD8E6] border-none rounded-3xl"
+              className="text-base text-black"
               placeholder="Nhập nội dung tìm kiếm"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             />
-            <Button className="bg-green-500 text-base text-white rounded-3xl hover:bg-green-700">
+            <Button 
+              className="bg-green-500 text-base hover:bg-green-600 text-white"
+              onClick={handleSearch}
+            >
               Tìm kiếm
             </Button>
           </div>
+
           {/* Add Category */}
           <div className="flex flex-row items-center">
-            <h2 className="font-bold px-2 py-4 text-black">
-              Danh sách thể loại
-            </h2>
+            <h2 className="font-bold px-2 py-4 text-black">Danh sách thể loại</h2>
             <CircleButton onClick={() => setShowPopup(true)} />
           </div>
+
+          {/* Loading */}
+          {loading && (
+            <div className="text-center py-8 text-gray-500">Đang tải...</div>
+          )}
+
+          {/* Grid of Categories */}
+          {!loading && categories.length > 0 && (
+            <div className="grid grid-cols-3 gap-4">
+              {categories.map((category) => (
+                <CategoryCard
+                  key={category.id}
+                  title={category.name}
+                  imageUrl={category.imageUrl || "https://picsum.photos/400/300"}
+                  href={`/admin-detail-category?id=${category.id}`}
+                  onEdit={() => handleEdit(category)}
+                  onDelete={() => handleDelete(category)}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Empty state */}
+          {!loading && categories.length === 0 && (
+            <div className="text-center py-8 text-gray-500">
+              {search ? "Không tìm thấy thể loại nào" : "Chưa có thể loại nào"}
+            </div>
+          )}
+
+          {/* Popups */}
           {showPopup && (
-            <AdminCategoryAddPopup onClose={() => setShowPopup(false)} />
+            <AdminCategoryAddPopup 
+              onClose={() => setShowPopup(false)}
+              onSuccess={handleAddSuccess}
+            />
           )}
-          {/* Table of Card choose category */}
-          <table className="table-fixed min-w-full min-h-screen">
-            <thead>
-              <tr>
-                <th className="w-1/3"></th>
-                <th className="w-1/3"></th>
-                <th className="w-1/3"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <CategoryCard
-                    title="GIÀY"
-                    imageUrl="https://picsum.photos/800/600"
-                    href="/admin-detail-category"
-                    onMenuClick={() => alert("Menu clicked")}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                  />
-                </td>
-                <td>
-                  <CategoryCard
-                    title="DẠ HỘI"
-                    imageUrl="https://picsum.photos/800/600"
-                    href="#"
-                    onMenuClick={() => alert("Menu clicked")}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                  />
-                </td>
-                <td>
-                  <CategoryCard
-                    title="ĐƯỜNG PHỐ"
-                    imageUrl="https://picsum.photos/800/600"
-                    href="#"
-                    onMenuClick={() => alert("Menu clicked")}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <CategoryCard
-                    title="PHỤ KIỆN"
-                    imageUrl="https://picsum.photos/800/600"
-                    href="#"
-                    onMenuClick={() => alert("Menu clicked")}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                  />
-                </td>
-                <td>
-                  <CategoryCard
-                    title="UNISEX"
-                    imageUrl="https://picsum.photos/800/600"
-                    href="#"
-                    onMenuClick={() => alert("Menu clicked")}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                  />
-                </td>
-                <td>
-                  <CategoryCard
-                    title="TRẺ EM"
-                    imageUrl="https://picsum.photos/800/600"
-                    href="#"
-                    onMenuClick={() => alert("Menu clicked")}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          {/* Edit Category Popup */}
-          {showEditPopup && (
-            <AdminCategoryEditPopup onClose={() => setShowEditPopup(false)} />
+
+          {showEditPopup && selectedCategory && (
+            <AdminCategoryEditPopup 
+              category={selectedCategory}
+              onClose={() => {
+                setShowEditPopup(false);
+                setSelectedCategory(null);
+              }}
+              onSuccess={handleEditSuccess}
+            />
           )}
-          {/* Delete Category Popup */}
-          {showDeletePopup && (
+
+          {showDeletePopup && selectedCategory && (
             <AdminCategoryDeletePopup
-              onClose={() => setShowDeletePopup(false)}
+              category={selectedCategory}
+              onClose={() => {
+                setShowDeletePopup(false);
+                setSelectedCategory(null);
+              }}
+              onSuccess={handleDeleteSuccess}
             />
           )}
         </main>
