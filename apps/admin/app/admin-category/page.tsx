@@ -1,9 +1,10 @@
 "use client";
 
 import { SetStateAction, useState } from "react";
-import { Input } from "../components/ui/input";
-import { Button, CircleButton } from "../components/ui/button";
-import { CategoryCard } from "../components/ui/card";
+import { Input } from "@workspace/ui/components/input";
+import { Button } from "@workspace/ui/components/button";
+import { CircleButton } from "@/components/button";
+import { CategoryCard } from "@/components/card";
 import AdminCategoryAddPopup from "../admin-category-add/page";
 import AdminCategoryEditPopup from "../admin-category-edit/page";
 import AdminCategoryDeletePopup from "../admin-category-delete/page";
@@ -135,16 +136,20 @@ export default function AdminCategoryDashboard() {
           {/* Search */}
           <div className="flex items-center gap-2">
             <Input
-              className="text-base"
+              className="text-base !bg-[#ADD8E6] border-none rounded-3xl"
               placeholder="Nhập nội dung tìm kiếm"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            <Button className="bg-green-500 text-base">Tìm kiếm</Button>
+            <Button className="bg-green-500 text-base text-white rounded-3xl hover:bg-green-700">
+              Tìm kiếm
+            </Button>
           </div>
           {/* Add Category */}
           <div className="flex flex-row items-center">
-            <h2 className="font-bold px-2 py-4">Danh sách thể loại</h2>
+            <h2 className="font-bold px-2 py-4 text-black">
+              Danh sách thể loại
+            </h2>
             <CircleButton onClick={() => setShowPopup(true)} />
           </div>
           {showPopup && (
@@ -164,7 +169,7 @@ export default function AdminCategoryDashboard() {
                 <td>
                   <CategoryCard
                     title="GIÀY"
-                    imageUrl="/image13.png"
+                    imageUrl="https://picsum.photos/800/600"
                     href="/admin-detail-category"
                     onMenuClick={() => alert("Menu clicked")}
                     onEdit={handleEdit}
@@ -174,7 +179,7 @@ export default function AdminCategoryDashboard() {
                 <td>
                   <CategoryCard
                     title="DẠ HỘI"
-                    imageUrl="/imageDahoi.png"
+                    imageUrl="https://picsum.photos/800/600"
                     href="#"
                     onMenuClick={() => alert("Menu clicked")}
                     onEdit={handleEdit}
@@ -184,7 +189,7 @@ export default function AdminCategoryDashboard() {
                 <td>
                   <CategoryCard
                     title="ĐƯỜNG PHỐ"
-                    imageUrl="/imageDuongpho.png"
+                    imageUrl="https://picsum.photos/800/600"
                     href="#"
                     onMenuClick={() => alert("Menu clicked")}
                     onEdit={handleEdit}
@@ -196,7 +201,7 @@ export default function AdminCategoryDashboard() {
                 <td>
                   <CategoryCard
                     title="PHỤ KIỆN"
-                    imageUrl="/imagePhukien.png"
+                    imageUrl="https://picsum.photos/800/600"
                     href="#"
                     onMenuClick={() => alert("Menu clicked")}
                     onEdit={handleEdit}
@@ -206,7 +211,7 @@ export default function AdminCategoryDashboard() {
                 <td>
                   <CategoryCard
                     title="UNISEX"
-                    imageUrl="/imageUnisex.png"
+                    imageUrl="https://picsum.photos/800/600"
                     href="#"
                     onMenuClick={() => alert("Menu clicked")}
                     onEdit={handleEdit}
@@ -216,7 +221,7 @@ export default function AdminCategoryDashboard() {
                 <td>
                   <CategoryCard
                     title="TRẺ EM"
-                    imageUrl="/imageTreEm.png"
+                    imageUrl="https://picsum.photos/800/600"
                     href="#"
                     onMenuClick={() => alert("Menu clicked")}
                     onEdit={handleEdit}
