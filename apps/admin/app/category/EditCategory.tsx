@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { X } from "lucide-react";
-import { Input, Textarea } from "../../../../packages/ui/src/components/input";
+import { Input, Textarea } from "components/input";
 import { Button } from "../../../../packages/ui/src/components/button";
 import { categoriesApi, Category } from "../../lib/api/categories";
 import { toast } from "sonner";

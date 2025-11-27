@@ -17,7 +17,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
     />
   );
 }
-function TextArea({
+function Textarea({
   className,
   rows,
   ...props
@@ -51,4 +51,4 @@ function TextArea({
     />
   );
 }
-export { Input, TextArea };
+export { Input, Textarea };

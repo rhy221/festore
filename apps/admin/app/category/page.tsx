@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { Input } from "../../../../packages/ui/src/components/input";
-import { Button, CircleButton } from "../../../../packages/ui/src/components/button";
-import { CategoryCard } from "../../../../packages/ui/src/components/card";
-import AdminCategoryAddPopup from "../admin-category-add/page";
-import AdminCategoryEditPopup from "../admin-category-edit/page";
-import AdminCategoryDeletePopup from "../admin-category-delete/page";
-import Sidebar from "../../components/Sidebar/Admin";
+import { Button, CircleButton } from "components/button";
+import { CategoryCard } from "components/card";
+import AdminCategoryAddPopup from "./AddCategory";
+import AdminCategoryEditPopup from "./EditCategory";
+import AdminCategoryDeletePopup from "./DeleteCategory";
+import Sidebar from "../../components/Sidebar/Sidebar";
 import Header from "../../components/Header/Header";
 import { categoriesApi, Category } from "../../lib/api/categories";
 import { toast } from "sonner";
