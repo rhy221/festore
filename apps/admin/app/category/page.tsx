@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Input } from "../../../../packages/ui/src/components/input";
 import { Button, CircleButton } from "components/button";
 import { CategoryCard } from "components/card";
@@ -21,7 +22,8 @@ export default function AdminCategoryDashboard() {
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
-  // Load categories
+  const router = useRouter();
+
   useEffect(() => {
     loadCategories();
   }, []);
@@ -117,14 +119,19 @@ export default function AdminCategoryDashboard() {
           {!loading && categories.length > 0 && (
             <div className="grid grid-cols-3 gap-4">
               {categories.map((category) => (
-                <CategoryCard
+                <div
                   key={category.id}
-                  title={category.name}
-                  imageUrl={category.imageUrl || "https://picsum.photos/400/300"}
-                  href={`/admin-detail-category?id=${category.id}`}
-                  onEdit={() => handleEdit(category)}
-                  onDelete={() => handleDelete(category)}
-                />
+                  className="cursor-pointer"
+                  onClick={() => router.push(`/category/${category.id}`)}
+                >
+                  <CategoryCard
+                    title={category.name}
+                    imageUrl={category.imageUrl || "https://picsum.photos/400/300"}
+                    href="#"
+                    onEdit={() => handleEdit(category)}
+                    onDelete={() => handleDelete(category)}
+                  />
+                </div>
               ))}
             </div>
           )}
