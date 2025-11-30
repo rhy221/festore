@@ -90,18 +90,18 @@ export default function AdminCategoryDashboard() {
           {/* Search */}
           <div className="flex items-center gap-2">
             <Input
-              className="text-base text-black"
+              className="text-base text-black !bg-[#C8E4F5] !border-[#C8E4F5] focus-visible:!bg-[#C8E4F5]"
               placeholder="Nhập nội dung tìm kiếm"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             />
-            <Button 
-              className="bg-green-500 text-base hover:bg-green-600 text-white"
-              onClick={handleSearch}
-            >
-              Tìm kiếm
-            </Button>
+              <Button
+                className="!bg-green-500 text-base !hover:bg-green-600 text-white"
+                onClick={handleSearch}
+              >
+                Tìm kiếm
+              </Button>
           </div>
 
           {/* Add Category */}
@@ -145,14 +145,14 @@ export default function AdminCategoryDashboard() {
 
           {/* Popups */}
           {showPopup && (
-            <AdminCategoryAddPopup 
+            <AdminCategoryAddPopup
               onClose={() => setShowPopup(false)}
               onSuccess={handleAddSuccess}
             />
           )}
 
           {showEditPopup && selectedCategory && (
-            <AdminCategoryEditPopup 
+            <AdminCategoryEditPopup
               category={selectedCategory}
               onClose={() => {
                 setShowEditPopup(false);
