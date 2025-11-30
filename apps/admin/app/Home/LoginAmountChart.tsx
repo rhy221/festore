@@ -10,8 +10,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-
-
 const data = [
   { date: "1/9", value: 30 },
   { date: "2/9", value: 40 },
@@ -37,7 +35,7 @@ const CustomDot = (props: any) => {
     <circle
       cx={cx}
       cy={cy}
-      r={4}
+      r={3}
       fill="white"
       stroke="#8b5cf6"
       strokeWidth={1}
@@ -45,23 +43,24 @@ const CustomDot = (props: any) => {
   );
 };
 
-export default function LineChartComponent( { chartData = data }: LineChartProps) {
-    const maxValue = Math.max(...data.map(d => d.value));
+export default function LineChartComponent({ chartData = data }: LineChartProps) {
+  const maxValue = Math.max(...data.map((d) => d.value));
+
   return (
-    <div className="flex flex-col w-full pl-7 pt-0 mb-10">
-      <h2 className="text-2xl font-normal pl-16 mb-16">Số lượng truy cập hệ thống theo ngày</h2>
-      <div className="flex pl-54 w-full">
-        <ResponsiveContainer width={568} height={328}>
+    <div className="flex flex-col w-full p-2">
+      <h2 className="text-xl font-normal mb-4">Số lượng truy cập hệ thống theo ngày</h2>
+      <div className="w-full h-[250px]">
+        <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={chartData}
-            margin={{ top: 20, right: 30, left: 10, bottom: 20 }}
+            margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
           >
             <defs>
               <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
                 <feGaussianBlur in="SourceAlpha" stdDeviation="2" />
                 <feOffset dx="0" dy="3" result="offsetblur" />
                 <feComponentTransfer>
-                  <feFuncA type="linear" slope="0.4   " />
+                  <feFuncA type="linear" slope="0.4" />
                 </feComponentTransfer>
                 <feFlood floodColor="#8979FF" floodOpacity="0.3" />
                 <feComposite in2="offsetblur" operator="in" />
@@ -75,7 +74,7 @@ export default function LineChartComponent( { chartData = data }: LineChartProps
             <CartesianGrid
               strokeDasharray="3 3"
               stroke="#e5e7eb"
-              vertical={true}
+              vertical={false}
               horizontal={true}
             />
 
@@ -83,7 +82,7 @@ export default function LineChartComponent( { chartData = data }: LineChartProps
               dataKey="date"
               axisLine={true}
               tickLine={false}
-              tick={{ fill: "#6b7280", fontSize: 12 }}
+              tick={{ fill: "#6b7280", fontSize: 10 }}
               dy={10}
               interval={0}
             />
@@ -91,9 +90,9 @@ export default function LineChartComponent( { chartData = data }: LineChartProps
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#6b7280", fontSize: 12 }}
+              tick={{ fill: "#6b7280", fontSize: 10 }}
               tickCount={7}
-              domain={[0, (maxValue + 10) - (maxValue + 10) % 10]}
+              domain={[0, (maxValue + 10) - ((maxValue + 10) % 10)]}
               dx={-10}
               allowDecimals={false}
             />
@@ -102,7 +101,7 @@ export default function LineChartComponent( { chartData = data }: LineChartProps
               type="linear"
               dataKey="value"
               stroke="#8979FF"
-              strokeWidth={1}
+              strokeWidth={2}
               dot={<CustomDot />}
               filter="url(#shadow)"
             />

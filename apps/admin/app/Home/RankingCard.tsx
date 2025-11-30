@@ -1,5 +1,4 @@
-import { Card, CardContent } from '@/components/ui/card'
-import Image from 'next/image'
+import { Card, CardContent } from '@workspace/ui/components/card'
 
 interface RankingCardProps {
   icon: React.ReactNode
@@ -11,21 +10,21 @@ interface RankingCardProps {
 
 function RankingCard({ icon, title, subtitle, metric, bgColor }: RankingCardProps) {
   return (
-    <Card className={`${bgColor} border-0 rounded-[45px] w-[300px] h-[151px]`}>
-      <CardContent>
-        <div className="flex items-center gap-4">
-          <div className="w-[110px] h-[110px] flex items-center justify-center flex-shrink-0">
+    <Card className={`${bgColor} border-0 rounded-[20px] w-[240px] h-[110px]`}>
+      <CardContent className="p-3">
+        <div className="flex items-center gap-3">
+          <div className="w-[70px] h-[70px] flex items-center justify-center flex-shrink-0">
             {icon}
           </div>
-          
+
           <div className="flex flex-col">
-            <h3 className="text-white font-extrabold text-xl leading-tight mb-1">
+            <h3 className="text-white font-extrabold text-base leading-tight mb-0.5">
               {title}
             </h3>
-            <p className="text-white font-extrabold text-x1 leading-tight mb-2">
+            <p className="text-white font-extrabold text-sm leading-tight mb-1">
               {subtitle}
             </p>
-            <span className="text-white font-normal text-x1">
+            <span className="text-white font-normal text-xs">
               {metric}
             </span>
           </div>
@@ -52,23 +51,24 @@ export default function TopThreeRankings({
   topTemplates,
   topDesigners
 }: TopThreeRankingsProps = {}) {
+
   const defaultTemplates: TopItem[] = [
     {
-      icon: <Image src="/template-icon.png" alt="Template" width={110} height={110} />,
+      icon: null,
       title: "Túi xách",
       subtitle: "Urban Chic",
       metric: "125 lượt xem",
       bgColor: "bg-[#4B0082]"
     },
     {
-      icon: <Image src="/template-icon.png" alt="Template" width={110} height={110} />,
+      icon: null,
       title: "Đầm",
       subtitle: "Nightfall Gown",
       metric: "100 lượt xem",
       bgColor: "bg-[#4B0082]"
     },
     {
-      icon: <Image src="/template-icon.png" alt="Template" width={110} height={110} />,
+      icon: null,
       title: "Quần",
       subtitle: "Canvas Cargo",
       metric: "100 lượt xem",
@@ -78,21 +78,21 @@ export default function TopThreeRankings({
 
   const defaultDesigners: TopItem[] = [
     {
-      icon: <Image src="/designer-icon.png" alt="Designer" width={110} height={109} />,
+      icon: null,
       title: "Phan Thành Đạt",
       subtitle: "",
       metric: "1,25 tỷ VNĐ",
       bgColor: "bg-[#008080]"
     },
     {
-      icon: <Image src="/designer-icon.png" alt="Designer" width={110} height={109} />,
+      icon: null,
       title: "Nguyễn Hồng Dương",
       subtitle: "",
       metric: "1,11 tỷ VNĐ",
       bgColor: "bg-[#008080]"
     },
     {
-      icon: <Image src="/designer-icon.png" alt="Designer" width={110} height={109} />,
+      icon: null,
       title: "Đỗ Thiên Tài",
       subtitle: "",
       metric: "1,09 tỷ VNĐ",
@@ -104,14 +104,13 @@ export default function TopThreeRankings({
   const designers = topDesigners && topDesigners.length > 0 ? topDesigners : defaultDesigners
 
   return (
-    <div className="pl-7 pt-5">
-      <h1 className="text-[32px] font-extrabold mb-3">
+    <div className="p-4">
+      <h1 className="text-3xl font-extrabold mb-4">
         Nổi bật
       </h1>
-      
-      {/* Top 3 Templates Section */}
-      <div className="mb-2 pl-3">
-        <h2 className="text-2xl font-normal mb-4">
+
+      <div className="mb-6">
+        <h2 className="text-xl font-normal mb-3">
           Top 3 mẫu thiết kế được xem nhiều nhất
         </h2>
         <div className="flex flex-wrap gap-4">
@@ -128,12 +127,11 @@ export default function TopThreeRankings({
         </div>
       </div>
 
-      {/* Top 3 Designers Section */}
-      <div className='pl-3 mb-10'>
-        <h2 className="text-2xl font-normal mb-4">
+      <div className="mb-4">
+        <h2 className="text-xl font-normal mb-3">
           Top 3 nhà thiết kế có doanh thu cao nhất
         </h2>
-        <div className="flex flex-wrap gap-7">
+        <div className="flex flex-wrap gap-4">
           {designers.map((item, index) => (
             <RankingCard
               key={index}
