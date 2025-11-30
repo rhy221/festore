@@ -12,8 +12,7 @@ const HEADER_HEIGHT = 80;
 
 export default function AdminUsersPage() {
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-
+    <div className="min-h-screen bg-gray-50 flex text-black">
       {/* SIDEBAR */}
       <div
         className="fixed top-0 left-0 h-full bg-white shadow-lg"
@@ -23,10 +22,7 @@ export default function AdminUsersPage() {
       </div>
 
       {/* MAIN AREA */}
-      <div
-        className="flex-1 ml-0"
-        style={{ marginLeft: SIDEBAR_WIDTH }}
-      >
+      <div className="flex-1 ml-0" style={{ marginLeft: SIDEBAR_WIDTH }}>
         {/* HEADER */}
         <div
           className="fixed top-0 right-0 z-20 bg-white shadow-md"
@@ -36,10 +32,7 @@ export default function AdminUsersPage() {
         </div>
 
         {/* PAGE CONTENT */}
-        <main
-          className="p-6 mt-6"
-          style={{ marginTop: HEADER_HEIGHT }}
-        >
+        <main className="p-6 mt-6" style={{ marginTop: HEADER_HEIGHT }}>
           <UserListSection />
           <UnlockRequestSection />
         </main>
