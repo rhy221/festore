@@ -1,6 +1,7 @@
 
 import NavBar from "@/components/NavBar";
 import Link from "next/link";
+import { Toaster } from "react-hot-toast";
 
 export default function RootLayout({
   children, modal
@@ -9,10 +10,11 @@ export default function RootLayout({
   modal: React.ReactNode
 }) {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col relative">
         <NavBar />
         {children}
         {modal}
+        <Toaster position="top-center"/>
     </div>
   );
 }
