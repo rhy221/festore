@@ -1,4 +1,4 @@
-import authAction from "@/api/auth.api";
+import authAction from "@/api/categories.api";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { LoginBodyType, LoginResType } from "@/schema/auth.schema";
 

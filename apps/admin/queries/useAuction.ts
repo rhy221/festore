@@ -1,4 +1,4 @@
-import { auctionAction } from "@/api/auction.api";
+import { auctionAction } from "@/api/home.api";
 import { GetAuctionBidsResType, GetAuctionResType, GetAuctionsResType } from "@/schema/auction.schema";
 import { useMutation, useQuery } from "@tanstack/react-query"
 

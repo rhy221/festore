@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { dashboardApi } from "../api/dashboard.api";
+import { dashboardApi } from "../api/reports.api";
 
 export const useDashboardQueries = {
   useMonthlyReport: (month: string) => {
