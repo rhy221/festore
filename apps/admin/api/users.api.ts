@@ -1,6 +1,6 @@
-import api from '@/lib/http';
+import api from "@/lib/http";
 
-const BASE_URL = '/api/admin';
+const BASE_URL = "/api/admin";
 
 export const UsersAPI = {
   getUsers: async (query: { name?: string; status?: string }) => {
