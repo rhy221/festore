@@ -18,9 +18,9 @@ export default function HomePage() {
 
       <Sidebar />
 
-      <main className="flex-grow p-6" style={{ paddingTop: HEADER_HEIGHT, marginLeft: SIDEBAR_WIDTH }}>
+      <main className="grow p-6" style={{ paddingTop: HEADER_HEIGHT, marginLeft: SIDEBAR_WIDTH }}>
         <div className="mb-6">
-          <QuickStats userCount={540} templateCount={1500} categoryCount={35} />
+          <QuickStats/>
         </div>
 
         <div className="mb-6 border rounded-lg shadow-md p-4 bg-white">
