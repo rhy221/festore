@@ -50,7 +50,7 @@ export function CategoryCard({
     <Link href={href} className="block !cursor-default">
       <div className="rounded-4xl bg-[#FAF0E6] p-5 hover:shadow-lg transition w-70 h-70 relative cursor-pointer">
         <div className="relative flex justify-between items-center">
-          <h3 className="font-bold text-center absolute left-1/2 -translate-x-1/2 text-black">
+          <h3 className="font-bold text-center absolute left-1/2 -translate-x-1/2">
             {title}
           </h3>
           <div ref={menuRef} className="ml-auto relative">
@@ -63,21 +63,21 @@ export function CategoryCard({
               }}
               className="rounded-full hover:bg-[#ecded0] cursor-pointer"
             >
-              <MoreVertical size={20} className="text-black" />
+              <MoreVertical size={20} />
             </button>
           </div>
         </div>
         {isMenuOpen && (
           <div className="absolute top-1/2 left-full translate-y-[-70%] translate-x-[-70%] mr-2 bg-[#EFF6FF] border rounded-lg shadow-lg z-10 w-32">
             {/* Watch Button */}
-            <button className="block px-4 py-1 hover:bg-[#dee8f5] w-full text-left text-black">
+            <button className="block px-4 py-1 hover:bg-[#dee8f5] w-full text-left">
               Xem
             </button>
             <hr className="mx-1 my-1 h-px bg-black border-0" />
 
             {/* Edit Button */}
             <button
-              className="block px-4 py-1 hover:bg-[#dee8f5] w-full text-left text-black"
+              className="block px-4 py-1 hover:bg-[#dee8f5] w-full text-left"
               onMouseDown={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -90,7 +90,7 @@ export function CategoryCard({
 
             {/* Delete Button */}
             <button
-              className="block px-4 py-1 hover:bg-[#dee8f5] w-full text-left text-black"
+              className="block px-4 py-1 hover:bg-[#dee8f5] w-full text-left"
               onMouseDown={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -121,7 +121,7 @@ export function ProductCard({ title, imageUrl, href }: CategoryCardProps) {
 
   return (
     <Link href={href} className="block !cursor-default">
-      <div className="bg-[#FAF0E6] p-3 hover:shadow-lg transition w-70 h-70 relative cursor-pointer text-black">
+      <div className="bg-[#FAF0E6] p-3 hover:shadow-lg transition w-70 h-70 relative cursor-pointer">
         <div className="mt-3">
           <Image
             src={imageUrl}
