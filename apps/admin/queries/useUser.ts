@@ -1,4 +1,4 @@
-import userAction from "@/api/user.api"
+import userAction from "@/api/users.api"
 import { UserProfileResType, UserProfileStaticsResType } from "@/schema/user.schema"
 import { useMutation, useQuery } from "@tanstack/react-query"
 
