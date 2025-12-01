@@ -1,52 +1,60 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@workspace/ui/components/dialog";
+import { BackspaceIcon } from "@heroicons/react/24/solid";
 
 type Design = {
-  name: string
-  designer: string
-  description: string
-  category: string
-  status: string
-  datePosted: string
-  image: string
-}
+  name: string;
+  designer: string;
+  description: string;
+  category: string;
+  status: string;
+  datePosted: string;
+  image: string;
+};
 
 interface DesignWarningDialogProps {
-  design: Design | null
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  design: Design | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export default function DesignWarningDialog({ design, open, onOpenChange }: DesignWarningDialogProps) {
-  const [warningContent, setWarningContent] = useState("")
+export default function DesignWarningDialog({
+  design,
+  open,
+  onOpenChange,
+}: DesignWarningDialogProps) {
+  const [warningContent, setWarningContent] = useState("");
 
-  if (!design) return null
+  if (!design) return null;
 
   const handleSendWarning = () => {
     // Handle warning submission logic here
-    console.log("Sending warning:", warningContent)
-    alert("Cảnh cáo đã được gửi qua email!")
-    onOpenChange(false)
-  }
+    console.log("Sending warning:", warningContent);
+    alert("Cảnh cáo đã được gửi qua email!");
+    onOpenChange(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl p-6" showCloseButton={false}>
+      <DialogContent
+        className="max-w-4xl p-6 bg-white text-black"
+        showCloseButton={false}
+      >
         {/* Header */}
         <div className="flex items-center justify-between">
-          <DialogTitle className="text-xl font-bold">
-            Cảnh cáo
-          </DialogTitle>
+          <DialogTitle className="text-xl font-bold">Cảnh cáo</DialogTitle>
 
           {/* Close button with X icon image */}
-          <button
+          <BackspaceIcon
+            className="w-8 h-8 pt-1 text-black cursor-pointer"
             onClick={() => onOpenChange(false)}
-            className="flex items-center justify-center w-8 h-6 border rounded-md bg-muted hover:bg-muted/70"
-          >
-            <img src="/xButtonIcon.png" alt="Close" className="w-4 h-4" />
-          </button>
+          />
         </div>
 
         {/* Content */}
@@ -84,7 +92,7 @@ export default function DesignWarningDialog({ design, open, onOpenChange }: Desi
 
         {/* Actions */}
         <div className="flex justify-center mt-6">
-          <button 
+          <button
             onClick={handleSendWarning}
             className="px-6 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold"
           >
@@ -93,7 +101,7 @@ export default function DesignWarningDialog({ design, open, onOpenChange }: Desi
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
 /* --- Components --- */
@@ -102,5 +110,5 @@ function InfoRow({ label, value }: { label: string; value: string }) {
     <p>
       <span className="font-semibold">{label}:</span> {value}
     </p>
-  )
+  );
 }

@@ -5,7 +5,8 @@ import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Filter, Loader2 } from "lucide-react";
 
-import { User, UserStatusFilterType, UserTypeFilterType, users } from "./types";
+import { User, UserStatusFilterType, UserTypeFilterType } from "./types";
+import { UsersAPI, users } from "@/api/users.api";
 import UserTable from "./UserTable";
 
 export default function UserListSection() {
@@ -70,9 +71,8 @@ export default function UserListSection() {
 
   // Handlers
   const handleViewDetail = (userId: number) => {
-    console.log(`Xem chi tiết người dùng ID: ${userId}`);
-    // TODO: Navigate to user detail page
-    alert(`Xem chi tiết người dùng ID: ${userId}`);
+    // Navigate to user detail page
+    window.location.href = `/admin/users/${userId}`;
   };
 
   const handleToggleLock = async (userId: number, isLocked: boolean) => {
