@@ -1,4 +1,3 @@
-"use client";
 import Link from "next/link";
 
 const menuItems = [
@@ -20,7 +19,9 @@ export default function Sidebar() {
           >
             <span className="font-extrabold text-base">{item.label}</span>
           </Link>
-          {index !== menuItems.length - 1 && <div className="border-t border-white/50" />}
+          {index !== menuItems.length - 1 && (
+            <div className="border-t border-white/50" />
+          )}
         </div>
       ))}
     </aside>

@@ -18,12 +18,14 @@ export default function UserTable({
   onDeleteUser,
 }: UserTableProps) {
   return (
-    <table className="w-full border border-black text-lg mt-4 border-collapse">
+    <table className="w-full border border-black text-lg mt-4 border-collapse text-black">
       <thead>
         <tr className="bg-gray-200 text-left">
           <th className="p-3 font-semibold border border-black">STT</th>
           <th className="p-3 font-semibold border border-black">Họ và tên</th>
-          <th className="p-3 font-semibold border border-black">Loại người dùng</th>
+          <th className="p-3 font-semibold border border-black">
+            Loại người dùng
+          </th>
           <th className="p-3 font-semibold border border-black">Trạng thái</th>
           <th className="p-3 font-semibold border border-black">Thao tác</th>
         </tr>
@@ -34,8 +36,12 @@ export default function UserTable({
           <tr key={u.id} className="border border-black">
             <td className="p-3 border border-black">{i + 1}</td>
             <td className="p-3 border border-black">{u.name}</td>
-            <td className="p-3 border border-black">{displayUserType(u.type)}</td>
-            <td className="p-3 border border-black">{displayUserStatus(u.status)}</td>
+            <td className="p-3 border border-black">
+              {displayUserType(u.type)}
+            </td>
+            <td className="p-3 border border-black">
+              {displayUserStatus(u.status)}
+            </td>
 
             <td className="p-3 flex items-center gap-2">
               <div
@@ -69,7 +75,10 @@ export default function UserTable({
                 onClick={() => onDeleteUser(u.id)}
                 title="Xóa tài khoản"
               >
-                <Trash2 size={30} className="text-gray-500 hover:text-red-700" />
+                <Trash2
+                  size={30}
+                  className="text-gray-500 hover:text-red-700"
+                />
               </div>
             </td>
           </tr>

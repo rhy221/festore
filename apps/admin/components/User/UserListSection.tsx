@@ -1,19 +1,53 @@
-// src/components/admin/user/UserListSection.tsx
 "use client";
+
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Filter } from "lucide-react";
-
-import {
-  users,
-  User,
-  UserStatusFilterType,
-  UserTypeFilterType,
-} from "./types";
+import { User, UserStatusFilterType, UserTypeFilterType } from "./types";
 import UserTable from "./UserTable";
+import http from "@/lib/http";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+
+export const userService = {
+  list: () => http.get("/api/users").then((res) => res.data),
+  get: (userId: number) => http.get<User>(`/api/users/${userId}`),
+  lock: (userId: number) => http.post(`/api/users/${userId}/lock`),
+  unlock: (userId: number) => http.post(`/api/users/${userId}/unlock`),
+  delete: (userId: number) => http.delete(`/api/users/${userId}`),
+};
 
 export default function UserListSection() {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  // Query: lấy danh sách user
+  const {
+    data: users = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["users"],
+    queryFn: userService.list,
+  });
+
+  // Mutations
+  const lockMutation = useMutation({
+    mutationFn: userService.lock,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["users"] }),
+  });
+
+  const unlockMutation = useMutation({
+    mutationFn: userService.unlock,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["users"] }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: userService.delete,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["users"] }),
+  });
+
   // States
   const [search, setSearch] = useState("");
   const [showUserStatusDropdown, setShowUserStatusDropdown] = useState(false);
@@ -23,11 +57,9 @@ export default function UserListSection() {
   const [userTypeFilter, setUserTypeFilter] =
     useState<UserTypeFilterType>("all");
 
-  // Refs
   const userStatusRef = useRef<HTMLDivElement | null>(null);
   const userTypeRef = useRef<HTMLDivElement | null>(null);
 
-  // Close dropdown logic
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (
@@ -48,34 +80,35 @@ export default function UserListSection() {
   }, []);
 
   // Filtering logic
-  const filteredUsers = users.filter((u) => {
+  const filteredUsers = users.filter((u: User) => {
     const matchesStatus =
       userStatusFilter === "all" ? true : u.status === userStatusFilter;
+
     const matchesType =
       userTypeFilter === "all" ? true : u.type === userTypeFilter;
-    // Thêm logic tìm kiếm theo tên/id/v.v. ở đây
+
     const matchesSearch = u.name.toLowerCase().includes(search.toLowerCase());
-    
+
     return matchesStatus && matchesType && matchesSearch;
   });
-  
-  // Dummy Handlers (Cần thay thế bằng logic API thực tế)
+
   const handleViewDetail = (userId: number) => {
-    console.log(`Xem chi tiết người dùng ID: ${userId}`);
-    // **TODO:** Thực hiện chuyển trang sang UserDetailPage
-  };
-  const handleToggleLock = (userId: number, isLocked: boolean) => {
-    console.log(`${isLocked ? 'Khóa' : 'Mở khóa'} người dùng ID: ${userId}`);
-    // **TODO:** Gọi API khóa/mở khóa
-  };
-  const handleDeleteUser = (userId: number) => {
-    console.log(`Xóa người dùng ID: ${userId}`);
-    // **TODO:** Gọi API xóa
+    router.push(`/admin/users/${userId}`);
   };
 
+  const handleToggleLock = (userId: number, isLocked: boolean) => {
+    if (isLocked) lockMutation.mutate(userId);
+    else unlockMutation.mutate(userId);
+  };
+
+  const handleDeleteUser = (userId: number) => {
+    if (confirm("Bạn có chắc muốn xóa?")) {
+      deleteMutation.mutate(userId);
+    }
+  };
 
   return (
-    <section className="mb-8">
+    <section className="mb-8 text-black">
       <h3 className="font-bold text-xl mb-4">Danh sách người dùng</h3>
 
       {/* Search */}
@@ -92,50 +125,7 @@ export default function UserListSection() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-6 mt-4">
-        {/* Lọc theo loại người dùng */}
-        <div className="relative" ref={userTypeRef}>
-          <div className="flex items-center gap-2">
-            <div className="text-base">Lọc theo loại người dùng</div>
-            <Filter
-              className="fill-black cursor-pointer"
-              onClick={() => {
-                setShowUserTypeDropdown((s) => !s);
-                setShowUserStatusDropdown(false); // Đóng filter khác
-              }}
-            />
-          </div>
-
-          {showUserTypeDropdown && (
-            <div className="absolute right-0 mt-2 w-52 bg-white border rounded shadow z-50">
-              {/* Các nút lọc loại người dùng */}
-              {(["all", "designer", "customer"] as UserTypeFilterType[]).map(
-                (type) => (
-                  <button
-                    key={type}
-                    className={`w-full text-left px-3 py-2 ${
-                      userTypeFilter === type
-                        ? "bg-gray-100 font-semibold"
-                        : "hover:bg-gray-50"
-                    }`}
-                    onClick={() => {
-                      setUserTypeFilter(type);
-                      setShowUserTypeDropdown(false);
-                    }}
-                  >
-                    {type === "all"
-                      ? "Tất cả"
-                      : type === "designer"
-                      ? "Nhà thiết kế"
-                      : "Khách hàng"}
-                  </button>
-                )
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Lọc theo trạng thái */}
+      <div className="flex gap-6 mt-4 text-black">
         <div className="relative" ref={userStatusRef}>
           <div className="flex items-center gap-2">
             <div className="text-base">Lọc theo trạng thái</div>
@@ -143,14 +133,13 @@ export default function UserListSection() {
               className="fill-black cursor-pointer"
               onClick={() => {
                 setShowUserStatusDropdown((s) => !s);
-                setShowUserTypeDropdown(false); // Đóng filter khác
+                setShowUserTypeDropdown(false);
               }}
             />
           </div>
 
           {showUserStatusDropdown && (
             <div className="absolute right-0 mt-2 w-44 bg-white border rounded shadow z-50">
-              {/* Các nút lọc trạng thái */}
               {(["all", "active", "locked"] as UserStatusFilterType[]).map(
                 (status) => (
                   <button
@@ -168,8 +157,8 @@ export default function UserListSection() {
                     {status === "all"
                       ? "Tất cả"
                       : status === "active"
-                      ? "Đang hoạt động"
-                      : "Bị khoá"}
+                        ? "Đang hoạt động"
+                        : "Bị khoá"}
                   </button>
                 )
               )}
@@ -178,8 +167,8 @@ export default function UserListSection() {
         </div>
       </div>
 
-      <UserTable 
-        users={filteredUsers} 
+      <UserTable
+        users={filteredUsers}
         onViewDetail={handleViewDetail}
         onToggleLock={handleToggleLock}
         onDeleteUser={handleDeleteUser}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import UnlockHistoryDialog, { type User } from "./UnlockHistoryDialog";
 import { BackspaceIcon } from "@heroicons/react/24/solid";
 import { CheckCircle2Icon, MinusCircle } from "lucide-react";
@@ -29,16 +29,20 @@ export default function UnlockRequestDialog({
   const [sendCommitment, setSendCommitment] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
 
-  // State for unlock history dialog
+  // State for unlock history dialog and the user data to show in it
   const [showHistoryDialog, setShowHistoryDialog] = useState(false);
+  const [historyUser, setHistoryUser] = useState<User | null>(null);
 
-  // Don't render if request is null, open is false, OR history dialog is open
-  if (!request || !open || showHistoryDialog) {
-    // Only render history dialog if it should be shown
-    if (showHistoryDialog) {
-      // Use existing user data from unlock-history page
-      const user: User = {
-        fullName: "Trịnh Mai Cường",
+  // Keep a persistent current user for the main dialog so that when the history
+  // dialog is closed we can save the updated history back into the main modal.
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [requestStatus, setRequestStatus] = useState<"pending" | "processed">(
+    request ? request.status : "pending"
+  );
+  useEffect(() => {
+    if (request && open && !currentUser) {
+      const initialUser: User = {
+        fullName: request.name,
         role: "Nhà thiết kế",
         email: "maicuong123@gmail.com",
         phone: "0123456789",
@@ -46,7 +50,7 @@ export default function UnlockRequestDialog({
         lockDate: "10/07/2025",
         lockReason:
           "Tài khoản bị khóa do đăng mẫu thiết kế bị báo cáo vi phạm bản quyền quá 3 lần trong vòng 7 ngày.",
-        appealReason: "Tài khoản bị khoá nhầm",
+        appealReason: request.reason,
         processingHistory: [
           {
             id: 1,
@@ -55,60 +59,98 @@ export default function UnlockRequestDialog({
             action: "Từ chối",
             note: "Vi phạm 1 lần trước đó, chưa gỡ mẫu vi phạm.",
           },
-          {
-            id: 2,
-            processor: "Nguyễn Văn An",
-            processDate: "24/07/2025",
-            action: "Từ chối",
-            note: "Đề nghị khoá vĩnh viễn.",
-          },
         ],
       };
-
-      return (
-        <UnlockHistoryDialog
-          user={user}
-          open={showHistoryDialog}
-          onOpenChange={(isOpen) => {
-            setShowHistoryDialog(isOpen);
-            if (!isOpen) {
-              // Reset form when history dialog closes
-              setAction(null);
-              setWarnLast(false);
-              setSendCommitment(false);
-              setRejectReason("");
-            }
-          }}
-        />
-      );
+      setCurrentUser(initialUser);
     }
+  }, [request, open, currentUser]);
+
+  if (!request || !open || !currentUser) {
     return null;
   }
 
-  // Convert request to user data for display
-  const user: User = {
-    fullName: request.name,
-    role: "Nhà thiết kế",
-    email: "maicuong123@gmail.com",
-    phone: "0123456789",
-    status: "Đang bị khoá",
-    lockDate: "10/07/2025",
-    lockReason:
-      "Tài khoản bị khóa do đăng mẫu thiết kế bị báo cáo vi phạm bản quyền quá 3 lần trong vòng 7 ngày.",
-    appealReason: request.reason,
-    processingHistory: [
-      {
-        id: 1,
-        processor: "Nguyễn Thị Bình",
-        processDate: "15/07/2025",
-        action: "Từ chối",
-        note: "Vi phạm 1 lần trước đó, chưa gỡ mẫu vi phạm.",
-      },
-    ],
+  const closeModal = () => {
+    onOpenChange(false);
+    setAction(null);
+    setWarnLast(false);
+    setSendCommitment(false);
+    setRejectReason("");
+    setHistoryUser(null);
+    setShowHistoryDialog(false);
   };
 
+  // If history dialog should be shown, render it with either the generated historyUser
+  // or the base `currentUser` above.
+  if (showHistoryDialog) {
+    return (
+      <UnlockHistoryDialog
+        user={historyUser ?? currentUser}
+        open={showHistoryDialog}
+        onOpenChange={(isOpen) => {
+          setShowHistoryDialog(isOpen);
+          if (!isOpen) {
+            // When the history dialog closes, persist the updated history into
+            // the main dialog (if available) and clear the temporary historyUser.
+            if (historyUser) {
+              setCurrentUser(historyUser);
+            }
+            setHistoryUser(null);
+            // Do NOT reset the form — user asked to keep the action state when
+            // returning to the request dialog.
+            closeModal();
+          }
+        }}
+      />
+    );
+  }
+
   const handleSubmit = () => {
-    // Just show the history dialog
+    // Build a new processing record based on selected action and options
+    const now = new Date();
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    const processDate = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
+
+    const newId = (currentUser.processingHistory?.length ?? 0) + 1;
+
+    const actionLabel =
+      action === "unlock"
+        ? "Mở khoá"
+        : action === "reject"
+          ? "Từ chối"
+          : "Không xác định";
+
+    let note = "";
+    if (action === "unlock") {
+      const parts: string[] = [];
+      if (warnLast) parts.push("Cảnh báo lần cuối");
+      if (sendCommitment) parts.push("Gửi cam kết qua email");
+      if (parts.length === 0) parts.push("Không có ghi chú");
+      note = parts.join("; ");
+    } else if (action === "reject") {
+      note = rejectReason || "Không có lý do được cung cấp";
+    } else {
+      note = "Không có hành động được chọn";
+    }
+
+    const newRecord = {
+      id: newId,
+      processor: "Quản trị viên",
+      processDate,
+      action: actionLabel,
+      note,
+    };
+
+    const updatedUser: User = {
+      ...currentUser,
+      status: action === "unlock" ? "Đang hoạt động" : "Đang bị khoá",
+      processingHistory: [...(currentUser.processingHistory ?? []), newRecord],
+    };
+
+    // store updated user temporarily and update main UI immediately
+    setHistoryUser(updatedUser);
+    setCurrentUser(updatedUser);
+    // mark request as processed in the UI
+    setRequestStatus("processed");
     setShowHistoryDialog(true);
   };
 
@@ -128,7 +170,7 @@ export default function UnlockRequestDialog({
 
             {/* top-right close pill */}
             <BackspaceIcon
-              onClick={() => onOpenChange(false)}
+              onClick={closeModal}
               aria-label="Đóng"
               className="absolute right-6 top-4 inline-flex items-center justify-center w-9 h-9 text-black"
             ></BackspaceIcon>
@@ -138,23 +180,23 @@ export default function UnlockRequestDialog({
           <div className="px-8 pb-8 pt-6">
             {/* Two column info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8 text-slate-900">
-              <InfoRow label="Họ và tên đầy đủ" value={user.fullName} />
-              <InfoRow label="Vai trò" value={user.role} />
-              <InfoRow label="Địa chỉ email" value={user.email} />
-              <InfoRow label="SĐT" value={user.phone} />
-              <InfoRow label="Trạng thái" value={user.status} />
-              <InfoRow label="Ngày khoá" value={user.lockDate} />
+              <InfoRow label="Họ và tên đầy đủ" value={currentUser.fullName} />
+              <InfoRow label="Vai trò" value={currentUser.role} />
+              <InfoRow label="Địa chỉ email" value={currentUser.email} />
+              <InfoRow label="SĐT" value={currentUser.phone} />
+              <InfoRow label="Trạng thái" value={currentUser.status} />
+              <InfoRow label="Ngày khoá" value={currentUser.lockDate} />
             </div>
 
             {/* Reasons */}
             <div className="mt-6 text-slate-900">
               <ReasonSection
                 label="Lý do khoá tài khoản"
-                value={user.lockReason}
+                value={currentUser.lockReason}
               />
               <ReasonSection
                 label="Lý do khiếu nại"
-                value={user.appealReason}
+                value={currentUser.appealReason}
                 className="mt-4"
               />
             </div>
@@ -185,7 +227,7 @@ export default function UnlockRequestDialog({
                     </tr>
                   </thead>
                   <tbody>
-                    {user.processingHistory.map((record) => (
+                    {currentUser.processingHistory.map((record) => (
                       <tr key={record.id}>
                         <td className="py-3 px-3 border border-slate-200">
                           {record.id}

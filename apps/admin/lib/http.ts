@@ -1,4 +1,3 @@
-import envConfig from "@/config";
 import axios, { AxiosError, AxiosInstance } from "axios";
 
 function decodeJwtPayload(token: string) {
@@ -18,12 +17,15 @@ export function isTokenExpired(token: string) {
   return payload.exp < now;
 }
 
+// 🟢 KHÔNG GÂY LỖI NỮA
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_ENDPOINT!;
+
 class Http {
   instance: AxiosInstance;
 
   constructor() {
     this.instance = axios.create({
-      baseURL: envConfig.NEXT_PUBLIC_API_ENDPOINT,
+      baseURL: API_BASE_URL,
       timeout: 10000,
       headers: {
         "Content-Type": "application/json",
@@ -32,20 +34,17 @@ class Http {
 
     this.instance.interceptors.request.use(
       (config) => {
-        
         if (config.data instanceof FormData) {
-            config.headers["Content-Type"] = "multipart/form-data";
-          }
+          config.headers["Content-Type"] = "multipart/form-data";
+        }
+
         const token = localStorage.getItem("accessToken");
 
         if (token) {
           if (isTokenExpired(token)) {
             localStorage.removeItem("accessToken");
           } else {
-            config.headers.set(
-              "Authorization",
-              `Bearer ${token}`
-            );
+            config.headers.set("Authorization", `Bearer ${token}`);
           }
         }
 
