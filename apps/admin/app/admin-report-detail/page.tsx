@@ -1,7 +1,7 @@
 "use client";
 import { BackspaceIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
-import { Button } from "../components/ui/button";
+import { Button } from "@workspace/ui/components/button";
 import { useState } from "react";
 type User = {
   name: string;
