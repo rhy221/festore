@@ -4,8 +4,8 @@ import React from "react";
 import Header from "../../components/Header/Header";
 import Sidebar from "@/components/Sidebar/Sidebar";
 
-import UserListSection from "@/app/users/User/UserListSection";
-import UnlockRequestSection from "@/app/users/User/UnlockRequestSection";
+import UserListSection from "@/app/users/UserListSection";
+import UnlockRequestSection from "@/app/users/UnlockRequestSection";
 
 const SIDEBAR_WIDTH = 240;
 const HEADER_HEIGHT = 80;

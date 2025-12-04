@@ -24,7 +24,6 @@ export const users: User[] = [
 ];
 
 export const UsersAPI = {
-  // Lấy danh sách users
   getUsers: async (query: {
     name?: string;
     status?: string;
@@ -34,9 +33,10 @@ export const UsersAPI = {
 
     let filteredUsers = [...users];
 
-    if (query.name) {
+    const qName = query.name?.toLowerCase();
+    if (qName) {
       filteredUsers = filteredUsers.filter((user) =>
-        user.name.toLowerCase().includes(query.name!.toLowerCase())
+        user.name.toLowerCase().includes(qName)
       );
     }
 
@@ -47,9 +47,7 @@ export const UsersAPI = {
     }
 
     if (query.type && query.type !== "all") {
-      filteredUsers = filteredUsers.filter(
-        (user) => user.type === query.type
-      );
+      filteredUsers = filteredUsers.filter((user) => user.type === query.type);
     }
 
     return {
@@ -59,12 +57,13 @@ export const UsersAPI = {
     };
   },
 
-  // Lấy chi tiết user
   getUserDetail: async (id: number) => {
     await new Promise((resolve) => setTimeout(resolve, 300));
 
-    const user = users.find((u) => u.id === id);
-    if (!user) throw new Error("User not found");
+    const found = users.find((u) => u.id === id);
+    if (!found) throw new Error("User not found");
+
+    const user = found; // now narrowed to User
 
     return {
       data: {
@@ -80,37 +79,40 @@ export const UsersAPI = {
     };
   },
 
-  // Khóa user
   blockUserAccount: async (id: number) => {
     await new Promise((resolve) => setTimeout(resolve, 400));
 
     const userIndex = users.findIndex((u) => u.id === id);
     if (userIndex === -1) throw new Error("User not found");
 
-    users[userIndex].status = "locked";
+    const user = users[userIndex];
+    if (!user) throw new Error("User not found"); // defensive when noUncheckedIndexedAccess
+
+    user.status = "locked";
 
     return {
-      data: users[userIndex],
+      data: user,
       message: "User blocked successfully",
     };
   },
 
-  // Mở khóa user
   unlockUser: async (id: number) => {
     await new Promise((resolve) => setTimeout(resolve, 400));
 
     const userIndex = users.findIndex((u) => u.id === id);
     if (userIndex === -1) throw new Error("User not found");
 
-    users[userIndex].status = "active";
+    const user = users[userIndex];
+    if (!user) throw new Error("User not found");
+
+    user.status = "active";
 
     return {
-      data: users[userIndex],
+      data: user,
       message: "User unlocked successfully",
     };
   },
 
-  // Xóa user
   deleteUser: async (id: number) => {
     await new Promise((resolve) => setTimeout(resolve, 400));
 
@@ -139,7 +141,6 @@ export const getUserStats = () => {
     bannedUsers: totalBannedUsers,
   };
 };
-
 
 // import api from '@/lib/http';
 

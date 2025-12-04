@@ -1,4 +1,3 @@
-// src/components/admin/user/UserListSection.tsx
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@workspace/ui/components/button";
@@ -6,11 +5,10 @@ import { Input } from "@workspace/ui/components/input";
 import { Filter, Loader2 } from "lucide-react";
 
 import { User, UserStatusFilterType, UserTypeFilterType } from "./types";
-import { UsersAPI, users } from "@/api/users.api";
+import { users as mockUsers } from "@/api/users.api";
 import UserTable from "./UserTable";
 
 export default function UserListSection() {
-  // States
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [showUserStatusDropdown, setShowUserStatusDropdown] = useState(false);
@@ -20,15 +18,18 @@ export default function UserListSection() {
   const [userTypeFilter, setUserTypeFilter] =
     useState<UserTypeFilterType>("all");
 
-  // Refs
   const userStatusRef = useRef<HTMLDivElement | null>(null);
   const userTypeRef = useRef<HTMLDivElement | null>(null);
 
-  // Loading states for actions
   const [isLoading, setIsLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
 
-  // Debounce search
+  const [localUsers, setLocalUsers] = useState<User[]>([]);
+
+  useEffect(() => {
+    setLocalUsers(mockUsers ?? []);
+  }, []);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
@@ -36,7 +37,6 @@ export default function UserListSection() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Close dropdown logic
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (
@@ -56,8 +56,7 @@ export default function UserListSection() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Filter users from mock data
-  const filteredUsers = users.filter((u) => {
+  const filteredUsers = localUsers.filter((u) => {
     const matchesStatus =
       userStatusFilter === "all" ? true : u.status === userStatusFilter;
     const matchesType =
@@ -69,30 +68,29 @@ export default function UserListSection() {
     return matchesStatus && matchesType && matchesSearch;
   });
 
-  // Handlers
   const handleViewDetail = (userId: number) => {
-    // Navigate to user detail page
     window.location.href = `/admin/users/${userId}`;
   };
 
   const handleToggleLock = async (userId: number, isLocked: boolean) => {
     setActionLoading(true);
+
     try {
-      // Simulate API call delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Find and update user in mock data
-      const userIndex = users.findIndex((u) => u.id === userId);
-      if (userIndex !== -1) {
-        users[userIndex].status = isLocked ? "locked" : "active";
-        alert(
-          isLocked
-            ? "Đã khóa tài khoản thành công!"
-            : "Đã mở khóa tài khoản thành công!"
-        );
-        // Force re-render by updating state
-        setUserStatusFilter((prev) => prev);
-      }
+      setLocalUsers((prev) =>
+        prev.map((u) =>
+          u.id === userId
+            ? { ...u, status: isLocked ? "locked" : "active" }
+            : u
+        )
+      );
+
+      alert(
+        isLocked
+          ? "Đã khóa tài khoản thành công!"
+          : "Đã mở khóa tài khoản thành công!"
+      );
     } catch (error) {
       console.error("Error toggling lock:", error);
       alert("Có lỗi xảy ra, vui lòng thử lại!");
@@ -102,32 +100,25 @@ export default function UserListSection() {
   };
 
   const handleDeleteUser = async (userId: number) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa người dùng này?")) {
-      setActionLoading(true);
-      try {
-        // Simulate API call delay
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (!window.confirm("Bạn có chắc chắn muốn xóa người dùng này?")) return;
 
-        // Remove user from mock data
-        const userIndex = users.findIndex((u) => u.id === userId);
-        if (userIndex !== -1) {
-          users.splice(userIndex, 1);
-          alert("Đã xóa người dùng thành công!");
-          // Force re-render by updating state
-          setUserStatusFilter((prev) => prev);
-        }
-      } catch (error) {
-        console.error("Error deleting user:", error);
-        alert("Có lỗi xảy ra, vui lòng thử lại!");
-      } finally {
-        setActionLoading(false);
-      }
+    setActionLoading(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      setLocalUsers((prev) => prev.filter((u) => u.id !== userId));
+
+      alert("Đã xóa người dùng thành công!");
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      alert("Có lỗi xảy ra, vui lòng thử lại!");
+    } finally {
+      setActionLoading(false);
     }
   };
 
   const handleSearch = async () => {
     setIsLoading(true);
-    // Simulate search delay
     await new Promise((resolve) => setTimeout(resolve, 500));
     setIsLoading(false);
   };
@@ -136,7 +127,6 @@ export default function UserListSection() {
     <section className="mb-8">
       <h3 className="font-bold text-xl mb-4">Danh sách người dùng</h3>
 
-      {/* Search */}
       <div className="flex items-center gap-2">
         <Input
           className="text-base !bg-[#ADD8E6] border-none rounded-3xl"
@@ -161,9 +151,7 @@ export default function UserListSection() {
         </Button>
       </div>
 
-      {/* Filters */}
       <div className="flex gap-6 mt-4">
-        {/* Lọc theo loại người dùng */}
         <div className="relative" ref={userTypeRef}>
           <div className="flex items-center gap-2">
             <div className="text-base">Lọc theo loại người dùng</div>
@@ -171,14 +159,13 @@ export default function UserListSection() {
               className="fill-black cursor-pointer"
               onClick={() => {
                 setShowUserTypeDropdown((s) => !s);
-                setShowUserStatusDropdown(false); // Đóng filter khác
+                setShowUserStatusDropdown(false);
               }}
             />
           </div>
 
           {showUserTypeDropdown && (
             <div className="absolute right-0 mt-2 w-52 bg-white border rounded shadow z-50">
-              {/* Các nút lọc loại người dùng */}
               {(["all", "designer", "customer"] as UserTypeFilterType[]).map(
                 (type) => (
                   <button
@@ -205,7 +192,6 @@ export default function UserListSection() {
           )}
         </div>
 
-        {/* Lọc theo trạng thái */}
         <div className="relative" ref={userStatusRef}>
           <div className="flex items-center gap-2">
             <div className="text-base">Lọc theo trạng thái</div>
@@ -213,14 +199,13 @@ export default function UserListSection() {
               className="fill-black cursor-pointer"
               onClick={() => {
                 setShowUserStatusDropdown((s) => !s);
-                setShowUserTypeDropdown(false); // Đóng filter khác
+                setShowUserTypeDropdown(false);
               }}
             />
           </div>
 
           {showUserStatusDropdown && (
             <div className="absolute right-0 mt-2 w-44 bg-white border rounded shadow z-50">
-              {/* Các nút lọc trạng thái */}
               {(["all", "active", "locked"] as UserStatusFilterType[]).map(
                 (status) => (
                   <button
@@ -248,7 +233,6 @@ export default function UserListSection() {
         </div>
       </div>
 
-      {/* Loading state */}
       {isLoading && (
         <div className="flex items-center justify-center py-8">
           <Loader2 className="h-8 w-8 animate-spin" />
@@ -256,7 +240,6 @@ export default function UserListSection() {
         </div>
       )}
 
-      {/* User table */}
       {!isLoading && (
         <UserTable
           users={filteredUsers}
@@ -267,7 +250,6 @@ export default function UserListSection() {
         />
       )}
 
-      {/* No data state */}
       {!isLoading && filteredUsers.length === 0 && (
         <div className="text-center py-8 text-gray-500">
           Không tìm thấy người dùng nào phù hợp với tiêu chí tìm kiếm
