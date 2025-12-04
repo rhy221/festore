@@ -12,9 +12,10 @@
     "typecheck": "tsc --noEmit"
   },
   "overrides": {
-  "react-is": "^19.0.0-rc-69d4b800-20241021"
+    "react-is": "^19.0.0-rc-69d4b800-20241021"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@workspace/ui": "workspace:*",
     "lucide-react": "^0.475.0",
     "next": "^15.4.5",
