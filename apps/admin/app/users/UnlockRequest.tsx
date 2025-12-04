@@ -1,24 +1,376 @@
 "use client";
 
-import { useState } from "react";
-import UnlockRequestDialog, { type UnlockRequest } from "@/components/UnlockRequestDialog";
+import React, { useState, useEffect } from "react";
+import UnlockHistoryDialog, { type User } from "./UnlockHistory";
+import { BackspaceIcon } from "@heroicons/react/24/solid";
+import { CheckCircle2Icon, MinusCircle } from "lucide-react";
 
-const sampleRequest: UnlockRequest = {
-  id: 1,
-  name: "Trịnh Mai Cường",
-  reason: "Tài khoản bị khoá nhầm",
-  date: "22/07/2025",
-  status: "pending"
+type UnlockRequest = {
+  id: number;
+  name: string;
+  reason: string;
+  date: string;
+  status: "pending" | "processed";
 };
 
-export default function UnlockRequestPage() {
-  const [open, setOpen] = useState(true);
+interface UnlockRequestDialogProps {
+  request: UnlockRequest | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export default function UnlockRequestDialog({
+  request,
+  open,
+  onOpenChange,
+}: UnlockRequestDialogProps) {
+  const [action, setAction] = useState<"unlock" | "reject" | null>(null);
+  const [warnLast, setWarnLast] = useState(false);
+  const [sendCommitment, setSendCommitment] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
+
+  // State for unlock history dialog and the user data to show in it
+  const [showHistoryDialog, setShowHistoryDialog] = useState(false);
+  const [historyUser, setHistoryUser] = useState<User | null>(null);
+
+  // Keep a persistent current user for the main dialog so that when the history
+  // dialog is closed we can save the updated history back into the main modal.
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [requestStatus, setRequestStatus] = useState<"pending" | "processed">(
+    request ? request.status : "pending"
+  );
+  useEffect(() => {
+    if (request && open && !currentUser) {
+      const initialUser: User = {
+        fullName: request.name,
+        role: "Nhà thiết kế",
+        email: "maicuong123@gmail.com",
+        phone: "0123456789",
+        status: "Đang bị khoá",
+        lockDate: "10/07/2025",
+        lockReason:
+          "Tài khoản bị khóa do đăng mẫu thiết kế bị báo cáo vi phạm bản quyền quá 3 lần trong vòng 7 ngày.",
+        appealReason: request.reason,
+        processingHistory: [
+          {
+            id: 1,
+            processor: "Nguyễn Thị Bình",
+            processDate: "15/07/2025",
+            action: "Từ chối",
+            note: "Vi phạm 1 lần trước đó, chưa gỡ mẫu vi phạm.",
+          },
+        ],
+      };
+      setCurrentUser(initialUser);
+    }
+  }, [request, open, currentUser]);
+
+  if (!request || !open || !currentUser) {
+    return null;
+  }
+
+  const closeModal = () => {
+    onOpenChange(false);
+    setAction(null);
+    setWarnLast(false);
+    setSendCommitment(false);
+    setRejectReason("");
+    setHistoryUser(null);
+    setShowHistoryDialog(false);
+  };
+
+  // If history dialog should be shown, render it with either the generated historyUser
+  // or the base `currentUser` above.
+  if (showHistoryDialog) {
+    return (
+      <UnlockHistoryDialog
+        user={historyUser ?? currentUser}
+        open={showHistoryDialog}
+        onOpenChange={(isOpen) => {
+          setShowHistoryDialog(isOpen);
+          if (!isOpen) {
+            // When the history dialog closes, persist the updated history into
+            // the main dialog (if available) and clear the temporary historyUser.
+            if (historyUser) {
+              setCurrentUser(historyUser);
+            }
+            setHistoryUser(null);
+            // Do NOT reset the form — user asked to keep the action state when
+            // returning to the request dialog.
+            closeModal();
+          }
+        }}
+      />
+    );
+  }
+
+  const handleSubmit = () => {
+    // Build a new processing record based on selected action and options
+    const now = new Date();
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    const processDate = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
+
+    const newId = (currentUser.processingHistory?.length ?? 0) + 1;
+
+    const actionLabel =
+      action === "unlock"
+        ? "Mở khoá"
+        : action === "reject"
+          ? "Từ chối"
+          : "Không xác định";
+
+    let note = "";
+    if (action === "unlock") {
+      const parts: string[] = [];
+      if (warnLast) parts.push("Cảnh báo lần cuối");
+      if (sendCommitment) parts.push("Gửi cam kết qua email");
+      if (parts.length === 0) parts.push("Không có ghi chú");
+      note = parts.join("; ");
+    } else if (action === "reject") {
+      note = rejectReason || "Không có lý do được cung cấp";
+    } else {
+      note = "Không có hành động được chọn";
+    }
+
+    const newRecord = {
+      id: newId,
+      processor: "Quản trị viên",
+      processDate,
+      action: actionLabel,
+      note,
+    };
+
+    const updatedUser: User = {
+      ...currentUser,
+      status: action === "unlock" ? "Đang hoạt động" : "Đang bị khoá",
+      processingHistory: [...(currentUser.processingHistory ?? []), newRecord],
+    };
+
+    // store updated user temporarily and update main UI immediately
+    setHistoryUser(updatedUser);
+    setCurrentUser(updatedUser);
+    // mark request as processed in the UI
+    setRequestStatus("processed");
+    setShowHistoryDialog(true);
+  };
 
   return (
-    <UnlockRequestDialog 
-      request={sampleRequest}
-      open={open}
-      onOpenChange={setOpen}
-    />
+    <>
+      {/* Overlay */}
+      <div className="fixed inset-0 bg-black/50 z-40" />
+
+      {/* Modal container - top aligned, centered horizontally */}
+      <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto">
+        <div className="mt-6 mb-8 w-full max-w-4xl rounded-2xl bg-white shadow-xl ring-1 ring-black/5">
+          {/* Header */}
+          <div className="relative border-b border-gray-100 px-8 pt-6 pb-4">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-center text-slate-900">
+              Chi tiết yêu cầu mở khoá
+            </h2>
+
+            {/* top-right close pill */}
+            <BackspaceIcon
+              onClick={closeModal}
+              aria-label="Đóng"
+              className="absolute right-6 top-4 inline-flex items-center justify-center w-9 h-9 text-black"
+            ></BackspaceIcon>
+          </div>
+
+          {/* Content */}
+          <div className="px-8 pb-8 pt-6">
+            {/* Two column info */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8 text-slate-900">
+              <InfoRow label="Họ và tên đầy đủ" value={currentUser.fullName} />
+              <InfoRow label="Vai trò" value={currentUser.role} />
+              <InfoRow label="Địa chỉ email" value={currentUser.email} />
+              <InfoRow label="SĐT" value={currentUser.phone} />
+              <InfoRow label="Trạng thái" value={currentUser.status} />
+              <InfoRow label="Ngày khoá" value={currentUser.lockDate} />
+            </div>
+
+            {/* Reasons */}
+            <div className="mt-6 text-slate-900">
+              <ReasonSection
+                label="Lý do khoá tài khoản"
+                value={currentUser.lockReason}
+              />
+              <ReasonSection
+                label="Lý do khiếu nại"
+                value={currentUser.appealReason}
+                className="mt-4"
+              />
+            </div>
+
+            {/* History table */}
+            <div className="mt-6">
+              <p className="font-semibold mb-3">Lịch sử xử lý</p>
+
+              <div className="overflow-x-auto">
+                <table className="w-full table-fixed border-collapse text-sm">
+                  <thead>
+                    <tr className="bg-white text-left text-slate-700">
+                      <th className="py-3 px-3 border border-slate-200 w-12">
+                        STT
+                      </th>
+                      <th className="py-3 px-3 border border-slate-200">
+                        Người xử lý
+                      </th>
+                      <th className="py-3 px-3 border border-slate-200 w-40">
+                        Ngày xử lý
+                      </th>
+                      <th className="py-3 px-3 border border-slate-200 w-32">
+                        Hành động
+                      </th>
+                      <th className="py-3 px-3 border border-slate-200">
+                        Ghi chú
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentUser.processingHistory.map((record) => (
+                      <tr key={record.id}>
+                        <td className="py-3 px-3 border border-slate-200">
+                          {record.id}
+                        </td>
+                        <td className="py-3 px-3 border border-slate-200">
+                          {record.processor}
+                        </td>
+                        <td className="py-3 px-3 border border-slate-200">
+                          {record.processDate}
+                        </td>
+                        <td className="py-3 px-3 border border-slate-200">
+                          {record.action}
+                        </td>
+                        <td className="py-3 px-3 border border-slate-200">
+                          {record.note}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Action area */}
+            <div className="mt-6">
+              <p className="font-semibold mb-4">Hành động xử lý</p>
+
+              {/* Two-column layout: left = controls, right = rejection reason */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                {/* Left column: radios + checkboxes */}
+                <div className="space-y-4">
+                  <div className="flex items-start gap-6">
+                    <label className="flex-1 flex items-center justify-between bg-white/60 border border-slate-200 rounded-lg p-3">
+                      <div className="flex items-center gap-3">
+                        <span className="inline-flex items-center justify-center rounded-full">
+                          <CheckCircle2Icon className=" fill-green-600 text-white  w-8 h-8 " />
+                        </span>
+                        <span className="text-base font-medium">Mở khoá</span>
+                      </div>
+                      <input
+                        type="radio"
+                        name="action"
+                        checked={action === "unlock"}
+                        onChange={() => setAction("unlock")}
+                        aria-label="Mở khoá"
+                        className="appearance-none w-5 h-5 border-2 border-gray-300 rounded-sm checked:bg-green-600 checked:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-200"
+                      />
+                    </label>
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <label className="flex items-center gap-3 text-base">
+                      <input
+                        type="checkbox"
+                        checked={warnLast}
+                        onChange={(e) => setWarnLast(e.target.checked)}
+                        className="w-4 h-4 accent-green-600 border-gray-300 rounded-sm focus:ring-2 focus:ring-green-200"
+                      />
+                      <span>Cảnh báo lần cuối cùng.</span>
+                    </label>
+
+                    <label className="flex items-center gap-3 text-base">
+                      <input
+                        type="checkbox"
+                        checked={sendCommitment}
+                        onChange={(e) => setSendCommitment(e.target.checked)}
+                        className="w-4 h-4 accent-green-600 border-gray-300 rounded-sm focus:ring-2 focus:ring-green-200"
+                      />
+                      <span>Gửi cam kết qua email.</span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Right column: rejection reason textarea */}
+                <div className="space-y-2">
+                  <label className="flex-1 flex items-center justify-between bg-white/60 border border-slate-200 rounded-lg p-3">
+                    <div className="flex items-center gap-3">
+                      <span className="inline-flex items-center justify-center rounded-full">
+                        <MinusCircle className="w-8 h-8 fill-red-500 text-white" />
+                      </span>
+                      <span className="text-base font-medium">Từ chối</span>
+                    </div>
+                    <input
+                      type="radio"
+                      name="action"
+                      checked={action === "reject"}
+                      onChange={() => setAction("reject")}
+                      aria-label="Từ chối"
+                      className="appearance-none w-5 h-5 border-2 border-gray-300 rounded-sm checked:bg-red-400 checked:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-200"
+                    />
+                  </label>
+                  <p className="font-semibold mb-2">Lý do từ chối</p>
+                  <textarea
+                    value={rejectReason}
+                    onChange={(e) => setRejectReason(e.target.value)}
+                    placeholder=""
+                    className="w-full resize-y bg-transparent border-0 border-b-2 border-slate-300 focus:outline-none focus:border-slate-400 py-2 text-base min-h-[120px]"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Submit */}
+            <div className="mt-6 pb-6">
+              <button
+                onClick={handleSubmit}
+                className="w-full inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold py-4 rounded-full"
+              >
+                Hoàn tất
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
+
+/* --- Components --- */
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-base font-semibold">{label}</p>
+      <p className="mt-1 text-base">{value}</p>
+    </div>
+  );
+}
+
+function ReasonSection({
+  label,
+  value,
+  className,
+}: {
+  label: string;
+  value: string;
+  className?: string;
+}) {
+  return (
+    <div className={className}>
+      <p className="font-semibold text-base">{label}</p>
+      <p className="mt-2 text-base">{value}</p>
+    </div>
+  );
+}
+
+export type { UnlockRequest };

@@ -3,19 +3,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
-import { Filter } from "lucide-react";
+import { Filter, Loader2 } from "lucide-react";
 
-import {
-  users,
-  User,
-  UserStatusFilterType,
-  UserTypeFilterType,
-} from "./types";
+import { User, UserStatusFilterType, UserTypeFilterType } from "./types";
+import { UsersAPI, users } from "@/api/users.api";
 import UserTable from "./UserTable";
 
 export default function UserListSection() {
   // States
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [showUserStatusDropdown, setShowUserStatusDropdown] = useState(false);
   const [showUserTypeDropdown, setShowUserTypeDropdown] = useState(false);
   const [userStatusFilter, setUserStatusFilter] =
@@ -26,6 +23,18 @@ export default function UserListSection() {
   // Refs
   const userStatusRef = useRef<HTMLDivElement | null>(null);
   const userTypeRef = useRef<HTMLDivElement | null>(null);
+
+  // Loading states for actions
+  const [isLoading, setIsLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   // Close dropdown logic
   useEffect(() => {
@@ -47,32 +56,81 @@ export default function UserListSection() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Filtering logic
+  // Filter users from mock data
   const filteredUsers = users.filter((u) => {
     const matchesStatus =
       userStatusFilter === "all" ? true : u.status === userStatusFilter;
     const matchesType =
       userTypeFilter === "all" ? true : u.type === userTypeFilter;
-    // Thêm logic tìm kiếm theo tên/id/v.v. ở đây
-    const matchesSearch = u.name.toLowerCase().includes(search.toLowerCase());
-    
+    const matchesSearch = debouncedSearch
+      ? u.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+      : true;
+
     return matchesStatus && matchesType && matchesSearch;
   });
-  
-  // Dummy Handlers (Cần thay thế bằng logic API thực tế)
+
+  // Handlers
   const handleViewDetail = (userId: number) => {
-    console.log(`Xem chi tiết người dùng ID: ${userId}`);
-    // **TODO:** Thực hiện chuyển trang sang UserDetailPage
-  };
-  const handleToggleLock = (userId: number, isLocked: boolean) => {
-    console.log(`${isLocked ? 'Khóa' : 'Mở khóa'} người dùng ID: ${userId}`);
-    // **TODO:** Gọi API khóa/mở khóa
-  };
-  const handleDeleteUser = (userId: number) => {
-    console.log(`Xóa người dùng ID: ${userId}`);
-    // **TODO:** Gọi API xóa
+    // Navigate to user detail page
+    window.location.href = `/admin/users/${userId}`;
   };
 
+  const handleToggleLock = async (userId: number, isLocked: boolean) => {
+    setActionLoading(true);
+    try {
+      // Simulate API call delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Find and update user in mock data
+      const userIndex = users.findIndex((u) => u.id === userId);
+      if (userIndex !== -1) {
+        users[userIndex].status = isLocked ? "locked" : "active";
+        alert(
+          isLocked
+            ? "Đã khóa tài khoản thành công!"
+            : "Đã mở khóa tài khoản thành công!"
+        );
+        // Force re-render by updating state
+        setUserStatusFilter((prev) => prev);
+      }
+    } catch (error) {
+      console.error("Error toggling lock:", error);
+      alert("Có lỗi xảy ra, vui lòng thử lại!");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDeleteUser = async (userId: number) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa người dùng này?")) {
+      setActionLoading(true);
+      try {
+        // Simulate API call delay
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        // Remove user from mock data
+        const userIndex = users.findIndex((u) => u.id === userId);
+        if (userIndex !== -1) {
+          users.splice(userIndex, 1);
+          alert("Đã xóa người dùng thành công!");
+          // Force re-render by updating state
+          setUserStatusFilter((prev) => prev);
+        }
+      } catch (error) {
+        console.error("Error deleting user:", error);
+        alert("Có lỗi xảy ra, vui lòng thử lại!");
+      } finally {
+        setActionLoading(false);
+      }
+    }
+  };
+
+  const handleSearch = async () => {
+    setIsLoading(true);
+    // Simulate search delay
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    setIsLoading(false);
+  };
 
   return (
     <section className="mb-8">
@@ -82,12 +140,24 @@ export default function UserListSection() {
       <div className="flex items-center gap-2">
         <Input
           className="text-base !bg-[#ADD8E6] border-none rounded-3xl"
-          placeholder="Nhập nội dung tìm kiếm"
+          placeholder="Nhập tên người dùng để tìm kiếm"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          onKeyPress={(e) => e.key === "Enter" && handleSearch()}
         />
-        <Button className="bg-green-500 text-base text-white rounded-3xl hover:bg-green-700">
-          Tìm kiếm
+        <Button
+          className="bg-green-500 text-base text-white rounded-3xl hover:bg-green-700 disabled:opacity-50"
+          onClick={handleSearch}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Đang tìm...
+            </>
+          ) : (
+            "Tìm kiếm"
+          )}
         </Button>
       </div>
 
@@ -126,8 +196,8 @@ export default function UserListSection() {
                     {type === "all"
                       ? "Tất cả"
                       : type === "designer"
-                      ? "Nhà thiết kế"
-                      : "Khách hàng"}
+                        ? "Nhà thiết kế"
+                        : "Khách hàng"}
                   </button>
                 )
               )}
@@ -168,8 +238,8 @@ export default function UserListSection() {
                     {status === "all"
                       ? "Tất cả"
                       : status === "active"
-                      ? "Đang hoạt động"
-                      : "Bị khoá"}
+                        ? "Đang hoạt động"
+                        : "Bị khoá"}
                   </button>
                 )
               )}
@@ -178,12 +248,31 @@ export default function UserListSection() {
         </div>
       </div>
 
-      <UserTable 
-        users={filteredUsers} 
-        onViewDetail={handleViewDetail}
-        onToggleLock={handleToggleLock}
-        onDeleteUser={handleDeleteUser}
-      />
+      {/* Loading state */}
+      {isLoading && (
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="h-8 w-8 animate-spin" />
+          <span className="ml-2">Đang tải dữ liệu...</span>
+        </div>
+      )}
+
+      {/* User table */}
+      {!isLoading && (
+        <UserTable
+          users={filteredUsers}
+          onViewDetail={handleViewDetail}
+          onToggleLock={handleToggleLock}
+          onDeleteUser={handleDeleteUser}
+          isLoading={actionLoading}
+        />
+      )}
+
+      {/* No data state */}
+      {!isLoading && filteredUsers.length === 0 && (
+        <div className="text-center py-8 text-gray-500">
+          Không tìm thấy người dùng nào phù hợp với tiêu chí tìm kiếm
+        </div>
+      )}
     </section>
   );
 }

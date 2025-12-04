@@ -1,7 +1,7 @@
 // src/components/admin/user/UnlockRequestTable.tsx
 
 import React from "react";
-import { type UnlockRequest } from "@/components/UnlockRequestDialog";
+import { type UnlockRequest } from "./UnlockRequest";
 import { displayUnlockStatus } from "./types";
 import { EyeIcon } from "lucide-react";
 

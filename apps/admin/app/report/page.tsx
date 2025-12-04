@@ -1,20 +1,19 @@
 "use client";
 
-import { ReportCard } from "@/components/card";
+import { ReportCard } from "../../components/card";
 import {
   Siren,
   User,
   MessageSquareWarningIcon,
   CheckCircle,
-  Filter,
   EyeIcon,
 } from "lucide-react";
 import { Input } from "@workspace/ui/components/input";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@workspace/ui/components/button";
 import AdminReportDetailPopup from "./DetailReport";
-import Header from "@/components/Header/Header";
 import Sidebar from "@/components/Sidebar/Sidebar";
+import Header from "@/components/Header/Header";
 
 type User = {
   id: number;
@@ -28,6 +27,7 @@ type User = {
   reportDate: Date;
   annunciator: string;
 };
+
 const users: User[] = [
   {
     id: 1,
@@ -71,13 +71,12 @@ const displayUserViolate = (s: string) =>
   s === "copyright" ? "Vi phạm bản quyền" : "Vi phạm bình luận";
 const displayUserType = (t: string) =>
   t === "designer" ? "Nhà thiết kế" : "Khách hàng";
+
 export default function AdminReportPage() {
   const [search, setSearch] = useState("");
-  // Dropdown states
   const [showUserViolateDropdown, setShowUserViolateDropdown] = useState(false);
   const [showUserTypeDropdown, setShowUserTypeDropdown] = useState(false);
 
-  // Selected filter values
   const [userViolateFilter, setUserViolateFilter] = useState<
     "all" | "comment" | "copyright"
   >("all");
@@ -86,14 +85,21 @@ export default function AdminReportPage() {
   >("all");
   const userViolateRef = useRef<HTMLDivElement | null>(null);
   const userTypeRef = useRef<HTMLDivElement | null>(null);
-  // Filtering logic
+
   const filteredUsers = users.filter((u) => {
     const matchesViolate =
       userViolateFilter === "all" ? true : u.violate === userViolateFilter;
     const matchesType =
       userTypeFilter === "all" ? true : u.type === userTypeFilter;
-    return matchesViolate && matchesType;
+    const matchesSearch =
+      search === "" ||
+      u.name.toLowerCase().includes(search.toLowerCase()) ||
+      u.email.toLowerCase().includes(search.toLowerCase()) ||
+      u.phone.includes(search);
+
+    return matchesViolate && matchesType && matchesSearch;
   });
+
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (
@@ -112,105 +118,58 @@ export default function AdminReportPage() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-  // Detail Violate Popup
+
   const [showDetailViolate, setShowDetailViolate] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
-      {/* Header */}
+    <div className="min-h-screen bg-gray-50">
       <Header />
+      <Sidebar />
 
-      {/* Content layout */}
-      <div className="flex flex-1 pt-32">
-        {/* Sidebar */}
-        <Sidebar />
+      {/* main content: margin-left = sidebar width, margin-top = header height */}
+      <main
+        className="bg-gray-100 p-6 overflow-auto ml-[296px] mt-32 min-h-[calc(100vh-8rem)]"
+      >
+        <h1 className="text-2xl font-bold">Thống kê nhanh</h1>
 
-        {/* Main content */}
-        <main className="flex-1 bg-white p-3 overflow-y-auto text-lg text-black">
-          <h1 className="text-2xl font-bold">Danh sách đang xử lý</h1>
-          <div className="flex items-center gap-2 pt-2">
-            <Input
-              className="text-base !bg-[#ADD8E6] border-none rounded-3xl"
-              placeholder="Nhập nội dung tìm kiếm"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <Button className="bg-green-500 text-base text-white rounded-3xl hover:bg-green-700">
-              Tìm kiếm
-            </Button>
-          </div>
-          {/* Filter Violate */}
-          <div className="flex items-center gap-10 pt-4">
-            <div className="flex items-center gap-2 relative">
-              <p>Lọc theo loại vi phạm</p>
-              <Filter
-                className="fill-black"
-                onClick={() => {
-                  setShowUserViolateDropdown(!showUserViolateDropdown);
-                  setShowUserTypeDropdown(false);
-                }}
-              />
-              {showUserViolateDropdown && (
-                <div className="absolute top-1/2 left-full translate-y-0 translate-x-0 mr-2 bg-[#EFF6FF] border rounded-lg shadow-lg z-10 w-32">
-                  <button
-                    className={`w-full text-left px-3 py-2 ${
-                      userViolateFilter === "all"
-                        ? "bg-[#EFF6FF] font-semibold"
-                        : "hover:bg-[#dee8f5]"
-                    }`}
-                    onClick={() => {
-                      setUserViolateFilter("all");
-                      setShowUserTypeDropdown(false);
-                    }}
-                  >
-                    Tất cả
-                  </button>
-                  <hr className="mx-1 my-1 h-px bg-black border-0" />
-                  <button
-                    className={`w-full text-left px-3 py-2 ${
-                      userViolateFilter === "comment"
-                        ? "bg-[#EFF6FF] font-semibold"
-                        : "hover:bg-[#dee8f5]"
-                    }`}
-                    onClick={() => {
-                      setUserViolateFilter("comment");
-                      setShowUserTypeDropdown(false);
-                    }}
-                  >
-                    Bình luận
-                  </button>
-                  <hr className="mx-1 my-1 h-px bg-black border-0" />
-                  <button
-                    className={`w-full text-left px-3 py-2 ${
-                      userViolateFilter === "copyright"
-                        ? "bg-[#EFF6FF] font-semibold"
-                        : "hover:bg-[#dee8f5]"
-                    }`}
-                    onClick={() => {
-                      setUserViolateFilter("copyright");
-                      setShowUserTypeDropdown(false);
-                    }}
-                  >
-                    Bản quyền
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
+        <div className="grid grid-cols-2 gap-4">
+          <ReportCard title="Tổng số vi phạm" icon={<Siren />} number={3} color="#FF4C4C" />
+          <ReportCard title="Số người vi phạm" icon={<User className="fill-current text-white" />} number={3} color="#FFAA00" />
+          <ReportCard title="Số vi phạm đang xử lý" icon={<MessageSquareWarningIcon />} number={3} color="#1E90FF" />
+          <ReportCard title="Số vi phạm đã xử lý" icon={<CheckCircle className=" text-white" />} number={3} color="#32CD32" />
+        </div>
+
+        <h1 className="text-2xl font-bold mt-6">Danh sách đang xử lý</h1>
+        <div className="flex items-center gap-2 pt-2">
+          <Input
+            className="text-base"
+            placeholder="Nhập nội dung tìm kiếm"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <Button className="bg-green-500 text-base">Tìm kiếm</Button>
+        </div>
+
+        {/* đặt table vào container có overflow-x nếu màn hình nhỏ */}
+        <div className="mt-4 overflow-x-auto">
           <UserTable users={filteredUsers} />
-          {showDetailViolate && selectedUser && (
-            <AdminReportDetailPopup
-              user={selectedUser}
-              onClose={() => {
-                setShowDetailViolate(false);
-                setSelectedUser(null);
-              }}
-            />
-          )}
-        </main>
-      </div>
+        </div>
+
+        {/* modal */}
+        {showDetailViolate && selectedUser && (
+          <AdminReportDetailPopup
+            user={selectedUser}
+            onClose={() => {
+              setShowDetailViolate(false);
+              setSelectedUser(null);
+            }}
+          />
+        )}
+      </main>
     </div>
   );
+
   function UserTable({ users }: { users: User[] }) {
     return (
       <table className="w-full border border-black text-lg mt-4 border-collapse text-center align-middle">
@@ -218,6 +177,7 @@ export default function AdminReportPage() {
           <tr>
             <th className="p-3 font-semibold border border-black">STT</th>
             <th className="p-3 font-semibold border border-black">Họ và tên</th>
+            <th className="p-3 font-semibold border border-black">Loại người dùng</th>
             <th className="p-3 font-semibold border border-black">Vi phạm</th>
             <th className="p-3 font-semibold border border-black"></th>
           </tr>
@@ -227,13 +187,12 @@ export default function AdminReportPage() {
             <tr key={u.id}>
               <td className="p-3 border border-black">{i + 1}</td>
               <td className="p-3 border border-black">{u.name}</td>
-              <td className="p-3 border border-black">
-                {displayUserViolate(u.violate)}
-              </td>
+              <td className="p-3 border border-black">{displayUserType(u.type)}</td>
+              <td className="p-3 border border-black">{displayUserViolate(u.violate)}</td>
               <td className="p-3 border border-black gap-2">
                 <EyeIcon
                   size={30}
-                  className="fill-black text-white"
+                  className="fill-black text-white cursor-pointer"
                   onClick={() => {
                     setSelectedUser(u);
                     setShowDetailViolate(true);

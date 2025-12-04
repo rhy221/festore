@@ -106,9 +106,6 @@ export default function AdminReportDetailPopup({
           </tbody>
         </table>
         <div className="flex justify-center gap-7 mt-4">
-          <Button className="bg-[#0057FF] text-[#445a8600] text-xl hover:bg-[#033497] rounded-3xl px-8">
-            Cảnh cáo
-          </Button>
           <Button className="bg-[#FF7043] text-white text-xl hover:bg-[#f15627] rounded-3xl px-8">
             Cảnh cáo
           </Button>

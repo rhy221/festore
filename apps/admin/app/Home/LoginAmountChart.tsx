@@ -1,6 +1,5 @@
 "use client";
-
-import React from "react";
+import { useState, useEffect } from "react";
 import {
   LineChart,
   Line,
@@ -9,25 +8,7 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
-
-const data = [
-  { date: "1/9", value: 30 },
-  { date: "2/9", value: 40 },
-  { date: "3/9", value: 68 },
-  { date: "4/9", value: 85 },
-  { date: "5/9", value: 55 },
-  { date: "6/9", value: 33 },
-  { date: "7/9", value: 91 },
-  { date: "8/9", value: 83 },
-  { date: "9/9", value: 34 },
-  { date: "10/9", value: 37 },
-  { date: "11/9", value: 78 },
-  { date: "12/9", value: 24 },
-];
-
-interface LineChartProps {
-  chartData?: typeof data;
-}
+import { getDailyAccess, type DailyAccessData } from '@/api/home.api';
 
 const CustomDot = (props: any) => {
   const { cx, cy } = props;
@@ -43,16 +24,73 @@ const CustomDot = (props: any) => {
   );
 };
 
-export default function LineChartComponent({ chartData = data }: LineChartProps) {
+interface LineChartProps {
+  chartData?: DailyAccessData[];
+}
+
+export default function LineChartComponent({ chartData }: LineChartProps) {
+  const [data, setData] = useState<DailyAccessData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchDailyData = async () => {
+      try {
+        setLoading(true);
+        
+        // Nếu có props chartData truyền vào, dùng luôn
+        if (chartData && chartData.length > 0) {
+          setData(chartData);
+          setLoading(false);
+          return;
+        }
+        
+        // Call API từ service
+        const apiData = await getDailyAccess();
+        setData(apiData);
+        
+      } catch (err) {
+        console.error('Error fetching daily access data:', err);
+        setError('Có lỗi xảy ra khi tải dữ liệu');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDailyData();
+  }, [chartData]);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col w-full p-2">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-lg text-gray-600">Đang tải biểu đồ...</div>
+        </div>
+      </div>
+    );
+  }
+
   const maxValue = Math.max(...data.map((d) => d.value));
 
   return (
-    <div className="flex flex-col w-full p-2">
-      <h2 className="text-xl font-normal mb-4">Số lượng truy cập hệ thống theo ngày</h2>
+     <div className="flex flex-col w-full p-6">
+      <p className="text-2xl font-bold mb-6">
+        Số lượng truy cập hệ thống theo ngày
+      </p>
+
+      {error && (
+        <div className="mb-4 p-3 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg shadow-sm">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+            <span className="text-yellow-800 font-medium text-sm">{error}</span>
+          </div>
+        </div>
+      )}
+
       <div className="w-full h-[250px]">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
-            data={chartData}
+            data={data}
             margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
           >
             <defs>

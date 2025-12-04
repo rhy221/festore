@@ -6,7 +6,7 @@ import { Input } from "@workspace/ui/components/input";
 import { Filter } from "lucide-react";
 import UnlockRequestDialog, {
   type UnlockRequest,
-} from "@/components/UnlockRequestDialog";
+} from "./UnlockRequest";
 
 import {
   unlockRequests,

@@ -1,21 +1,20 @@
 // src/components/admin/user/types.ts
 
-// Tái xuất (Re-export) UnlockRequest Type
-import { type UnlockRequest } from "@/components/UnlockRequestDialog";
+// Re-export UnlockRequest type
+import { type UnlockRequest } from "./UnlockRequest";
 
-// Types
-export type User = {
-  id: number;
-  name: string;
-  type: "designer" | "customer";
-  status: "active" | "locked";
-};
+// Import User type từ mock API
+import { type User } from "@/api/users.api";
 
+// Re-export lại cho các component dùng chung
+export type { User };
+
+// Filter Types
 export type UserStatusFilterType = "all" | "active" | "locked";
 export type UserTypeFilterType = "all" | "designer" | "customer";
 export type UnlockStatusFilterType = "all" | "pending" | "processed";
 
-// Data objects
+// UI Display Data
 export const adminInfo = {
   name: "ABC",
   greeting: "Xin chào admin",
@@ -27,12 +26,7 @@ export const stats = {
   bannedUsers: 12,
 };
 
-export const users: User[] = [
-  { id: 1, name: "Nguyễn Thị An", type: "designer", status: "active" },
-  { id: 2, name: "Phạm Công Bình", type: "customer", status: "active" },
-  { id: 3, name: "Trịnh Mai Cường", type: "designer", status: "locked" },
-];
-
+// Unlock Requests Mock (vì chưa có API riêng)
 export const unlockRequests: UnlockRequest[] = [
   {
     id: 1,
@@ -43,10 +37,12 @@ export const unlockRequests: UnlockRequest[] = [
   },
 ];
 
-// Display helpers
+// Display Helpers
 export const displayUserStatus = (s: string) =>
   s === "active" ? "Đang hoạt động" : "Bị khoá";
+
 export const displayUserType = (t: string) =>
   t === "designer" ? "Nhà thiết kế" : "Khách hàng";
+
 export const displayUnlockStatus = (s: string) =>
   s === "pending" ? "Đang chờ xử lý" : "Đã xử lý";
