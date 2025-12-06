@@ -27,7 +27,10 @@ export default function HomePage() {
           <TopThreeRankings />
         </div>
 
-        <h2 className="text-[32px] font-extrabold pl-3 mb-4">Biểu đồ trực quan</h2>
+        <h2 className="text-[24px] font-bold pl-3 mb-4">
+          Biểu đồ trực quan
+        </h2>
+
 
         <div className="mb-6 border rounded-lg shadow-md p-4 bg-white">
           <WeeklyChart />

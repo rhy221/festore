@@ -1,42 +1,26 @@
-// src/components/admin/user/UnlockRequestSection.tsx
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Filter } from "lucide-react";
-import UnlockRequestDialog, {
-  type UnlockRequest,
-} from "./UnlockRequest";
+import UnlockRequestDialog, { type UnlockRequest } from "./UnlockRequest";
 
-import {
-  unlockRequests,
-  UnlockStatusFilterType,
-  displayUnlockStatus,
-} from "./types";
+import { unlockRequests, UnlockStatusFilterType, displayUnlockStatus } from "./types";
 import UnlockRequestTable from "./UnlockRequestTable";
 
 export default function UnlockRequestSection() {
-  // States
   const [search, setSearch] = useState("");
-  const [selectedRequest, setSelectedRequest] = useState<UnlockRequest | null>(
-    null
-  );
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [selectedRequest, setSelectedRequest] = useState<UnlockRequest | null>(null);
   const [showUnlockDialog, setShowUnlockDialog] = useState(false);
-  const [showUnlockStatusDropdown, setShowUnlockStatusDropdown] =
-    useState(false);
-  const [unlockStatusFilter, setUnlockStatusFilter] =
-    useState<UnlockStatusFilterType>("all");
+  const [showUnlockStatusDropdown, setShowUnlockStatusDropdown] = useState(false);
+  const [unlockStatusFilter, setUnlockStatusFilter] = useState<UnlockStatusFilterType>("all");
 
-  // Ref
   const unlockStatusRef = useRef<HTMLDivElement | null>(null);
 
-  // Close dropdown logic
+  // Click outside dropdown
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (
-        unlockStatusRef.current &&
-        !unlockStatusRef.current.contains(e.target as Node)
-      ) {
+      if (unlockStatusRef.current && !unlockStatusRef.current.contains(e.target as Node)) {
         setShowUnlockStatusDropdown(false);
       }
     }
@@ -44,17 +28,22 @@ export default function UnlockRequestSection() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Filtering logic
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // Filtered requests logic
   const filteredUnlockRequests = unlockRequests.filter((r) => {
+    // Filter trạng thái
     const matchesStatus =
-      unlockStatusFilter === "all"
-        ? true
-        : unlockStatusFilter === "pending"
-        ? r.status === "pending"
-        : r.status === "processed";
-    // Thêm logic tìm kiếm theo tên/reason/v.v. ở đây
-    const matchesSearch = r.name.toLowerCase().includes(search.toLowerCase());
-    
+      unlockStatusFilter === "all" ? true : r.status === unlockStatusFilter;
+
+    // Filter search (tên hoặc lý do)
+    const matchesSearch = r.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+                          r.reason.toLowerCase().includes(debouncedSearch.toLowerCase());
+
     return matchesStatus && matchesSearch;
   });
 
@@ -62,75 +51,57 @@ export default function UnlockRequestSection() {
     setSelectedRequest(request);
     setShowUnlockDialog(true);
   };
-  
-  // Dummy handler
-  const handleSearch = () => {
-      console.log(`Tìm kiếm yêu cầu mở khóa với từ khóa: ${search}`);
-  }
 
   return (
-    <section>
-      <h3 className="font-bold text-xl mb-4">Yêu cầu mở khoá tài khoản</h3>
+    <section className="mb-10 font-sans">
+      <h3 className="text-2xl font-bold mb-6 text-gray-900">Yêu cầu mở khoá tài khoản</h3>
 
       {/* Search */}
-      <div className="flex items-center gap-2">
+      <div className="flex flex-1 max-w-lg mb-4">
         <Input
-          className="text-base !bg-[#ADD8E6] border-none rounded-3xl"
-          placeholder="Nhập nội dung tìm kiếm"
+          className="flex-1 px-4 py-3 rounded-full border border-gray-200 shadow-sm focus:border-blue-400 focus:ring focus:ring-blue-100 transition-all duration-300"
+          placeholder="Nhập tên hoặc nội dung tìm kiếm"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Button 
-            className="bg-green-500 text-base text-white rounded-3xl hover:bg-green-700"
-            onClick={handleSearch}
-        >
-          Tìm kiếm
-        </Button>
       </div>
 
-      {/* Filters */}
-      <div className="flex gap-6 mt-4">
-        {/* Lọc theo trạng thái (unlock requests) */}
+      {/* Status filter */}
+      <div className="flex flex-wrap gap-4 mb-6">
         <div className="relative" ref={unlockStatusRef}>
-          <div className="flex items-center gap-2">
-            <div className="text-base">Lọc theo trạng thái</div>
-            <Filter
-              className="fill-black cursor-pointer"
-              onClick={() => {
-                setShowUnlockStatusDropdown((s) => !s);
-              }}
-            />
+          <div
+            className="flex items-center gap-2 cursor-pointer select-none px-4 py-2 bg-white border border-gray-200 rounded-full shadow-sm hover:shadow-md transition-shadow duration-300"
+            onClick={() => setShowUnlockStatusDropdown((s) => !s)}
+          >
+            <span className="text-gray-700 font-medium">Trạng thái</span>
+            <Filter className="h-5 w-5 text-gray-500" />
           </div>
 
           {showUnlockStatusDropdown && (
-            <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow z-50">
-              {/* Các nút lọc trạng thái */}
-              {(["all", "pending", "processed"] as UnlockStatusFilterType[]).map(
-                (status) => (
-                  <button
-                    key={status}
-                    className={`w-full text-left px-3 py-2 ${
-                      unlockStatusFilter === status
-                        ? "bg-gray-100 font-semibold"
-                        : "hover:bg-gray-50"
-                    }`}
-                    onClick={() => {
-                      setUnlockStatusFilter(status);
-                      setShowUnlockStatusDropdown(false);
-                    }}
-                  >
-                    {displayUnlockStatus(status)}
-                  </button>
-                )
-              )}
+            <div className="absolute mt-2 w-44 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
+              {(["all", "pending", "processed"] as UnlockStatusFilterType[]).map((status) => (
+                <button
+                  key={status}
+                  className={`w-full text-left px-4 py-2 text-gray-700 hover:bg-blue-50 transition-colors ${
+                    unlockStatusFilter === status ? "bg-blue-100 font-semibold" : ""
+                  }`}
+                  onClick={() => {
+                    setUnlockStatusFilter(status);
+                    setShowUnlockStatusDropdown(false);
+                  }}
+                >
+                  {status === "all" ? "Tất cả" : displayUnlockStatus(status)}
+                </button>
+              ))}
             </div>
           )}
         </div>
       </div>
 
+      {/* Table */}
       <UnlockRequestTable requests={filteredUnlockRequests} onViewRequest={handleViewRequest} />
 
-      {/* Unlock Request Dialog (Giữ lại đây vì nó phụ thuộc vào state của Section này) */}
+      {/* Dialog */}
       <UnlockRequestDialog
         request={selectedRequest}
         open={showUnlockDialog}

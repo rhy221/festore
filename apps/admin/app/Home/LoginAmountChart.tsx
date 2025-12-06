@@ -8,7 +8,7 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
-import { getDailyAccess, type DailyAccessData } from '@/api/home.api';
+import { getDailyAccess, type DailyAccessData } from "@/api/home.api";
 
 const CustomDot = (props: any) => {
   const { cx, cy } = props;
@@ -16,10 +16,10 @@ const CustomDot = (props: any) => {
     <circle
       cx={cx}
       cy={cy}
-      r={3}
-      fill="white"
-      stroke="#8b5cf6"
-      strokeWidth={1}
+      r={2.5}
+      fill="#fff"
+      stroke="#111827"
+      strokeWidth={1.5}
     />
   );
 };
@@ -37,21 +37,18 @@ export default function LineChartComponent({ chartData }: LineChartProps) {
     const fetchDailyData = async () => {
       try {
         setLoading(true);
-        
-        // Nếu có props chartData truyền vào, dùng luôn
+
         if (chartData && chartData.length > 0) {
           setData(chartData);
           setLoading(false);
           return;
         }
-        
-        // Call API từ service
+
         const apiData = await getDailyAccess();
         setData(apiData);
-        
       } catch (err) {
-        console.error('Error fetching daily access data:', err);
-        setError('Có lỗi xảy ra khi tải dữ liệu');
+        console.error("Error fetching daily access data:", err);
+        setError("Có lỗi xảy ra khi tải dữ liệu");
       } finally {
         setLoading(false);
       }
@@ -62,10 +59,8 @@ export default function LineChartComponent({ chartData }: LineChartProps) {
 
   if (loading) {
     return (
-      <div className="flex flex-col w-full p-2">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-lg text-gray-600">Đang tải biểu đồ...</div>
-        </div>
+      <div className="flex items-center justify-center h-[220px] text-sm text-gray-400">
+        Đang tải biểu đồ...
       </div>
     );
   }
@@ -73,75 +68,67 @@ export default function LineChartComponent({ chartData }: LineChartProps) {
   const maxValue = Math.max(...data.map((d) => d.value));
 
   return (
-     <div className="flex flex-col w-full p-6">
-      <p className="text-2xl font-bold mb-6">
-        Số lượng truy cập hệ thống theo ngày
-      </p>
+    <div className="w-full rounded-2xl border border-gray-200 bg-white px-5 pt-5 pb-4 shadow-sm">
+      
+      {/* TITLE – STYLE FASHION */}
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-sm font-semibold tracking-wide text-gray-900">
+          Lượt truy cập theo ngày
+        </h2>
+        <span className="text-xs text-gray-400">Daily Access</span>
+      </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg shadow-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-            <span className="text-yellow-800 font-medium text-sm">{error}</span>
-          </div>
+        <div className="mb-3 rounded-lg border border-yellow-200 bg-yellow-50 px-3 py-2 text-xs text-yellow-800">
+          {error}
         </div>
       )}
 
-      <div className="w-full h-[250px]">
+      {/* CHART */}
+      <div className="w-full h-[180px]">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={data}
-            margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
+            margin={{ top: 10, right: 10, left: -15, bottom: 0 }}
           >
             <defs>
-              <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur in="SourceAlpha" stdDeviation="2" />
-                <feOffset dx="0" dy="3" result="offsetblur" />
-                <feComponentTransfer>
-                  <feFuncA type="linear" slope="0.4" />
-                </feComponentTransfer>
-                <feFlood floodColor="#8979FF" floodOpacity="0.3" />
-                <feComposite in2="offsetblur" operator="in" />
-                <feMerge>
-                  <feMergeNode />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
+              <linearGradient id="fashionLine" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#111827" />
+                <stop offset="100%" stopColor="#6b7280" />
+              </linearGradient>
             </defs>
 
             <CartesianGrid
-              strokeDasharray="3 3"
-              stroke="#e5e7eb"
+              strokeDasharray="2 6"
+              stroke="#eee"
               vertical={false}
-              horizontal={true}
             />
 
             <XAxis
               dataKey="date"
-              axisLine={true}
+              axisLine={false}
               tickLine={false}
-              tick={{ fill: "#6b7280", fontSize: 10 }}
-              dy={10}
-              interval={0}
+              tick={{ fill: "#9ca3af", fontSize: 10 }}
+              dy={8}
             />
 
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#6b7280", fontSize: 10 }}
-              tickCount={7}
-              domain={[0, (maxValue + 10) - ((maxValue + 10) % 10)]}
+              tick={{ fill: "#9ca3af", fontSize: 10 }}
+              tickCount={6}
+              domain={[0, maxValue + 10]}
               dx={-10}
               allowDecimals={false}
             />
 
             <Line
-              type="linear"
+              type="monotone"
               dataKey="value"
-              stroke="#8979FF"
+              stroke="url(#fashionLine)"
               strokeWidth={2}
               dot={<CustomDot />}
-              filter="url(#shadow)"
+              activeDot={{ r: 4 }}
             />
           </LineChart>
         </ResponsiveContainer>

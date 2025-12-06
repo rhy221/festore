@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
-import { X, ImagePlus } from "lucide-react";
-import { Input, Textarea } from "components/input";
+import { X } from "lucide-react";
+import { Input} from "components/input";
+import { Textarea } from "components/textarea";
 import { Button } from "../../../../packages/ui/src/components/button";
 import { categoriesApi } from "../../lib/api/categories";
 import { toast } from "sonner";
@@ -17,12 +18,11 @@ export default function AdminCategoryAddPopup({
 }: AdminCategoryAddPopupProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
     if (!name.trim()) {
-      toast.error("Vui lòng nhập tên thể loại");
+      toast.error("Vui lòng nhập tên danh mục");
       return;
     }
 
@@ -31,85 +31,65 @@ export default function AdminCategoryAddPopup({
       await categoriesApi.create({
         name: name.trim(),
         description: description.trim(),
-        imageUrl: imageUrl.trim() || undefined,
       });
+      toast.success(`Đã tạo danh mục "${name}" thành công.`);
       onSuccess();
     } catch (error) {
       console.error("Failed to create category:", error);
-      toast.error("Không thể tạo thể loại");
+      toast.error("Không thể tạo danh mục. Vui lòng thử lại.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg text-black max-w-3xl w-full">
-        <div className="flex flex-row bg-white justify-between gap-70">
-          <p className="font-bold text-2xl pb-3">Tạo thể loại mới</p>
-          <X
-            className="w-8 h-8 pt-1 cursor-pointer hover:text-gray-600"
+    <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50 transition-opacity duration-300">
+      <div className="bg-white p-8 rounded-2xl shadow-2xl text-gray-900 max-w-xl w-full">
+        
+        <div className="flex justify-between items-start pb-4 border-b border-gray-100 mb-6">
+          <h2 className="text-3xl font-light tracking-wide">Tạo thể loại mới</h2>
+          <button 
             onClick={onClose}
-          />
+            className="p-1 text-gray-500 hover:text-black transition duration-200 rounded-full hover:bg-gray-100"
+            aria-label="Đóng"
+          >
+            <X className="w-6 h-6" />
+          </button>
         </div>
 
-        <table className="w-full border-amber-950">
-          <thead>
-            <tr>
-              <th className="w-1/2"></th>
-              <th className="w-1/2"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="align-text-top">
-                <p className="font-semibold">Tên thể loại</p>
-                <Input
-                  className="border-0 shadow-none border-b-2 rounded-none border-black w-full focus-visible:ring-0 p-0 focus-visible:border-black"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Nhập tên thể loại"
-                />
-              </td>
-              <td
-                rowSpan={2}
-                className=" text-center align-text-top justify-items-center"
-              >
-                <p className="font-semibold pb-2">Ảnh mô tả (nếu có)</p>
-                <div className="w-60 h-40 border-2 border-black flex flex-col items-center justify-center cursor-pointer mx-auto rounded">
-                  <ImagePlus className="w-12 h-12 mb-2" strokeWidth={1} />
-                  <Input
-                    type="text"
-                    className="w-full text-xs px-2"
-                    placeholder="URL ảnh"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                  />
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td className="align-text-top pt-5">
-                <p className="font-semibold">Mô tả thể loại</p>
-                <Textarea
-                  rows={4}
-                  className="w-full mt-2"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Nhập mô tả thể loại"
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div className="space-y-6">
+          
+          <div>
+            <label htmlFor="category-name" className="block text-sm font-medium text-gray-700 mb-1">Tên thể loại</label>
+            <Input
+              id="category-name"              
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
 
-        <Button
-          className="bg-[#0057FF] text-white text-xl hover:bg-[#0548ce] mt-6 w-full rounded-xl disabled:opacity-50"
-          onClick={handleSubmit}
-          disabled={loading}
-        >
-          {loading ? "Đang xử lý..." : "Hoàn tất"}
-        </Button>
+          <div>
+            <label htmlFor="category-description" className="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
+            <Textarea
+                id="category-description"                
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="pt-6 flex justify-end">
+          <Button
+            className="bg-blue-600 text-white text-sm font-medium 
+                      hover:bg-blue-700 px-6 py-2 rounded-lg 
+                      transition duration-200 disabled:opacity-50"
+            onClick={handleSubmit}
+            disabled={loading}
+          >
+            {loading ? "Đang xử lý..." : "Tạo thể loại"}
+          </Button>
+        </div>
+
       </div>
     </div>
   );

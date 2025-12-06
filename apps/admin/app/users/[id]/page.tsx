@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import DesignDetailDialog, {
   type Design,
-} from "@/components/DesignDetailDialog";
+} from "../DesignDetail";
 import { UsersAPI, type User } from "@/api/users.api";
 import Header from "@/components/Header/Header";
 import Sidebar from "@/components/Sidebar/Sidebar";

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import { BarChart, Bar, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
   ChartContainer,
@@ -9,12 +9,12 @@ import {
   ChartLegendContent,
   ChartConfig,
 } from "@workspace/ui/components/chart";
-import { getWeeklyDesigns, type WeeklyData } from '@/api/home.api';
+import { getWeeklyDesigns, type WeeklyData } from "@/api/home.api";
 
 const chartConfig = {
   designs: {
     label: "2025",
-    color: "#9e92fe",
+    color: "#111827", // Đen fashion
   },
 } satisfies ChartConfig;
 
@@ -31,21 +31,18 @@ export default function WeeklyChart({ data }: WeeklyChartProps) {
     const fetchWeeklyData = async () => {
       try {
         setLoading(true);
-        
-        // Nếu có props data truyền vào, dùng luôn
+
         if (data && data.length > 0) {
           setChartData(data);
           setLoading(false);
           return;
         }
-        
-        // Call API từ service
+
         const apiData = await getWeeklyDesigns();
         setChartData(apiData);
-        
       } catch (err) {
-        console.error('Error fetching weekly data:', err);
-        setError('Có lỗi xảy ra khi tải dữ liệu');
+        console.error("Error fetching weekly data:", err);
+        setError("Có lỗi xảy ra khi tải dữ liệu");
       } finally {
         setLoading(false);
       }
@@ -56,63 +53,70 @@ export default function WeeklyChart({ data }: WeeklyChartProps) {
 
   if (loading) {
     return (
-      <div className="flex flex-col w-full p-6">
-        <div className="flex items-center justify-center h-96">
-          <div className="text-lg text-gray-600">Đang tải biểu đồ...</div>
-        </div>
+      <div className="flex items-center justify-center h-[220px] text-sm text-gray-400">
+        Đang tải biểu đồ...
       </div>
     );
   }
 
-  const maxDesigns = Math.max(...chartData.map(d => d.designs));
+  const maxDesigns = Math.max(...chartData.map((d) => d.designs));
 
   return (
-    <div className="flex flex-col w-full p-6">
-      <p className="text-2xl font-bold mb-6">
-        Số lượng mẫu thiết kế mới mỗi tuần
-      </p>
+    <div className="w-full rounded-2xl border border-gray-200 bg-white px-5 pt-5 pb-4 shadow-sm">
+
+      {/* HEADER FASHION */}
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-sm font-semibold tracking-wide text-gray-900">
+          Thiết kế mới theo tuần
+        </h2>
+        <span className="text-xs text-gray-400">Weekly Designs</span>
+      </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg shadow-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-            <span className="text-yellow-800 font-medium text-sm">{error}</span>
-          </div>
+        <div className="mb-3 rounded-lg border border-yellow-200 bg-yellow-50 px-3 py-2 text-xs text-yellow-800">
+          {error}
         </div>
       )}
 
-      <div className="w-full flex justify-center">
+      {/* CHART */}
+      <div className="w-full h-[220px]">
         <ChartContainer
           config={chartConfig}
-          className="w-full max-w-5xl min-h-[450px] rounded-lg"
+          className="w-full h-full"
         >
-          <BarChart accessibilityLayer data={chartData} barCategoryGap={"20%"}>
-            <CartesianGrid strokeDasharray="3 3" vertical={true} horizontal={true}/>
+          <BarChart data={chartData} barCategoryGap="35%">
+            <CartesianGrid
+              strokeDasharray="2 6"
+              stroke="#eee"
+              vertical={false}
+            />
+
             <XAxis
               dataKey="week"
-              angle={-45}
               tickLine={false}
-              axisLine={true}
-              tickMargin={15}
-              scale={"band"}
-              tick={{ textAnchor: "middle", fontSize: 13 }}                                                                            
+              axisLine={false}
+              tickMargin={10}
+              tick={{ fill: "#9ca3af", fontSize: 10 }}
             />
+
             <YAxis
               tickLine={false}
               axisLine={false}
-              tick={{ fill: 'hsl(0, 0%, 40%)', fontSize: 13 }}
-              tickCount={8}
-              domain={[0, (maxDesigns + 5) - (maxDesigns + 5) % 5]}
+              tick={{ fill: "#9ca3af", fontSize: 10 }}
+              tickCount={6}
+              domain={[0, maxDesigns + 5]}
               allowDecimals={false}
             />
+
             <ChartTooltip content={<ChartTooltipContent />} />
-            <ChartLegend content={<ChartLegendContent/>} />
+            <ChartLegend content={<ChartLegendContent />} />
+
             <Bar
               dataKey="designs"
               fill="var(--color-designs)"
-              barSize={45}
-              radius={[8, 8, 0, 0]}
-              background={{ fill: "#f2f4f9" }} 
+              barSize={22} // ✅ Thu nhỏ fashion
+              radius={[6, 6, 0, 0]}
+              background={{ fill: "#f3f4f6" }}
             />
           </BarChart>
         </ChartContainer>

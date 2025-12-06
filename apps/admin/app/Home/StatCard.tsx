@@ -1,33 +1,39 @@
-import { useState, useEffect } from 'react'
-import { Card, CardContent } from '@workspace/ui/components/card'
-import { Users, FileText, Grid3x3 } from 'lucide-react'
-import { getQuickStats } from '@/api/home.api'
+import { useState, useEffect } from "react"
+import { Card, CardContent } from "@workspace/ui/components/card"
+import { Users, FileText, Grid3x3 } from "lucide-react"
+import { getQuickStats } from "@/api/home.api"
+
 interface StatCardProps {
   title: string
   value: number
   icon: React.ReactNode
-  bgColor: string
 }
 
-function StatCard({ title, value, icon, bgColor }: StatCardProps) {
+function StatCard({ title, value, icon }: StatCardProps) {
   return (
-    <Card className={`${bgColor} border-0 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105`}>
+    <Card className="group w-full sm:w-[280px] rounded-2xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
       <CardContent className="p-6">
-        <h3 className="text-white text-lg font-bold mb-4 text-center drop-shadow-sm">
-          {title}
-        </h3>
-        <div className="flex items-center justify-center gap-6">
-          {/* Icon Container */}
-          <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-lg border-4 border-white/40">
-            <div className="text-gray-700">
-              {icon}
-            </div>
+        <div className="flex items-center justify-between mb-6">
+
+          {/* TEXT */}
+          <div>
+            <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">
+              {title}
+            </p>
+            <p className="text-3xl font-extrabold text-gray-900">
+              {value.toLocaleString("vi-VN")}
+            </p>
           </div>
 
-          {/* Number */}
-          <div className="text-white text-5xl font-black drop-shadow-md">
-            {value.toLocaleString('vi-VN')}
+          {/* ICON */}
+          <div className="w-12 h-12 rounded-xl border border-gray-200 flex items-center justify-center text-gray-700 group-hover:bg-black group-hover:text-white transition">
+            {icon}
           </div>
+        </div>
+
+        {/* DECOR LINE */}
+        <div className="h-[2px] w-full bg-gray-100 rounded-full overflow-hidden">
+          <div className="h-full w-1/3 bg-black transition-all duration-300 group-hover:w-full"></div>
         </div>
       </CardContent>
     </Card>
@@ -46,10 +52,10 @@ interface QuickStatsProps {
   categoryCount?: number
 }
 
-export default function QuickStats({ 
-  userCount, 
-  templateCount, 
-  categoryCount 
+export default function QuickStats({
+  userCount,
+  templateCount,
+  categoryCount
 }: QuickStatsProps = {}) {
   const [stats, setStats] = useState<StatsData>({
     userCount: 0,
@@ -63,21 +69,22 @@ export default function QuickStats({
     const fetchStats = async () => {
       try {
         setLoading(true)
-        
-        // Nếu có props truyền vào, dùng luôn không cần call API
-        if (userCount !== undefined && templateCount !== undefined && categoryCount !== undefined) {
+
+        if (
+          userCount !== undefined &&
+          templateCount !== undefined &&
+          categoryCount !== undefined
+        ) {
           setStats({ userCount, templateCount, categoryCount })
           setLoading(false)
           return
         }
-        
-        // Call API từ service
+
         const data = await getQuickStats()
         setStats(data)
-        
       } catch (err) {
-        console.error('Error fetching stats:', err)
-        setError('Có lỗi xảy ra khi tải dữ liệu')
+        console.error("Error fetching stats:", err)
+        setError("Có lỗi xảy ra khi tải dữ liệu")
       } finally {
         setLoading(false)
       }
@@ -88,63 +95,58 @@ export default function QuickStats({
 
   const statCards = [
     {
-      title: "Tổng số người dùng",
+      title: "Người dùng",
       value: stats.userCount,
-      icon: <Users size={32} strokeWidth={2.5} />,
-      bgColor: "bg-linear-to-br from-emerald-500 to-green-600"
+      icon: <Users size={22} />
     },
     {
-      title: "Tổng số mẫu thiết kế",
+      title: "Mẫu thiết kế",
       value: stats.templateCount,
-      icon: <FileText size={32} strokeWidth={2.5} />,
-      bgColor: "bg-linear-to-br from-amber-400 to-yellow-500"
+      icon: <FileText size={22} />
     },
     {
-      title: "Tổng số thể loại",
+      title: "Thể loại",
       value: stats.categoryCount,
-      icon: <Grid3x3 size={32} strokeWidth={2.5} />,
-      bgColor: "bg-linear-to-br from-pink-500 to-rose-500"
+      icon: <Grid3x3 size={22} />
     }
   ]
 
   if (loading) {
     return (
-      <div className="p-6">
-        <div className="flex items-center justify-center h-32">
-          <div className="text-lg text-gray-600">Đang tải thống kê...</div>
-        </div>
+      <div className="flex items-center justify-center min-h-[180px] text-gray-500 text-sm">
+        Đang tải thống kê...
       </div>
     )
   }
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-black mb-2 bg-linear-to-r from-emerald-600 via-amber-500 to-pink-600 bg-clip-text text-transparent">
-          Thống kê nhanh
-        </h1>
-        <div className="h-1 w-32 bg-linear-to-r from-emerald-600 via-amber-500 to-pink-600 rounded-full"></div>
-      </div>
+    <div className="bg-[#fafafa] py-10 px-6">
+      <div className="max-w-6xl mx-auto">
 
-      {error && (
-        <div className="mb-4 p-3 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg shadow-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-            <span className="text-yellow-800 font-medium text-sm">{error}</span>
-          </div>
+        {/* HEADER */}
+        <div className="mb-10">
+          <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 mb-2">
+            Thống kê nhanh
+          </h1>
         </div>
-      )}
 
-      <div className="flex flex-wrap gap-5">
-        {statCards.map((stat, index) => (
-          <StatCard
-            key={index}
-            title={stat.title}
-            value={stat.value}
-            icon={stat.icon}
-            bgColor={stat.bgColor}
-          />
-        ))}
+        {error && (
+          <div className="mb-6 p-3 rounded-xl border border-red-200 bg-red-50 text-red-600 text-sm">
+            {error}
+          </div>
+        )}
+
+        {/* STATS GRID */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+          {statCards.map((stat, index) => (
+            <StatCard
+              key={index}
+              title={stat.title}
+              value={stat.value}
+              icon={stat.icon}
+            />
+          ))}
+        </div>
       </div>
     </div>
   )
