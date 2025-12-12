@@ -14,7 +14,7 @@ import { getWeeklyDesigns, type WeeklyData } from "@/api/home.api";
 const chartConfig = {
   designs: {
     label: "2025",
-    color: "#111827", // Đen fashion
+    color: "#111827",
   },
 } satisfies ChartConfig;
 
@@ -59,12 +59,12 @@ export default function WeeklyChart({ data }: WeeklyChartProps) {
     );
   }
 
-  const maxDesigns = Math.max(...chartData.map((d) => d.designs));
+  const maxDesigns = chartData.length
+    ? Math.max(...chartData.map((d) => d.designs))
+    : 0;
 
   return (
     <div className="w-full rounded-2xl border border-gray-200 bg-white px-5 pt-5 pb-4 shadow-sm">
-
-      {/* HEADER FASHION */}
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm font-semibold tracking-wide text-gray-900">
           Thiết kế mới theo tuần
@@ -78,18 +78,10 @@ export default function WeeklyChart({ data }: WeeklyChartProps) {
         </div>
       )}
 
-      {/* CHART */}
       <div className="w-full h-[220px]">
-        <ChartContainer
-          config={chartConfig}
-          className="w-full h-full"
-        >
+        <ChartContainer config={chartConfig} className="w-full h-full">
           <BarChart data={chartData} barCategoryGap="35%">
-            <CartesianGrid
-              strokeDasharray="2 6"
-              stroke="#eee"
-              vertical={false}
-            />
+            <CartesianGrid strokeDasharray="2 6" stroke="#eee" vertical={false} />
 
             <XAxis
               dataKey="week"
@@ -114,7 +106,7 @@ export default function WeeklyChart({ data }: WeeklyChartProps) {
             <Bar
               dataKey="designs"
               fill="var(--color-designs)"
-              barSize={22} // ✅ Thu nhỏ fashion
+              barSize={22}
               radius={[6, 6, 0, 0]}
               background={{ fill: "#f3f4f6" }}
             />

@@ -1,5 +1,5 @@
 import React from "react";
-import { type UnlockRequest } from "./UnlockRequest";
+import { type UnlockRequest } from "./UnlockRequest"; 
 import { displayUnlockStatus } from "./types";
 import { EyeIcon } from "lucide-react";
 
@@ -41,14 +41,13 @@ export default function UnlockRequestTable({
                   className={`px-3 py-1 rounded-full text-sm font-medium ${
                     r.status === "pending"
                       ? "bg-yellow-100 text-yellow-700"
-                      : r.status === "processed"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-gray-100 text-gray-700"
+                      : "bg-green-100 text-green-700"
                   }`}
                 >
                   {displayUnlockStatus(r.status)}
                 </span>
               </td>
+
               <td className="p-3 flex justify-center items-center gap-4">
                 <button
                   className="p-2 rounded-full hover:bg-gray-200 transition-colors"
@@ -60,6 +59,7 @@ export default function UnlockRequestTable({
               </td>
             </tr>
           ))}
+
           {requests.length === 0 && (
             <tr>
               <td

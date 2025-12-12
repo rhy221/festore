@@ -4,7 +4,7 @@ import { Button } from "../../../../packages/ui/src/components/button";
 import { toast } from "sonner";
 import Sidebar from "components/Sidebar/Sidebar";
 import Header from "components/Header/Header";
-import { categoriesApi, Category } from "../../lib/api/categories";
+import { CategoriesAPI, Category } from "@/api/categories.api";
 import AdminCategoryAddPopup from "./AddCategory";
 import AdminCategoryEditPopup from "./EditCategory";
 import AdminCategoryDeletePopup from "./DeleteCategory";
@@ -77,7 +77,7 @@ export default function AdminCategoryPage() {
   const loadCategories = async () => {
     try {
       setLoading(true);
-      const data = await categoriesApi.getAll();
+      const data = await CategoriesAPI.getCategories({});
       setCategories(data);
     } catch {
       toast.error("Không thể tải danh sách danh mục");

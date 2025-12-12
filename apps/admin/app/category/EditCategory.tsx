@@ -4,7 +4,7 @@ import { X } from "lucide-react";
 import { Input } from "components/input";
 import { Textarea } from "components/textarea";
 import { Button } from "../../../../packages/ui/src/components/button";
-import { categoriesApi, Category } from "../../lib/api/categories";
+import { CategoriesAPI, Category } from "@/api/categories.api";
 import { toast } from "sonner";
 
 interface AdminCategoryEditPopupProps {
@@ -19,7 +19,7 @@ export default function AdminCategoryEditPopup({
   onSuccess,
 }: AdminCategoryEditPopupProps) {
   const [name, setName] = useState(category.name);
-  const [description, setDescription] = useState(category.description);
+  const [description, setDescription] = useState(category.description ?? "");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
@@ -30,12 +30,18 @@ export default function AdminCategoryEditPopup({
 
     try {
       setLoading(true);
-      await categoriesApi.update(category.id, {
-        name: name.trim(),
-        description: description.trim(),
+
+      await CategoriesAPI.updateCategory({
+        id: category.id,
+        body: {
+          name: name.trim(),
+          description: (description ?? "").trim(),
+        },
       });
+
       onSuccess();
     } catch (error) {
+      console.error("Update category failed:", error);
       toast.error("Không thể cập nhật thể loại");
     } finally {
       setLoading(false);
@@ -45,7 +51,7 @@ export default function AdminCategoryEditPopup({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div className="w-full max-w-2xl rounded-2xl bg-white p-8 shadow-2xl animate-in fade-in zoom-in">
-
+        
         <div className="mb-8 flex items-center justify-between">
           <h2 className="text-2xl font-bold tracking-wide text-gray-900">
             Chỉnh sửa thể loại
@@ -63,7 +69,7 @@ export default function AdminCategoryEditPopup({
             </label>
             <Input
               value={name}
-              onChange={(e) => setName(e.target.value)}             
+              onChange={(e) => setName(e.target.value)}
             />
           </div>
 
@@ -83,7 +89,7 @@ export default function AdminCategoryEditPopup({
             <Textarea
               rows={5}
               value={description}
-              onChange={(e) => setDescription(e.target.value)} 
+              onChange={(e) => setDescription(e.target.value)}
             />
           </div>
         </div>

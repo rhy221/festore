@@ -9,7 +9,7 @@ import {
 import DesignWarningDialog from "./DesignWarning";
 import { BackspaceIcon } from "@heroicons/react/24/solid";
 
-type Design = {
+export type Design = {
   name: string;
   designer: string;
   description: string;
@@ -52,13 +52,11 @@ export default function DesignDetailDialog({
   };
 
   const handleDelete = () => {
-    // Handle delete logic here
     console.log("Deleting design:", design.name);
     alert("Mẫu thiết kế đã được xóa!");
     onOpenChange(false);
   };
 
-  // Convert Design to warning design format
   const warningDesign = {
     name: design.name,
     designer: design.designer,
@@ -76,22 +74,18 @@ export default function DesignDetailDialog({
           className="max-w-3xl p-6 bg-white text-black"
           showCloseButton={false}
         >
-          {/* Header */}
           <div className="flex items-center justify-between">
             <DialogTitle className="text-xl font-bold">
               Xem chi tiết mẫu thiết kế
             </DialogTitle>
 
-            {/* Close button with X icon image */}
             <BackspaceIcon
               className="w-8 h-8 pt-1 text-black cursor-pointer"
               onClick={() => onOpenChange(false)}
             />
           </div>
 
-          {/* Content */}
           <div className="flex gap-6 mt-4">
-            {/* Left: Image */}
             <div className="w-60">
               <img
                 src={design.image}
@@ -100,7 +94,6 @@ export default function DesignDetailDialog({
               />
             </div>
 
-            {/* Right: Info */}
             <div className="flex-1 space-y-2 text-sm leading-relaxed">
               <p>
                 <span className="font-semibold">Tên mẫu thiết kế:</span>{" "}
@@ -151,7 +144,6 @@ export default function DesignDetailDialog({
             </div>
           </div>
 
-          {/* Actions */}
           <div className="flex justify-end gap-3 mt-6">
             <button
               onClick={handleWarningClick}
@@ -169,7 +161,6 @@ export default function DesignDetailDialog({
         </DialogContent>
       </Dialog>
 
-      {/* Warning Dialog */}
       <DesignWarningDialog
         design={warningDesign}
         open={showWarningDialog}
@@ -178,5 +169,3 @@ export default function DesignDetailDialog({
     </>
   );
 }
-
-export type { Design };

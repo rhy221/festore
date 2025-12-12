@@ -1,24 +1,7 @@
 "use client";
 
 import React from "react";
-
-type User = {
-  fullName: string
-  role: string
-  email: string
-  phone: string
-  status: string
-  lockDate: string
-  lockReason: string
-  appealReason: string
-  processingHistory: Array<{
-    id: number
-    processor: string
-    processDate: string
-    action: string
-    note: string
-  }>
-}
+import { type User } from "@/api/users.api"; // ⬅️ DÙNG TYPE USER TỪ API THẬT
 
 interface UnlockHistoryDialogProps {
   user: User | null;
@@ -26,7 +9,11 @@ interface UnlockHistoryDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export default function UnlockHistoryDialog({ user, open, onOpenChange }: UnlockHistoryDialogProps) {
+export default function UnlockHistoryDialog({
+  user,
+  open,
+  onOpenChange,
+}: UnlockHistoryDialogProps) {
   if (!user || !open) return null;
 
   return (
@@ -39,9 +26,7 @@ export default function UnlockHistoryDialog({ user, open, onOpenChange }: Unlock
         <div className="mt-10 mb-8 w-full max-w-4xl rounded-2xl bg-white shadow-xl ring-1 ring-black/5 p-8">
           {/* Header */}
           <div className="relative">
-            <h2 className="text-2xl font-bold text-slate-900">
-              Chi tiết xử lý
-            </h2>
+            <h2 className="text-2xl font-bold text-slate-900">Chi tiết xử lý</h2>
             <button
               onClick={() => onOpenChange(false)}
               aria-label="Đóng"
@@ -64,7 +49,11 @@ export default function UnlockHistoryDialog({ user, open, onOpenChange }: Unlock
           {/* Reasons */}
           <div className="mt-6 text-slate-900">
             <ReasonSection label="Lý do khoá tài khoản" value={user.lockReason} />
-            <ReasonSection label="Lý do khiếu nại" value={user.appealReason} className="mt-4" />
+            <ReasonSection
+              label="Lý do khiếu nại"
+              value={user.appealReason}
+              className="mt-4"
+            />
           </div>
 
           {/* History table */}
@@ -83,19 +72,30 @@ export default function UnlockHistoryDialog({ user, open, onOpenChange }: Unlock
                   </tr>
                 </thead>
                 <tbody>
-                  {user.processingHistory.map((record) => (
-                    <tr key={record.id}>
-                      <td className="border border-slate-400 py-2 px-3 text-center">{record.id}</td>
-                      <td className="border border-slate-400 py-2 px-3">{record.processor}</td>
-                      <td className="border border-slate-400 py-2 px-3 text-center">{record.processDate}</td>
-                      <td className="border border-slate-400 py-2 px-3 text-center">{record.action}</td>
-                      <td className="border border-slate-400 py-2 px-3">{record.note}</td>
+                  {user.processingHistory?.map((record, idx) => (
+                    <tr key={record.id ?? idx}>
+                      <td className="border border-slate-400 py-2 px-3 text-center">
+                        {idx + 1}
+                      </td>
+                      <td className="border border-slate-400 py-2 px-3">
+                        {record.processor}
+                      </td>
+                      <td className="border border-slate-400 py-2 px-3 text-center">
+                        {record.processDate}
+                      </td>
+                      <td className="border border-slate-400 py-2 px-3 text-center">
+                        {record.action}
+                      </td>
+                      <td className="border border-slate-400 py-2 px-3">
+                        {record.note}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           </div>
+
         </div>
       </div>
     </>
@@ -109,24 +109,24 @@ function InfoRow({ label, value }: { label: string; value: string }) {
       <p className="font-semibold">{label}</p>
       <p className="mt-1">{value}</p>
     </div>
-  )
+  );
 }
 
-function ReasonSection({ 
-  label, 
-  value, 
-  className 
-}: { 
-  label: string; 
-  value: string; 
-  className?: string 
+function ReasonSection({
+  label,
+  value,
+  className,
+}: {
+  label: string;
+  value: string;
+  className?: string;
 }) {
   return (
     <div className={className}>
       <p className="font-semibold">{label}</p>
       <p className="mt-2">{value}</p>
     </div>
-  )
+  );
 }
 
-export type { User }
+export type { User };

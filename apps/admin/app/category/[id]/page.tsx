@@ -6,7 +6,7 @@ import { Button } from "../../../../../packages/ui/src/components/button";
 import { ProductCard } from "components/card";
 import Sidebar from "components/Sidebar/Sidebar";
 import Header from "../../../components/Header/Header";
-import { categoriesApi, Category, Product } from "../../../lib/api/categories";
+import { CategoriesAPI, type Category, type Product } from "@/api/categories.api";
 import { toast } from "sonner";
 
 export default function AdminCategoryDashboard() {
@@ -27,13 +27,12 @@ export default function AdminCategoryDashboard() {
     try {
       setLoading(true);
       const [categoryData, productsData] = await Promise.all([
-        categoriesApi.getById(categoryId),
-        categoriesApi.getProducts(categoryId),
+        CategoriesAPI.getById(categoryId),
+        CategoriesAPI.getProducts(categoryId),
       ]);
       setCategory(categoryData);
       setProducts(productsData);
     } catch (error) {
-      console.error("Failed to load category data:", error);
       toast.error("Không thể tải dữ liệu");
     } finally {
       setLoading(false);
@@ -43,10 +42,9 @@ export default function AdminCategoryDashboard() {
   const handleSearch = async () => {
     try {
       setLoading(true);
-      const productsData = await categoriesApi.getProducts(categoryId, search);
+      const productsData = await CategoriesAPI.getProducts(categoryId, search);
       setProducts(productsData);
     } catch (error) {
-      console.error("Failed to search products:", error);
       toast.error("Không thể tìm kiếm");
     } finally {
       setLoading(false);
@@ -91,7 +89,6 @@ export default function AdminCategoryDashboard() {
               <p className="font-bold text-3xl text-black">{category?.name}</p>
               <p className="text-black">{category?.description}</p>
 
-              {/* Search */}
               <div className="flex items-center gap-2 py-2">
                 <Input
                   className="text-base text-black !bg-[#C8E4F5] !border-[#C8E4F5] focus-visible:!bg-[#C8E4F5]"
@@ -108,13 +105,10 @@ export default function AdminCategoryDashboard() {
                 </Button>
               </div>
 
-              {/* Filter for Product */}
               <div className="flex items-center gap-5 py-2">
                 <Button
                   className={`${
-                    filter === "all"
-                      ? "bg-[#cdcde2]"
-                      : "bg-[#E6E6FA]"
+                    filter === "all" ? "bg-[#cdcde2]" : "bg-[#E6E6FA]"
                   } text-black text-sm rounded-3xl hover:bg-[#cdcde2]`}
                   onClick={() => handleFilter("all")}
                 >
@@ -122,9 +116,7 @@ export default function AdminCategoryDashboard() {
                 </Button>
                 <Button
                   className={`${
-                    filter === "newest"
-                      ? "bg-[#cdcde2]"
-                      : "bg-[#E6E6FA]"
+                    filter === "newest" ? "bg-[#cdcde2]" : "bg-[#E6E6FA]"
                   } text-black text-sm rounded-3xl hover:bg-[#cdcde2]`}
                   onClick={() => handleFilter("newest")}
                 >
@@ -132,12 +124,10 @@ export default function AdminCategoryDashboard() {
                 </Button>
               </div>
 
-              {/* Loading */}
               {loading && (
                 <div className="text-center py-8 text-gray-500">Đang tải...</div>
               )}
 
-              {/* Grid of Products */}
               {!loading && products.length > 0 && (
                 <div className="grid grid-cols-3 gap-4">
                   {products.map((product) => (
@@ -151,7 +141,6 @@ export default function AdminCategoryDashboard() {
                 </div>
               )}
 
-              {/* Empty state */}
               {!loading && products.length === 0 && (
                 <div className="text-center py-8 text-gray-500">
                   {search

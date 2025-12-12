@@ -8,7 +8,7 @@ import {
 } from "@workspace/ui/components/dialog";
 import { BackspaceIcon } from "@heroicons/react/24/solid";
 
-type Design = {
+export type Design = {
   name: string;
   designer: string;
   description: string;
@@ -34,7 +34,6 @@ export default function DesignWarningDialog({
   if (!design) return null;
 
   const handleSendWarning = () => {
-    // Handle warning submission logic here
     console.log("Sending warning:", warningContent);
     alert("Cảnh cáo đã được gửi qua email!");
     onOpenChange(false);
@@ -46,20 +45,16 @@ export default function DesignWarningDialog({
         className="max-w-4xl p-6 bg-white text-black"
         showCloseButton={false}
       >
-        {/* Header */}
         <div className="flex items-center justify-between">
           <DialogTitle className="text-xl font-bold">Cảnh cáo</DialogTitle>
 
-          {/* Close button with X icon image */}
           <BackspaceIcon
             className="w-8 h-8 pt-1 text-black cursor-pointer"
             onClick={() => onOpenChange(false)}
           />
         </div>
 
-        {/* Content */}
         <div className="flex gap-6 mt-4">
-          {/* Left: Image */}
           <div className="w-60">
             <img
               src={design.image}
@@ -68,12 +63,12 @@ export default function DesignWarningDialog({
             />
           </div>
 
-          {/* Right: Info */}
           <div className="flex-1 space-y-2 text-sm leading-relaxed">
             <InfoRow label="Tên mẫu thiết kế" value={design.name} />
             <InfoRow label="Nhà thiết kế" value={design.designer} />
             <InfoRow label="Mô tả" value={design.description} />
             <InfoRow label="Thể loại" value={design.category} />
+
             <div className="flex gap-8">
               <InfoRow label="Trạng thái" value={design.status} />
               <InfoRow label="Ngày đăng mẫu" value={design.datePosted} />
@@ -90,7 +85,6 @@ export default function DesignWarningDialog({
           </div>
         </div>
 
-        {/* Actions */}
         <div className="flex justify-center mt-6">
           <button
             onClick={handleSendWarning}
@@ -104,7 +98,6 @@ export default function DesignWarningDialog({
   );
 }
 
-/* --- Components --- */
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <p>

@@ -1,25 +1,19 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent } from "@workspace/ui/components/card"
-import { ShoppingBag, Shirt, User } from "lucide-react"
-import { getTopRankings, type TopTemplate, type TopDesigner } from "@/api/home.api"
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "@workspace/ui/components/card";
+import { ShoppingBag, Shirt, User } from "lucide-react";
+import { getTopRankings, type TopTemplate, type TopDesigner } from "@/api/home.api";
 
 interface RankingCardProps {
-  icon: React.ReactNode
-  title: string
-  subtitle: string
-  metric: string
-  isTopOne?: boolean
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+  metric: string;
+  isTopOne?: boolean;
 }
 
-function RankingCard({
-  icon,
-  title,
-  subtitle,
-  metric,
-  isTopOne,
-}: RankingCardProps) {
+function RankingCard({ icon, title, subtitle, metric, isTopOne }: RankingCardProps) {
   return (
     <Card
       className={`
@@ -35,7 +29,6 @@ function RankingCard({
       <CardContent className="p-4">
         <div className="flex flex-col gap-4">
 
-          {/* ICON */}
           <div
             className={`
               w-10 h-10 rounded-xl flex items-center justify-center transition
@@ -49,7 +42,6 @@ function RankingCard({
             {icon}
           </div>
 
-          {/* CONTENT */}
           <div>
             <h3
               className={`leading-tight mb-1 line-clamp-1 ${
@@ -84,59 +76,58 @@ function RankingCard({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export default function TopThreeRankings() {
-  const [templates, setTemplates] = useState<TopTemplate[]>([])
-  const [designers, setDesigners] = useState<TopDesigner[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [templates, setTemplates] = useState<TopTemplate[]>([]);
+  const [designers, setDesigners] = useState<TopDesigner[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const getIcon = (iconName?: string, size = 18) => {
     switch (iconName) {
       case "bag":
-        return <ShoppingBag size={size} />
+        return <ShoppingBag size={size} />;
       case "shirt":
-        return <Shirt size={size} />
+        return <Shirt size={size} />;
       case "user":
-        return <User size={size} />
+        return <User size={size} />;
       default:
-        return <ShoppingBag size={size} />
+        return <ShoppingBag size={size} />;
     }
-  }
+  };
 
   useEffect(() => {
     const fetchRankings = async () => {
       try {
-        setLoading(true)
-        const data = await getTopRankings()
-        setTemplates(data.topTemplates)
-        setDesigners(data.topDesigners)
+        setLoading(true);
+        const data = await getTopRankings(); // API thật
+        setTemplates(data.topTemplates ?? []);
+        setDesigners(data.topDesigners ?? []);
       } catch (err) {
-        console.error("Error fetching rankings:", err)
-        setError("Không thể tải dữ liệu bảng xếp hạng")
+        console.error("Error fetching rankings:", err);
+        setError("Không thể tải dữ liệu bảng xếp hạng");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchRankings()
-  }, [])
+    fetchRankings();
+  }, []);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[260px] text-gray-500 text-sm">
         Đang tải dữ liệu...
       </div>
-    )
+    );
   }
 
   return (
     <div className="min-h-screen bg-[#fafafa] py-10 px-6">
       <div className="max-w-5xl mx-auto">
 
-        {/* HEADER */}
         <div className="mb-10">
           <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 mb-2">
             Bảng xếp hạng
@@ -152,23 +143,21 @@ export default function TopThreeRankings() {
           </div>
         )}
 
-        {/* TOP TEMPLATE */}
+        {/* TOP TEMPLATES */}
         <section className="mb-14">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold text-gray-900">
-              Top mẫu thiết kế
-            </h2>
+            <h2 className="text-lg font-bold text-gray-900">Top mẫu thiết kế</h2>
             <div className="h-px flex-1 ml-5 bg-gray-200"></div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 justify-items-center">
             {templates.map((item, index) => (
               <div key={index} className="relative">
-
-                {/* RANK BADGE */}
                 <div
-                  className={`absolute -top-2.5 -right-2.5 z-10 w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center shadow
-                  ${index === 0 ? "bg-yellow-400 text-black" : "bg-black text-white"}`}
+                  className={`
+                    absolute -top-2.5 -right-2.5 z-10 w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center shadow
+                    ${index === 0 ? "bg-yellow-400 text-black" : "bg-black text-white"}
+                  `}
                 >
                   {index + 1}
                 </div>
@@ -185,23 +174,21 @@ export default function TopThreeRankings() {
           </div>
         </section>
 
-        {/* TOP DESIGNER */}
+        {/* TOP DESIGNERS */}
         <section>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold text-gray-900">
-              Top nhà thiết kế
-            </h2>
+            <h2 className="text-lg font-bold text-gray-900">Top nhà thiết kế</h2>
             <div className="h-px flex-1 ml-5 bg-gray-200"></div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 justify-items-center">
             {designers.map((item, index) => (
               <div key={index} className="relative">
-
-                {/* RANK BADGE */}
                 <div
-                  className={`absolute -top-2.5 -right-2.5 z-10 w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center shadow
-                  ${index === 0 ? "bg-yellow-400 text-black" : "bg-black text-white"}`}
+                  className={`
+                    absolute -top-2.5 -right-2.5 z-10 w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center shadow
+                    ${index === 0 ? "bg-yellow-400 text-black" : "bg-black text-white"}
+                  `}
                 >
                   {index + 1}
                 </div>
@@ -219,5 +206,5 @@ export default function TopThreeRankings() {
         </section>
       </div>
     </div>
-  )
+  );
 }

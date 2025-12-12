@@ -10,25 +10,18 @@ import {
 } from "recharts";
 import { getDailyAccess, type DailyAccessData } from "@/api/home.api";
 
-const CustomDot = (props: any) => {
-  const { cx, cy } = props;
-  return (
-    <circle
-      cx={cx}
-      cy={cy}
-      r={2.5}
-      fill="#fff"
-      stroke="#111827"
-      strokeWidth={1.5}
-    />
-  );
-};
+const CustomDot = ({ cx, cy }: any) => (
+  <circle
+    cx={cx}
+    cy={cy}
+    r={2.5}
+    fill="#fff"
+    stroke="#111827"
+    strokeWidth={1.5}
+  />
+);
 
-interface LineChartProps {
-  chartData?: DailyAccessData[];
-}
-
-export default function LineChartComponent({ chartData }: LineChartProps) {
+export default function LineChartComponent() {
   const [data, setData] = useState<DailyAccessData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -37,14 +30,7 @@ export default function LineChartComponent({ chartData }: LineChartProps) {
     const fetchDailyData = async () => {
       try {
         setLoading(true);
-
-        if (chartData && chartData.length > 0) {
-          setData(chartData);
-          setLoading(false);
-          return;
-        }
-
-        const apiData = await getDailyAccess();
+        const apiData = await getDailyAccess(); // ⬅ API thật
         setData(apiData);
       } catch (err) {
         console.error("Error fetching daily access data:", err);
@@ -55,7 +41,7 @@ export default function LineChartComponent({ chartData }: LineChartProps) {
     };
 
     fetchDailyData();
-  }, [chartData]);
+  }, []);
 
   if (loading) {
     return (
@@ -65,12 +51,20 @@ export default function LineChartComponent({ chartData }: LineChartProps) {
     );
   }
 
-  const maxValue = Math.max(...data.map((d) => d.value));
+  if (error) {
+    return (
+      <div className="rounded-2xl border border-gray-200 bg-white px-5 py-4 shadow-sm">
+        <div className="mb-3 rounded-lg border border-yellow-200 bg-yellow-50 px-3 py-2 text-xs text-yellow-800">
+          {error}
+        </div>
+      </div>
+    );
+  }
+
+  const maxValue = Math.max(...data.map((d) => d.value), 0);
 
   return (
     <div className="w-full rounded-2xl border border-gray-200 bg-white px-5 pt-5 pb-4 shadow-sm">
-      
-      {/* TITLE – STYLE FASHION */}
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm font-semibold tracking-wide text-gray-900">
           Lượt truy cập theo ngày
@@ -78,13 +72,6 @@ export default function LineChartComponent({ chartData }: LineChartProps) {
         <span className="text-xs text-gray-400">Daily Access</span>
       </div>
 
-      {error && (
-        <div className="mb-3 rounded-lg border border-yellow-200 bg-yellow-50 px-3 py-2 text-xs text-yellow-800">
-          {error}
-        </div>
-      )}
-
-      {/* CHART */}
       <div className="w-full h-[180px]">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
@@ -98,11 +85,7 @@ export default function LineChartComponent({ chartData }: LineChartProps) {
               </linearGradient>
             </defs>
 
-            <CartesianGrid
-              strokeDasharray="2 6"
-              stroke="#eee"
-              vertical={false}
-            />
+            <CartesianGrid strokeDasharray="2 6" stroke="#eee" vertical={false} />
 
             <XAxis
               dataKey="date"

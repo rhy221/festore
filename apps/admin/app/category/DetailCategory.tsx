@@ -6,7 +6,7 @@ import { Button } from "../../../../packages/ui/src/components/button";
 import { ProductCard } from "components/card";
 import Sidebar from "components/Sidebar/Sidebar";
 import Header from "../../components/Header/Header";
-import { categoriesApi, Category, Product } from "../../lib/api/categories";
+import { CategoriesAPI, Category, Product } from "@/api/categories.api";
 import { toast } from "sonner";
 
 export default function AdminCategoryDashboard() {
@@ -26,12 +26,15 @@ export default function AdminCategoryDashboard() {
   const loadCategoryData = async () => {
     try {
       setLoading(true);
+
       const [categoryData, productsData] = await Promise.all([
-        categoriesApi.getById(categoryId),
-        categoriesApi.getProducts(categoryId),
+        CategoriesAPI.getCategories({ name: "" }).then((list) =>
+          list.find((c) => c.id === categoryId)
+        ),
+        CategoriesAPI.getProducts(categoryId),
       ]);
 
-      setCategory(categoryData);
+      setCategory(categoryData || null);
       setProducts(productsData);
     } catch (error) {
       console.error("Failed to load category data:", error);
@@ -44,7 +47,7 @@ export default function AdminCategoryDashboard() {
   const handleSearch = async () => {
     try {
       setLoading(true);
-      const productsData = await categoriesApi.getProducts(categoryId, search);
+      const productsData = await CategoriesAPI.getProducts(categoryId, search);
       setProducts(productsData);
     } catch (error) {
       console.error("Failed to search products:", error);
@@ -57,8 +60,10 @@ export default function AdminCategoryDashboard() {
   const handleFilter = (filterType: "all" | "newest") => {
     setFilter(filterType);
     if (filterType === "newest") {
-      const sorted = [...products].sort((a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      const sorted = [...products].sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() -
+          new Date(a.createdAt).getTime()
       );
       setProducts(sorted);
     } else {
@@ -112,9 +117,7 @@ export default function AdminCategoryDashboard() {
               <div className="flex items-center gap-5 py-2">
                 <Button
                   className={`${
-                    filter === "all"
-                      ? "bg-[#cdcde2]"
-                      : "bg-[#E6E6FA]"
+                    filter === "all" ? "bg-[#cdcde2]" : "bg-[#E6E6FA]"
                   } text-black text-sm rounded-3xl hover:bg-[#cdcde2]`}
                   onClick={() => handleFilter("all")}
                 >
