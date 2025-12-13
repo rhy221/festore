@@ -10,6 +10,7 @@ import DesignWarningDialog from "./DesignWarning";
 import { BackspaceIcon } from "@heroicons/react/24/solid";
 
 export type Design = {
+  id: string;
   name: string;
   designer: string;
   description: string;
