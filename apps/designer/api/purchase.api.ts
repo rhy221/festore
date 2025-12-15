@@ -3,8 +3,8 @@ import { Purchase } from "@/schema/purchase.schema";
 
 export const purchaseAction = {
 
-    getPurchasedProducts: async () => {
-        const response = await http.get<Purchase[]>('/purchases/my-purchases');
+    getPurchasedProducts: async (params?: any) => {
+        const response = await http.get('/purchases/my-purchases', {params});
         console.log(response.data);
         return response.data;
     }, 

@@ -38,6 +38,7 @@ const userAction = {
 
   getStatics: async () => {
     const response = await http.get<UserProfileStaticsResType>("/users/profile?opt=statics");
+    console.log(response.data);
     return response.data;
   
   },
@@ -46,7 +47,22 @@ const userAction = {
   updateMe: async (body: FormData) => {
       const response = await http.patch<UserProfileResType>("/users/profile", body, {timeout: 90000});
       return response.data;
-  }
+  },
+
+   getUserPortfolio: async (userId: string) => {
+    const response = await http.get<UserProfileResType>("/users/portfolio", {
+      params: {
+        userId,
+      }
+    });
+    return response.data;
+  
+  },
+
+  updateUserPortfolio: async (body: FormData) => {
+      const response = await http.patch<UserProfileResType>("/users/portfolio", body, {timeout: 90000});
+      return response.data;
+  },
 };
 
 export default userAction;

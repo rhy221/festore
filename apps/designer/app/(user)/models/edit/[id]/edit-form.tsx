@@ -15,7 +15,7 @@ import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@workspace/ui/components/select';
 import { Spinner } from '@workspace/ui/components/spinner';
-import { useEditProduct, useProduct, useUploadProduct } from '@/queries/useProduct';
+import { useCategories, useEditProduct, useProduct, useUploadProduct } from '@/queries/useProduct';
 import { formatToLocalInput } from '@/lib/utils';
 
 
@@ -23,11 +23,18 @@ export default function EditForm({ id }: { id: string  })
 {
   const priceStep =  1000;
   const router = useRouter();
+
+  const {data: categories, isLoading: categoriesLoading} = useCategories();
+  const [styles, setStyles] = useState<string[]>([]);
+
   const form = useForm<EditProductType>({
     resolver: zodResolver(editProductSchema),
     defaultValues: {
     title: "",
     description: "",
+    categoryId: "",
+    style: "",
+    gender: "",
     images: [],
     oldImages: [],
     models: [],
@@ -41,6 +48,21 @@ export default function EditForm({ id }: { id: string  })
     
   }
   })
+
+   useEffect(() => {
+      const category = form.watch("categoryId"); 
+      if(category) {
+        const currentCategory = categories?.find((ca) => ca._id === category)
+        if(currentCategory) {
+          setStyles(currentCategory.styles);
+          if(design)
+          {
+            form.setValue("style", design.style);
+          }
+        }
+      }
+  }, [form.watch("categoryId")])
+
   const {data: design, isLoading: loadingDesign} = useProduct(id)
   const editMutation = useEditProduct();
 
@@ -52,6 +74,9 @@ export default function EditForm({ id }: { id: string  })
     form.reset({
       title: design.title,
       description: design.description,
+      categoryId: design.categoryId,
+      style: design.style,
+      gender: design.gender,
       type: design.type,
       oldImages: design.imageUrls || [],
       oldModels: design.modelFiles.map(m => m.publicId) || [],
@@ -100,11 +125,23 @@ export default function EditForm({ id }: { id: string  })
   // };
 
   const handleSubmit = async (data: EditProductType) => {
-    console.log(data);
+
     const formData = new FormData();
-    formData.append("title", data.title);
-    formData.append("description", data.description ?? "");
+    if(data.title)
+      formData.append("title", data.title);
     
+    if(data.description)
+      formData.append("description", data.description ?? "");
+    
+    if(data.categoryId)
+      formData.append("categoryId", data.categoryId);
+    
+    if(data.style)
+      formData.append("style", data.style);
+
+    if(data.gender)
+      formData.append("gender", data.gender);
+
     if(data.images)
     data.images.map((file) => {
       formData.append("images", file);
@@ -115,10 +152,12 @@ export default function EditForm({ id }: { id: string  })
       formData.append("models", file);
     });
 
+    if(data.oldImages)
     data.oldImages.map((file) => {
       formData.append("oldImages", file);
     });
 
+    if(data.oldModels)
     data.oldModels.map((file) => {
       formData.append("oldModels", file);
     });
@@ -216,6 +255,106 @@ export default function EditForm({ id }: { id: string  })
           )}>
 
           </Controller>
+
+
+          <Controller
+                  name="categoryId"
+                  control={form.control}
+                  render={({field, fieldState}) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name} className="block text-sm font-medium text-gray-700">
+                        Category
+                      </FieldLabel>
+                      <Select
+                      name={field.name}
+                      value={field.value}
+                      onValueChange={field.onChange} required>
+                  <SelectTrigger 
+                  id={field.name}
+                  name={field.name} 
+                  className="w-full">
+                    <SelectValue placeholder="Choose category" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                      {categories && categories.map((ca => (
+                        <SelectItem key={ca._id} value={ca._id}>{ca.name}</SelectItem>
+                      )))}
+                  </SelectContent>
+                </Select>
+                {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                    </Field>
+                  )}>
+
+                  </Controller>
+
+                   <Controller
+                  name="style"
+                  control={form.control}
+                  render={({field, fieldState}) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name} className="block text-sm font-medium text-gray-700">
+                        Styles
+                      </FieldLabel>
+                      <Select
+                      name={field.name}
+                      value={field.value}
+                      onValueChange={field.onChange} required>
+                  <SelectTrigger 
+                  id={field.name}
+                  name={field.name} 
+                  className="w-full">
+                    <SelectValue placeholder="Choose style" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                      {styles && styles.map((st => (
+                        <SelectItem key={st} value={st}>{st}</SelectItem>
+                      )))}
+                  </SelectContent>
+                </Select>
+                {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                    </Field>
+                  )}>
+
+                  </Controller>
+
+                   <Controller
+                  name="gender"
+                  control={form.control}
+                  render={({field, fieldState}) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name} className="block text-sm font-medium text-gray-700">
+                        Gender
+                      </FieldLabel>
+                      <Select
+                      name={field.name}
+                      value={field.value}
+                      onValueChange={field.onChange} required>
+                  <SelectTrigger 
+                  id={field.name}
+                  name={field.name} 
+                  className="w-full">
+                    <SelectValue placeholder="Choose gender" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                      <SelectItem value={"Male"}>Male</SelectItem>
+                      <SelectItem value={"Female"}>Female</SelectItem>
+                      <SelectItem value={"Unisex"}>Unisex</SelectItem>
+                  </SelectContent>
+                </Select>
+                {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                    </Field>
+                  )}>
+
+                  </Controller>
         </FieldGroup>
 
           <EditFiles />

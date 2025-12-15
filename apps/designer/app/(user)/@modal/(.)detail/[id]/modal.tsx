@@ -1,5 +1,6 @@
 'use client'
  
+import { Button } from '@workspace/ui/components/button'
 import { X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
  
@@ -18,13 +19,13 @@ export function Modal({ children }: { children: React.ReactNode }) {
     //   <div>{children}</div>
     // </>
     <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center ">
-      <button
+      <button 
         onClick={() => {
           router.back()
         }}
-        className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors z-10"
+        className="absolute w-8 aspect-square h-auto top-8 right-8 text-white/70 hover:text-white  transition-colors z-10"
       >
-        <X className="w-6 h-6" />
+        <X className=' w-8 aspect-square' />
       </button>
       <div className='absolute inset-0 flex justify-center p-10 overflow-auto'>{children}</div>
       </div>

@@ -11,7 +11,7 @@ import {
   NavigationMenuViewport,
 } from "@workspace/ui/components/navigation-menu"
 import Link from 'next/link'
-import { Box, ChartArea, CircleUser, House, LogOut, Search, ShoppingCart } from 'lucide-react'
+import { Banknote, Box, ChartArea, CircleUser, House, LogOut, Search, ShoppingCart } from 'lucide-react'
 import { Input } from '@workspace/ui/components/input'
 import { Button } from '@workspace/ui/components/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui/components/avatar'
@@ -20,62 +20,63 @@ import { useRouter } from 'next/navigation'
 import { isTokenExpired } from '@/lib/http'
 import Image from 'next/image'
 import { useCart } from '@/queries/useCart'
-
+import { useAuthStore } from '@/stores/authStore'
 
 const NavBar = () => {
-
-    
     const router = useRouter();
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+    const authStore = useAuthStore()
     const {data: cart, isLoading: cartLoading} = useCart();
 
-  useEffect(() => {
-    const stored = localStorage.getItem("accessToken");
-
-    if (stored && !isTokenExpired(stored)) {
-      setIsLoggedIn(true);
-    } else {
-      setIsLoggedIn(false);
-    }
-  }, []);
     const logOut = () => {
-    localStorage.removeItem("accessToken");
-    setIsLoggedIn(false);
-    router.replace("/");
-  };
-
+        authStore.logout();
+        router.replace("/");
+    };
 
   return (
-    <div className='flex justify-between items-center bg-white px-8 border-b-2 sticky top-0 z-50'>
+    <div className='flex justify-between items-center bg-background px-8 py-4 border-b border-border sticky top-0 z-50 transition-colors duration-300'>
         {/*Left*/}
         <div className='flex items-center basis-[700px] gap-4'>
             {/* Title */}
-                <Link href='/' className='flex items-center gap-2'>
-                    <Image src='/logo.svg' alt="logo" height={50} width={50}  className='w-8 h-8'/>
-                    <span className='text-2xl font-bold'>HHCLOSET</span>
+                <Link href='/' className='flex items-center gap-2 group'>
+                    {/* Dark Mode: Invert logo to make it white if original is black */}
+                    <Image 
+                        src='/logo.svg' 
+                        alt="logo" 
+                        height={50} 
+                        width={50}  
+                        className='w-8 h-8 dark:invert transition-all'
+                    />
+                    <span className='text-xl font-bold tracking-tight text-foreground group-hover:text-ring transition-colors'>
+                        HHCLOSET
+                    </span>
                 </Link>
         </div>
         
         {/* Right */}
-        <div className='flex gap-4 items-center'>
+        <div className='flex gap-6 items-center'>
             {/* Nav */}
             <div>
                 <NavigationMenu>
-                 <NavigationMenuList>        
-                     <NavigationMenuItem>
+                 <NavigationMenuList className="gap-1">        
+                      <NavigationMenuItem>
                         <NavigationMenuLink asChild>
-                            <Link href='/gallery' > <span className='text-2xl'>Gallery</span> </Link>
+                            <Link href='/gallery' className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-ring focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"> 
+                                <span className='text-base'>Gallery</span> 
+                            </Link>
                         </NavigationMenuLink>
                     </NavigationMenuItem>
-                     <NavigationMenuItem>
+                      <NavigationMenuItem>
                         <NavigationMenuLink asChild>
-                            <Link href='/store'><span className='text-2xl'>Store</span></Link>
+                            <Link href='/store' className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-ring focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50">
+                                <span className='text-base'>Store</span>
+                            </Link>
                         </NavigationMenuLink>
                     </NavigationMenuItem>
-                     <NavigationMenuItem>
+                      <NavigationMenuItem>
                         <NavigationMenuLink asChild>
-                            <Link href='/auction'><span className='text-2xl'>Auction</span></Link>
+                            <Link href='/auction' className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-ring focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50">
+                                <span className='text-base'>Auction</span>
+                            </Link>
                         </NavigationMenuLink>
                     </NavigationMenuItem>
                   </NavigationMenuList>
@@ -83,17 +84,17 @@ const NavBar = () => {
             </div>     
 
             <div>
-                <Button asChild>
-  <Link href="/upload">Upload</Link>
-</Button>
-                
+                {/* Primary Button */}
+                <Button asChild className="rounded-full px-6 font-bold" size="default">
+                    <Link href="/upload">UPLOAD</Link>
+                </Button>
             </div>
              {/*cart*/}
             <div>
-                <Button size={"icon-lg"} asChild>
-                    <Link href={"/cart"} className='relative'>
-                        <ShoppingCart fill='white' stroke='white' />
-                        <span className="absolute -top-1 -right-1 bg-gray-700 text-[10px] text-white w-4 h-4 flex items-center justify-center rounded-full">
+                <Button variant="ghost" size="icon" asChild className="relative hover:bg-accent/50 rounded-full">
+                    <Link href={"/cart"}>
+                        <ShoppingCart className="w-5 h-5 text-foreground" />
+                        <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full ring-2 ring-background">
                             {(cartLoading || !cart?.items) ? 0 : cart.items.length}
                         </span>
                     </Link>
@@ -102,78 +103,72 @@ const NavBar = () => {
 
             {/*Auth*/}
             <div className='flex items-center gap-2'>
-                {!isLoggedIn ? (
-                    <><Link href="/auth/login">
-                    <Button variant={'outline'}>Đăng nhập</Button>
-                </Link>
-                <Link href="/auth/register">
-                     <Button>Đăng ký</Button> 
-
-                </Link></>
+                {!authStore.isAuthenticated ? (
+                    <>
+                    <Link href="/auth/login">
+                        <Button variant={'ghost'} className="text-foreground hover:text-ring">Log In</Button>
+                    </Link>
+                    <Link href="/auth/register">
+                        <Button variant="outline" className="border-border text-foreground hover:bg-accent hover:text-accent-foreground">Sign In</Button> 
+                    </Link>
+                    </>
                 ) : (
-<DropdownMenu >
-                    <DropdownMenuTrigger>
-                        <Avatar className="">
-                        <AvatarImage src="https://picsum.photos/seed/picsum/200/300"/>
-                        <AvatarFallback>Avatar</AvatarFallback>
-                    </Avatar> 
+                <DropdownMenu >
+                    <DropdownMenuTrigger asChild>
+                         <Button variant="ghost" className="relative h-10 w-10 rounded-full ring-2 ring-transparent hover:ring-ring transition-all p-0">
+                            <Avatar className="h-9 w-9 border border-border">
+                                <AvatarImage src={authStore.user?.avatarUrl}/>
+                                <AvatarFallback className="bg-muted text-muted-foreground">U</AvatarFallback>
+                            </Avatar> 
+                        </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent sideOffset={6}  className='mr-8 w-52'>
-                        <DropdownMenuItem>
-                            <Link href="/portfolio/infor" className='w-full'>
-                               <div className='flex w-full gap-4'>
-                                <CircleUser />
-                                <span>Profile</span>
+                    <DropdownMenuContent align="end" sideOffset={8}  className='w-56 bg-card border-border text-card-foreground shadow-lg'>
+                        <div className="flex items-center justify-start gap-2 p-2">
+                            <div className="flex flex-col space-y-1 leading-none">
+                                <p className="font-medium text-sm">My Account</p>
+                                <p className="w-[180px] truncate text-xs text-muted-foreground">Manage your session</p>
                             </div>
+                        </div>
+                        <DropdownMenuSeparator className="bg-border" />
+                        <DropdownMenuItem asChild>
+                            <Link href={`/portfolio/${authStore.user?.id}/infor`} className='cursor-pointer w-full flex items-center gap-2 group focus:bg-accent focus:text-accent-foreground'>
+                                <CircleUser className="w-4 h-4 text-muted-foreground group-hover:text-foreground" />
+                                <span>Portfolio</span>
                             </Link> 
                         </DropdownMenuItem>
                       
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                            <Link href="/dashboard" className='w-full'>
-                               <div className='flex w-full gap-4'>
-                                <ChartArea />
-                                <span>Dashboard</span>
-                            </div>
+                        <DropdownMenuItem asChild>
+                            <Link href="/sales" className='cursor-pointer w-full flex items-center gap-2 group focus:bg-accent focus:text-accent-foreground'>
+                                <ChartArea className="w-4 h-4 text-muted-foreground group-hover:text-foreground" />
+                                <span>Sales</span>
                             </Link> 
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
-                            <Link href="/products" className='w-full'>
-                               <div className='flex w-full gap-4'>
-                                <Box />
-                                <span>Products</span>
-                            </div>
+                        <DropdownMenuItem asChild>
+                            <Link href="/models" className='cursor-pointer w-full flex items-center gap-2 group focus:bg-accent focus:text-accent-foreground'>
+                                <Box className="w-4 h-4 text-muted-foreground group-hover:text-foreground" />
+                                <span>Models</span>
                             </Link> 
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
-                            <Link href="/purchase" className='w-full'>
-                               <div className='flex w-full gap-4'>
-                                <Box />
+                        <DropdownMenuItem asChild>
+                            <Link href="/purchase" className='cursor-pointer w-full flex items-center gap-2 group focus:bg-accent focus:text-accent-foreground'>
+                                <Banknote className="w-4 h-4 text-muted-foreground group-hover:text-foreground" />
                                 <span>Purchase</span>
-                            </div>
                             </Link> 
                         </DropdownMenuItem>
 
-                        <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={logOut}>
-                            <div className='flex w-full gap-4'>
-                                <LogOut />
+                        <DropdownMenuSeparator className="bg-border" />
+                          <DropdownMenuItem onClick={logOut} className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive">
+                            <div className='flex w-full gap-2 items-center'>
+                                <LogOut className="w-4 h-4" />
                                 <span>Log out</span>
                             </div>
-                                
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
-                
                 )}
-                
-                
             </div>
         </div>
-        
-        
     </div>
-   
   )
 }
 

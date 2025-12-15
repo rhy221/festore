@@ -2,6 +2,7 @@
 
 import { useLoginMutation } from "@/queries/useAuth";
 import { LoginBodySchema, LoginBodyType } from "@/schema/auth.schema";
+import { useAuthStore } from "@/stores/authStore";
 import { useRegisterStore } from "@/stores/useRegisterStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
@@ -10,12 +11,15 @@ import { Input } from "@workspace/ui/components/input";
 import { Spinner } from "@workspace/ui/components/spinner";
 import { cn } from "@workspace/ui/lib/utils";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 
 export default function LoginForm() {
   const loginMutation = useLoginMutation();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl');
 
+  const authStore = useAuthStore()
   const router = useRouter();
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBodySchema),
@@ -34,12 +38,18 @@ export default function LoginForm() {
       //   description: "Login successful!",
       // });
       if(result.accessToken) {
-        localStorage.setItem("accessToken", result.accessToken);
+
+        authStore.login(result.user ,result.accessToken);
+        // localStorage.setItem("accessToken", result.accessToken);
 
 
       // localStorage.setItem("refresh_token", result.refreshToken);
       // localStorage.setItem("user", JSON.stringify(result));
-      router.push("/");
+      if (callbackUrl) {
+      router.push(callbackUrl); // Quay lại trang cũ
+    } else {
+      router.push('/'); // Hoặc về trang chủ
+    }
       }
       
     } catch (error) {

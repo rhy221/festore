@@ -1,183 +1,250 @@
+// 'use client';
+
+// import { useState } from 'react';
+// import { GalleryHeader } from './header';
+// import { GalleryFilters } from './gallery-filters';
+// import { GalleryGrid } from './gallery-grid';
+// // import { GalleryItemModal } from './gallery-item-modal';
+// import { Tabs, TabsContent, TabsList, TabsTrigger } from '@workspace/ui/components/tabs';
+// import { useGetGalleryItems } from '@/queries/useProduct';
+// import { useParams, useRouter, useSearchParams } from 'next/navigation';
+
+// export function GalleryPage() {
+
+  
+//  const params = useParams();
+//    const searchParams = useSearchParams();
+//    const router = useRouter();
+ 
+//    const apiParams = {
+//      categorySlug: params.categorySlug ? params.categorySlug[0] : '', 
+//      gender: searchParams.get("gender"),
+//      style: searchParams.get("style"),
+//      search: searchParams.get("search"),
+//      page: searchParams.get("page") || '1',
+//    };
+
+//    const updateFilter = (key: string, value: string | null) => {
+          
+    
+//         const params = new URLSearchParams(searchParams.toString());
+//         if (value) {
+//           params.set(key, value);
+//         } else {
+//           params.delete(key);
+//         }
+//         router.push(`?${params.toString()}`, { scroll: false });
+//       };
+      
+// const {data: gallery, isLoading: galleryLoading} = useGetGalleryItems(apiParams);
+  
+
+//     if(galleryLoading) 
+//     return (<>
+//     Loading...
+//     </>)
+//   if(!gallery)
+//     return(<>
+//     Check your connection.
+//     </>)
+//   return (
+//     <div className="min-h-screen bg-black px-8">
+//       {/* <GalleryHeader /> */}
+
+//       <main className="container mx-auto  py-8">
+//         <div className="flex items-center justify-center gap-8 mb-12">
+//           <h1 className="text-4xl font-bold text-white">GALLERY</h1>
+//           {/* <button className="text-white/60 hover:text-white transition-colors text-lg border-b-2 border-transparent hover:border-white/60">
+//             CREATOR
+//           </button> */}
+//         </div>
+
+//         <GalleryFilters
+//           itemCount={gallery.data.length}
+//         />
+
+//         <div className="mt-12">
+//           <GalleryGrid gallery={gallery}/>
+//         </div>
+
+//         <div className="mt-12 flex justify-center">
+//           <button className="px-8 py-3 rounded-lg border border-white/20 text-white hover:bg-white/10 transition-colors">
+//             Load More
+//           </button>
+//         </div>
+//       </main>
+
+//     </div>
+//   );
+// }
+
+
 'use client';
 
-import { useState } from 'react';
-import { GalleryHeader } from './header';
 import { GalleryFilters } from './gallery-filters';
 import { GalleryGrid } from './gallery-grid';
-// import { GalleryItemModal } from './gallery-item-modal';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@workspace/ui/components/tabs';
 import { useGetGalleryItems } from '@/queries/useProduct';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 
-const mockGalleryItems = [
-  {
-    id: '1',
-    title: 'Ethereal Garden Collection',
-    image: 'https://images.pexels.com/photos/1820560/pexels-photo-1820560.jpeg',
-    creator: 'Art Studio Co',
-    likes: 2840,
-    views: 15420,
-    category: 'fashion',
-  },
-  {
-    id: '2',
-    title: 'Forest Spirit Dress',
-    image: 'https://images.pexels.com/photos/1055691/pexels-photo-1055691.jpeg',
-    creator: 'Dream Weaver',
-    likes: 5640,
-    views: 28300,
-    category: 'fashion',
-  },
-  {
-    id: '3',
-    title: 'Mystic Ensemble',
-    image: 'https://images.pexels.com/photos/1536619/pexels-photo-1536619.jpeg',
-    creator: 'Cosmic Design',
-    likes: 4320,
-    views: 19800,
-    category: 'fashion',
-  },
-  {
-    id: '4',
-    title: 'Urban Minimalist',
-    image: 'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg',
-    creator: 'Modern Threads',
-    likes: 3210,
-    views: 12500,
-    category: 'fashion',
-  },
-  {
-    id: '5',
-    title: 'Golden Hour Collection',
-    image: 'https://images.pexels.com/photos/1539638/pexels-photo-1539638.jpeg',
-    creator: 'Luxe Design',
-    likes: 6780,
-    views: 34200,
-    category: 'fashion',
-  },
-  {
-    id: '6',
-    title: 'Elegant Evening Wear',
-    image: 'https://images.pexels.com/photos/2739667/pexels-photo-2739667.jpeg',
-    creator: 'Haute Mode',
-    likes: 5120,
-    views: 25600,
-    category: 'fashion',
-  },
-  {
-    id: '7',
-    title: 'Street Style Edge',
-    image: 'https://images.pexels.com/photos/1536619/pexels-photo-1536619.jpeg',
-    creator: 'Urban Studio',
-    likes: 4890,
-    views: 22300,
-    category: 'fashion',
-  },
-  {
-    id: '8',
-    title: 'Classic Silhouette',
-    image: 'https://images.pexels.com/photos/1055691/pexels-photo-1055691.jpeg',
-    creator: 'Timeless Wear',
-    likes: 3450,
-    views: 16700,
-    category: 'fashion',
-  },
-  {
-    id: '9',
-    title: 'Contemporary Fusion',
-    image: 'https://images.pexels.com/photos/1820560/pexels-photo-1820560.jpeg',
-    creator: 'Future Fashion',
-    likes: 5670,
-    views: 29100,
-    category: 'fashion',
-  },
-  {
-    id: '10',
-    title: 'Bohemian Dreams',
-    image: 'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg',
-    creator: 'Free Spirit Co',
-    likes: 4320,
-    views: 20100,
-    category: 'fashion',
-  },
-  {
-    id: '11',
-    title: 'Avant Garde Design',
-    image: 'https://images.pexels.com/photos/1539638/pexels-photo-1539638.jpeg',
-    creator: 'Experimental Lab',
-    likes: 3890,
-    views: 18400,
-    category: 'fashion',
-  },
-  {
-    id: '12',
-    title: 'Vintage Inspired',
-    image: 'https://images.pexels.com/photos/2739667/pexels-photo-2739667.jpeg',
-    creator: 'Retro Revival',
-    likes: 6210,
-    views: 31500,
-    category: 'fashion',
-  },
-];
+// Import Shadcn Pagination
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@workspace/ui/components/pagination';
+import { cn } from '@workspace/ui/lib/utils';
 
 export function GalleryPage() {
-  const [activeTab, setActiveTab] = useState('All');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('featured');
-  const [selectedItem, setSelectedItem] = useState<any>(null);
-  const [creatorTab, setCreatorTab] = useState('gallery');
-const {data: gallery, isLoading: galleryLoading} = useGetGalleryItems();
-  const filteredItems = mockGalleryItems.filter((item) =>
-    item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.creator.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const params = useParams();
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
-    if(galleryLoading) 
-    return (<>
-    Loading...
-    </>)
-  if(!gallery)
-    return(<>
-    Check your connection.
-    </>)
+  // 1. Chuẩn bị Params cho API
+  const currentPage = Number(searchParams.get("page")) || 1;
+  const apiParams = {
+    categorySlug: params.categorySlug ? params.categorySlug[0] : '', 
+    gender: searchParams.get("gender"),
+    style: searchParams.get("style"),
+    search: searchParams.get("search"),
+    page: currentPage,
+  };
+
+  // 2. Hàm cập nhật URL (Dùng chung cho Filter và Pagination)
+  const updateFilter = (key: string, value: string | null) => {
+    const newParams = new URLSearchParams(searchParams.toString());
+    
+    if (value) {
+      newParams.set(key, value);
+    } else {
+      newParams.delete(key);
+    }
+
+    // Nếu thay đổi filter (không phải page), reset về trang 1
+    if (key !== 'page') {
+        newParams.set('page', '1');
+    }
+
+    router.push(`?${newParams.toString()}`, { scroll: true }); // Scroll lên đầu khi chuyển trang
+  };
+
+  // 3. Fetch Data
+  const { data, isLoading: galleryLoading } = useGetGalleryItems(apiParams);
+
+  if (galleryLoading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <Loader2 className="animate-spin text-white w-8 h-8" />
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center text-white">
+        Check your connection.
+      </div>
+    );
+  }
+
+  // 4. Lấy Metadata từ Response Backend
+  // (Backend trả về { data: [], meta: { total, page, limit, lastPage, ... } })
+  const { meta } = data; 
+
   return (
-    <div className="min-h-screen bg-black">
-      {/* <GalleryHeader /> */}
-
-      <main className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-black px-8 pb-20">
+      
+      <main className="container mx-auto py-8">
         <div className="flex items-center justify-center gap-8 mb-12">
-          <h1 className="text-4xl font-bold text-white">GALLERY</h1>
-          <button className="text-white/60 hover:text-white transition-colors text-lg border-b-2 border-transparent hover:border-white/60">
-            CREATOR
-          </button>
+          <h1 className="text-4xl font-bold text-white tracking-wider">GALLERY</h1>
         </div>
 
+        {/* Filters Component */}
+        {/* Truyền updateFilter xuống GalleryFilters nếu cần */}
         <GalleryFilters
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          itemCount={gallery.length}
+          
+          // onFilterChange={updateFilter} // Ví dụ nếu GalleryFilters hỗ trợ callback này
         />
 
-        <div className="mt-12">
-          <GalleryGrid gallery={gallery}/>
+        {/* Grid Content */}
+        <div className="mt-12 min-h-[400px]">
+          {data.data.length > 0 ? (
+             <GalleryGrid gallery={data} />
+          ) : (
+             <div className="text-center text-gray-500 py-20 text-lg">No items found.</div>
+          )}
         </div>
 
-        <div className="mt-12 flex justify-center">
-          <button className="px-8 py-3 rounded-lg border border-white/20 text-white hover:bg-white/10 transition-colors">
-            Load More
-          </button>
-        </div>
+        {/* --- Pagination Controls --- */}
+        {meta && meta.lastPage > 0 && (
+          <div className="mt-16">
+            <Pagination>
+              <PaginationContent>
+                
+                {/* Previous Button */}
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => meta.hasPrevPage && updateFilter('page', (currentPage - 1).toString())}
+                    className={cn(
+                        "cursor-pointer text-white hover:text-white hover:bg-white/10 select-none", 
+                        !meta.hasPrevPage && "pointer-events-none opacity-50 text-gray-600"
+                    )} 
+                  />
+                </PaginationItem>
+
+                {/* Page Numbers Logic */}
+                {Array.from({ length: meta.lastPage }, (_, i) => i + 1).map((page) => {
+                  // Logic hiển thị thu gọn (Ellipsis): Hiện trang đầu, trang cuối, và xung quanh trang hiện tại
+                  if (
+                    page === 1 || 
+                    page === meta.lastPage || 
+                    (page >= currentPage - 1 && page <= currentPage + 1)
+                  ) {
+                    return (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          isActive={page === currentPage}
+                          onClick={() => updateFilter('page', page.toString())}
+                          className={cn(
+                              "cursor-pointer select-none text-white hover:bg-white/10 hover:text-white border-none",
+                              page === currentPage && "bg-white text-black hover:bg-white hover:text-black font-bold"
+                          )}
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  }
+                  
+                  // Render dấu ...
+                  if (page === currentPage - 2 || page === currentPage + 2) {
+                     return <PaginationItem key={page}><PaginationEllipsis className="text-gray-500" /></PaginationItem>
+                  }
+                  
+                  return null;
+                })}
+
+                {/* Next Button */}
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => meta.hasNextPage && updateFilter('page', (currentPage + 1).toString())}
+                    className={cn(
+                        "cursor-pointer text-white hover:text-white hover:bg-white/10 select-none", 
+                        !meta.hasNextPage && "pointer-events-none opacity-50 text-gray-600"
+                    )}
+                  />
+                </PaginationItem>
+
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
+
       </main>
-
-      {/* {selectedItem && (
-        <GalleryItemModal
-          item={selectedItem}
-          onClose={() => setSelectedItem(null)}
-        />
-      )} */}
     </div>
   );
 }

@@ -11,7 +11,7 @@ export default function RootLayout({
 }) {
   return (
     <div className="min-h-screen bg-zinc-950">
-        <main className="container mx-auto px-40 py-12">
+        <main className="container mx-auto px-16 py-12">
              <Tabs defaultValue="mycart" className="w-full">
           <TabsList className="border-b border-zinc-800 bg-transparent h-auto p-0 rounded-none ">
             <TabsTrigger
@@ -25,6 +25,14 @@ export default function RootLayout({
               className="text-white/50 font-bold text-[1.2rem] data-[state=active]:text-white data-[state=active]:bg-transparent bg-transparent  border-0 rounded-none px-0 mr-8"
             >
             <Link href={"/purchase"}>PURCHASE</Link>
+
+              
+            </TabsTrigger>
+            <TabsTrigger
+              value="/orders"
+              className="text-white/50 font-bold text-[1.2rem] data-[state=active]:text-white data-[state=active]:bg-transparent bg-transparent  border-0 rounded-none px-0 mr-8"
+            >
+            <Link href={"/orders"}>ORDERS</Link>
 
               
             </TabsTrigger>

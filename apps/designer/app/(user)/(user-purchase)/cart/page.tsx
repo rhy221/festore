@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { useCart, useRemoveFromCart } from '@/queries/useCart';
 import { useCreateOrder } from '@/queries/useOrder';
 import { Spinner } from '@workspace/ui/components/spinner';
+import { formatCurrency } from '@/lib/utils';
 
 interface CartItem {
   id: string;
@@ -119,21 +120,28 @@ export default function MyCartPage() {
                       onCheckedChange={() => toggleItemSelect(item.id)}
                       className="w-5 h-5 mt-1"
                     /> */}
-
-                    <img
+                    <Link href={`/detail/${item.productId}`}>
+                     <img
                       src={item.imageUrls[0]}
                       alt={item.title}
                       className="w-24 h-24 rounded-lg object-cover flex-shrink-0"
                     />
+                    </Link>
+                   
 
                     <div className="flex-1 min-w-0">
                       {/* <p className="text-white/60 text-xs mb-1">{item.license}</p> */}
-                      <h3 className="text-white/90 mb-1">{item.designer.name}</h3>
-                      <p className="text-white font-bold text-2xl">{item.title}</p>
+                      <Link href={`/portfolio/${item.designer.userId}`}>
+                          <h3 className="text-white/90 mb-1">{item.designer.name}</h3>
+
+                      </Link>
+                      <Link href={`/detail/${item.productId}`}>
+                                            <p className="text-white font-bold text-lg hover:text-cyan-400 transition-colors line-clamp-1">{item.title}</p>
+                      </Link>
                     </div>
 
                     <div className="flex items-center justify-between gap-4">
-                      <span className="text-white font-bold">${item.price.toFixed(2)}</span>
+                      <span className="text-white font-bold">{formatCurrency(item.price)}</span>
                       <button
                         onClick={() => onRemoveItem(item.productId)}
                         className="p-2 text-white/50 hover:text-red-500 hover:bg-red-500/10 rounded transition-colors opacity-0 group-hover:opacity-100"
@@ -169,7 +177,7 @@ export default function MyCartPage() {
                     <div className="flex justify-between items-center mb-6">
                       <span className="text-white font-bold">TOTAL</span>
                       <span className="text-white text-2xl font-bold">
-                        ${cart.totalAmount.toFixed(2)}
+                        { formatCurrency(cart.totalAmount)}
                       </span>
                     </div>
 

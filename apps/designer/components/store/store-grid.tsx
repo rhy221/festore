@@ -5,7 +5,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useGetStoreItems } from '@/queries/useProduct';
 import { useRouter } from 'next/navigation';
-import { DesignResType } from '@/schema/product.schema';
+import { DesignResType, GetStoreItemsResType } from '@/schema/product.schema';
 import { useAddToCart } from '@/queries/useCart';
 
 export interface StoreItem {
@@ -26,25 +26,11 @@ interface StoreGridProps {
   onAddToCart: (item: StoreItem) => void;
 }
 
-export function StoreGrid({store} : {store: DesignResType[]}) {
+export function StoreGrid({store} : {store: GetStoreItemsResType}) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [likedItems, setLikedItems] = useState<Set<string>>(new Set());
 
   const router = useRouter();
   const addToCartMutation = useAddToCart();
-  // const toggleLike = (id: string, e: React.MouseEvent) => {
-  //   e.stopPropagation();
-  //   setLikedItems((prev) => {
-  //     const newSet = new Set(prev);
-  //     if (newSet.has(id)) {
-  //       newSet.delete(id);
-  //     } else {
-  //       newSet.add(id);
-  //     }
-  //     return newSet;
-  //   });
-  // };
-
 
   const onItemClick = (id: string) => {
     router.push(`/detail/${id}`);
@@ -61,7 +47,7 @@ export function StoreGrid({store} : {store: DesignResType[]}) {
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-      {store.map((item) => (
+      {store.data.map((item) => (
         <div
           key={item._id}
           className="group"

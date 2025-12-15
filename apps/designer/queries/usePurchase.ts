@@ -3,10 +3,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { toast } from 'react-hot-toast';
 
-export const usePurchasedProducts = () => {
+export const usePurchasedProducts = (params?: any) => {
   return useQuery({
-    queryKey: ['purchasedProducts'],
-    queryFn: purchaseAction.getPurchasedProducts,
+    queryKey: ['purchasedProducts', params],
+    queryFn: () => purchaseAction.getPurchasedProducts(params),
   });
 };
 
