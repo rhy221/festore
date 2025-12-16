@@ -3,10 +3,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation"; 
 
 const menuItems = [
-  { label: "Trang chủ", href: "/home" },
-  { label: "Quản lý người dùng", href: "/users" },
-  { label: "Thể loại", href: "/category" },
-  { label: "Vi phạm", href: "/report" },
+  { label: "Home", href: "/home" },
+  { label: "User Management", href: "/users" },
+  { label: "Categories", href: "/category" },
+  { label: "Reports", href: "/report" },
 ];
 
 export default function Sidebar() {
@@ -21,7 +21,6 @@ export default function Sidebar() {
 
   return (
     <aside className="fixed top-[80px] left-0 h-screen w-[240px] bg-gray-900 text-white flex flex-col shadow-2xl transition-all duration-300">
-      
       <div className="flex flex-col flex-1 py-6 space-y-2">
         {menuItems.map((item) => { 
             const isActive = checkIsActive(item.href);

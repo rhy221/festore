@@ -3,9 +3,10 @@ import api from "@/lib/http";
 export interface Category {
   id: string;
   name: string;
-  description?: string;
-  createdAt: string;
-  productCount: number;
+  slug: string;
+  styles: string[];     
+  isDeleted: boolean;
+  productCount?: number;
 }
 
 export interface Product {

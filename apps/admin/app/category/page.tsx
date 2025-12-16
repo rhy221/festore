@@ -1,19 +1,28 @@
 "use client";
+
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "../../../../packages/ui/src/components/button";
 import { toast } from "sonner";
 import Sidebar from "components/Sidebar/Sidebar";
 import Header from "components/Header/Header";
-import { CategoriesAPI, type Category } from "@/api/categories.api";
+import { CategoriesAPI } from "@/api/categories.api";
 import AdminCategoryAddPopup from "./AddCategory";
 import AdminCategoryEditPopup from "./EditCategory";
 import AdminCategoryDeletePopup from "./DeleteCategory";
 import { useRouter } from "next/navigation";
 
+type CategoryFixed = {
+  id: string;
+  name: string;
+  slug: string;
+  styles: string[];
+  isDeleted: boolean;
+};
+
 interface ActionDropdownProps {
-  category: Category;
-  onEdit: (category: Category) => void;
-  onDelete: (category: Category) => void;
+  category: CategoryFixed;
+  onEdit: (category: CategoryFixed) => void;
+  onDelete: (category: CategoryFixed) => void;
   onView: (id: string) => void;
   onClose: () => void;
 }
@@ -29,12 +38,16 @@ const AdminCategoryActionsDropdown: React.FC<ActionDropdownProps> = ({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         onClose();
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
 
   return (
@@ -43,58 +56,72 @@ const AdminCategoryActionsDropdown: React.FC<ActionDropdownProps> = ({
       className="absolute right-0 mt-2 w-40 bg-gray-50 border border-gray-200 rounded-lg shadow-lg z-10"
     >
       <div
-        className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer rounded-t-lg transition"
-        onClick={() => { onView(category.id); onClose(); }}
+        className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer rounded-t-lg"
+        onClick={() => {
+          onView(category.id);
+          onClose();
+        }}
       >
-        Xem chi tiết
+        View details
       </div>
       <div
-        className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer transition"
-        onClick={() => { onEdit(category); onClose(); }}
+        className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+        onClick={() => {
+          onEdit(category);
+          onClose();
+        }}
       >
-        Sửa
+        Edit
       </div>
       <div
-        className="px-4 py-2 text-sm text-red-600 hover:bg-red-50 cursor-pointer rounded-b-lg transition"
-        onClick={() => { onDelete(category); onClose(); }}
+        className="px-4 py-2 text-sm text-red-600 hover:bg-red-50 cursor-pointer rounded-b-lg"
+        onClick={() => {
+          onDelete(category);
+          onClose();
+        }}
       >
-        Xóa
+        Delete
       </div>
     </div>
   );
 };
 
 export default function AdminCategoryPage() {
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<CategoryFixed[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddPopup, setShowAddPopup] = useState(false);
-  const [editCategory, setEditCategory] = useState<Category | null>(null);
-  const [deleteCategory, setDeleteCategory] = useState<Category | null>(null);
-  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const [editCategory, setEditCategory] =
+    useState<CategoryFixed | null>(null);
+  const [deleteCategory, setDeleteCategory] =
+    useState<CategoryFixed | null>(null);
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(
+    null
+  );
 
   const router = useRouter();
 
   const loadCategories = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await CategoriesAPI.getCategories({});
+      const data: any = await CategoriesAPI.getCategories({});
 
-      const rawData: any = data;
-      const categoryList: Category[] = (
-        Array.isArray(rawData)
-          ? rawData
-          : Array.isArray(rawData?.data)
-            ? rawData.data
-            : []
+      const list: CategoryFixed[] = (
+        Array.isArray(data)
+          ? data
+          : Array.isArray(data?.data)
+          ? data.data
+          : []
       ).map((c: any) => ({
-        ...c,
-        id: c.id ?? c._id,
+        id: String(c._id),
+        name: c.name,
+        slug: c.slug,
+        styles: Array.isArray(c.styles) ? c.styles : [],
+        isDeleted: Boolean(c.isDeleted),
       }));
 
-      setCategories(categoryList);
-    } catch (error) {
-      console.error("Lỗi tải danh mục:", error);
-      toast.error("Không thể tải danh sách danh mục");
+      setCategories(list);
+    } catch {
+      toast.error("Failed to load categories");
       setCategories([]);
     } finally {
       setLoading(false);
@@ -121,36 +148,39 @@ export default function AdminCategoryPage() {
         <div className="w-[296px]">
           <Sidebar />
         </div>
+
         <main className="flex-1 p-6 overflow-y-auto font-sans text-gray-800">
           <div className="flex justify-between items-center mb-4 border-b pb-2 border-gray-200">
-            <h1 className="text-xl font-medium text-black">Danh sách thể loại</h1>
+            <h1 className="text-xl font-medium text-black">
+              Category List
+            </h1>
             <Button
-              className="bg-black text-white px-4 py-2 text-sm font-medium hover:bg-gray-800 shadow-md transition"
+              className="bg-black text-white px-4 py-2 text-sm font-medium hover:bg-gray-800"
               onClick={() => setShowAddPopup(true)}
             >
-              + Thêm thể loại
+              + Add category
             </Button>
           </div>
 
           {loading ? (
-            <div className="text-center py-12 text-gray-500 text-base">Đang tải dữ liệu...</div>
+            <div className="text-center py-12 text-gray-500">
+              Loading data...
+            </div>
           ) : categories.length === 0 ? (
-            <div className="text-center py-12 text-gray-500 text-base">
-              <p className="mb-4">Chưa có danh mục nào được tạo.</p>
-              <Button
-                className="text-black border border-black px-4 py-2 bg-transparent hover:bg-black hover:text-white transition"
-                onClick={() => setShowAddPopup(true)}
-              >
-                Tạo thể loại đầu tiên
-              </Button>
+            <div className="text-center py-12 text-gray-500">
+              No categories found.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200 text-center">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider text-center">Tên thể loại</th>
-                    <th className="px-6 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider text-center">Mô tả</th>
+                    <th className="px-6 py-2 text-xs font-medium text-gray-500 uppercase">
+                      Category name
+                    </th>
+                    <th className="px-6 py-2 text-xs font-medium text-gray-500 uppercase">
+                      Styles
+                    </th>
                     <th className="px-6 py-2 w-16"></th>
                   </tr>
                 </thead>
@@ -158,46 +188,38 @@ export default function AdminCategoryPage() {
                   {categories.map((category) => (
                     <tr
                       key={category.id}
-                      className="hover:bg-gray-100 transition-colors duration-200 cursor-pointer"
+                      className="hover:bg-gray-100 cursor-pointer"
                     >
                       <td
-                        className="px-6 py-3 font-medium text-gray-900 hover:text-gray-600 transition"
+                        className="px-6 py-3 font-medium text-gray-900"
                         onClick={() => handleView(category.id)}
                       >
                         {category.name}
                       </td>
-                      <td className="px-6 py-3 text-gray-500 text-sm">
-                        <p className="truncate max-w-lg">{category.description || "Không có mô tả"}</p>
+
+                      <td className="px-6 py-3 text-sm text-gray-600">
+                        {category.styles.length > 0
+                          ? category.styles.join(", ")
+                          : "—"}
                       </td>
+
                       <td className="px-6 py-3 relative">
                         <Button
-                          className="text-gray-600 hover:text-black transition p-1 rounded-full border border-transparent hover:border-gray-300 bg-transparent"
+                          className="bg-transparent"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleActionClick(category.id);
                           }}
-                          title="Tùy chọn hành động"
                         >
-                          <svg
-                            className="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M12 5v.01M12 12v.01M12 19v.01"
-                            />
-                          </svg>
+                          ⋮
                         </Button>
 
                         {openDropdownId === category.id && (
                           <AdminCategoryActionsDropdown
                             category={category}
-                            onClose={() => setOpenDropdownId(null)}
+                            onClose={() =>
+                              setOpenDropdownId(null)
+                            }
                             onEdit={setEditCategory}
                             onDelete={setDeleteCategory}
                             onView={handleView}
@@ -214,21 +236,32 @@ export default function AdminCategoryPage() {
           {showAddPopup && (
             <AdminCategoryAddPopup
               onClose={() => setShowAddPopup(false)}
-              onSuccess={() => { setShowAddPopup(false); loadCategories(); }}
+              onSuccess={() => {
+                setShowAddPopup(false);
+                loadCategories();
+              }}
             />
           )}
+
           {editCategory && (
             <AdminCategoryEditPopup
               category={editCategory}
               onClose={() => setEditCategory(null)}
-              onSuccess={() => { setEditCategory(null); loadCategories(); }}
+              onSuccess={() => {
+                setEditCategory(null);
+                loadCategories();
+              }}
             />
           )}
+
           {deleteCategory && (
             <AdminCategoryDeletePopup
               category={deleteCategory}
               onClose={() => setDeleteCategory(null)}
-              onSuccess={() => { setDeleteCategory(null); loadCategories(); }}
+              onSuccess={() => {
+                setDeleteCategory(null);
+                loadCategories();
+              }}
             />
           )}
         </main>
