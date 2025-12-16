@@ -54,7 +54,7 @@ export default function DesignDetailDialog({
 
   const handleDelete = () => {
     console.log("Deleting design:", design.name);
-    alert("Mẫu thiết kế đã được xóa!");
+    alert("The design has been deleted!");
     onOpenChange(false);
   };
 
@@ -77,7 +77,7 @@ export default function DesignDetailDialog({
         >
           <div className="flex items-center justify-between">
             <DialogTitle className="text-xl font-bold">
-              Xem chi tiết mẫu thiết kế
+              Design Details
             </DialogTitle>
 
             <BackspaceIcon
@@ -97,49 +97,59 @@ export default function DesignDetailDialog({
 
             <div className="flex-1 space-y-2 text-sm leading-relaxed">
               <p>
-                <span className="font-semibold">Tên mẫu thiết kế:</span>{" "}
+                <span className="font-semibold">Design Name:</span>{" "}
                 {design.name}
               </p>
               <p>
-                <span className="font-semibold">Nhà thiết kế:</span>{" "}
+                <span className="font-semibold">Designer:</span>{" "}
                 {design.designer}
               </p>
               <p>
-                <span className="font-semibold">Mô tả:</span>{" "}
+                <span className="font-semibold">Description:</span>{" "}
                 {design.description}
               </p>
               <p>
-                <span className="font-semibold">Thể loại:</span>{" "}
+                <span className="font-semibold">Category:</span>{" "}
                 {design.category}
               </p>
               <p>
-                <span className="font-semibold">Trạng thái:</span>{" "}
+                <span className="font-semibold">Status:</span>{" "}
                 {design.status} &nbsp;&nbsp;
-                <span className="font-semibold">Ngày đăng mẫu:</span>{" "}
+                <span className="font-semibold">Date Posted:</span>{" "}
                 {design.datePosted}
               </p>
 
-              <h4 className="mt-3 font-semibold">Thông tin bán hàng</h4>
+              <h4 className="mt-3 font-semibold">Sales Information</h4>
               <p>
-                <span className="font-semibold">Giá bán trực tiếp:</span>{" "}
+                <span className="font-semibold">Direct Price:</span>{" "}
                 {design.salesInfo.directPrice}
               </p>
               <p>
-                <span className="font-semibold">Đấu giá:</span>
+                <span className="font-semibold">Auction:</span>
               </p>
               <ul className="list-disc list-inside pl-2">
-                <li>Giá khởi điểm: {design.salesInfo.auction.startingPrice}</li>
-                <li>Bước giá: {design.salesInfo.auction.priceStep}</li>
                 <li>
-                  Giá chốt cuối cùng: {design.salesInfo.auction.finalPrice}
+                  Starting Price:{" "}
+                  {design.salesInfo.auction.startingPrice}
                 </li>
-                <li>Người chốt: {design.salesInfo.auction.winner}</li>
+                <li>
+                  Price Step:{" "}
+                  {design.salesInfo.auction.priceStep}
+                </li>
+                <li>
+                  Final Price:{" "}
+                  {design.salesInfo.auction.finalPrice}
+                </li>
+                <li>
+                  Winner:{" "}
+                  {design.salesInfo.auction.winner}
+                </li>
               </ul>
 
               <p>
-                <span className="font-semibold">Lượt thích:</span>{" "}
+                <span className="font-semibold">Likes:</span>{" "}
                 {design.engagement.likes} &nbsp;&nbsp;
-                <span className="font-semibold">Lượt xem:</span>{" "}
+                <span className="font-semibold">Views:</span>{" "}
                 {design.engagement.views}
               </p>
             </div>
@@ -150,13 +160,13 @@ export default function DesignDetailDialog({
               onClick={handleWarningClick}
               className="px-4 py-2 rounded-md bg-orange-500 hover:bg-orange-600 text-white"
             >
-              Cảnh cáo
+              Issue Warning
             </button>
             <button
               onClick={handleDelete}
               className="px-4 py-2 rounded-md bg-red-500 hover:bg-red-600 text-white"
             >
-              Xoá
+              Delete
             </button>
           </div>
         </DialogContent>

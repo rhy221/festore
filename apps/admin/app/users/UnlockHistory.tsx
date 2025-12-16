@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { type User } from "@/api/users.api"; // ⬅️ DÙNG TYPE USER TỪ API THẬT
+import { type User } from "@/api/users.api";
 
 interface UnlockHistoryDialogProps {
   user: User | null;
@@ -26,31 +26,36 @@ export default function UnlockHistoryDialog({
         <div className="mt-10 mb-8 w-full max-w-4xl rounded-2xl bg-white shadow-xl ring-1 ring-black/5 p-8">
           {/* Header */}
           <div className="relative">
-            <h2 className="text-2xl font-bold text-slate-900">Chi tiết xử lý</h2>
+            <h2 className="text-2xl font-bold text-slate-900">
+              Processing Details
+            </h2>
             <button
               onClick={() => onOpenChange(false)}
-              aria-label="Đóng"
+              aria-label="Close"
               className="absolute right-0 top-0 inline-flex items-center justify-center w-8 h-8 hover:bg-gray-100 rounded"
             >
               <img src="/xButtonIcon.png" alt="Close" className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Two column info */}
+          {/* Two-column info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-12 mt-6 text-slate-900">
-            <InfoRow label="Họ và tên đầy đủ" value={user.fullName} />
-            <InfoRow label="Vai trò" value={user.role} />
-            <InfoRow label="Địa chỉ email" value={user.email} />
-            <InfoRow label="SĐT" value={user.phone} />
-            <InfoRow label="Trạng thái" value={user.status} />
-            <InfoRow label="Ngày khoá" value={user.lockDate} />
+            <InfoRow label="Full Name" value={user.fullName} />
+            <InfoRow label="Role" value={user.role} />
+            <InfoRow label="Email Address" value={user.email} />
+            <InfoRow label="Phone Number" value={user.phone} />
+            <InfoRow label="Account Status" value={user.status} />
+            <InfoRow label="Lock Date" value={user.lockDate} />
           </div>
 
           {/* Reasons */}
           <div className="mt-6 text-slate-900">
-            <ReasonSection label="Lý do khoá tài khoản" value={user.lockReason} />
             <ReasonSection
-              label="Lý do khiếu nại"
+              label="Account Lock Reason"
+              value={user.lockReason}
+            />
+            <ReasonSection
+              label="Appeal Reason"
               value={user.appealReason}
               className="mt-4"
             />
@@ -58,17 +63,25 @@ export default function UnlockHistoryDialog({
 
           {/* History table */}
           <div className="mt-6">
-            <p className="font-semibold mb-3">Lịch sử xử lý</p>
+            <p className="font-semibold mb-3">Processing History</p>
 
             <div className="overflow-x-auto">
               <table className="w-full border border-slate-400 border-collapse text-sm">
                 <thead>
                   <tr className="bg-white text-slate-700">
-                    <th className="border border-slate-400 py-2 px-3">STT</th>
-                    <th className="border border-slate-400 py-2 px-3">Người xử lý</th>
-                    <th className="border border-slate-400 py-2 px-3">Ngày xử lý</th>
-                    <th className="border border-slate-400 py-2 px-3">Hành động</th>
-                    <th className="border border-slate-400 py-2 px-3">Ghi chú</th>
+                    <th className="border border-slate-400 py-2 px-3">No.</th>
+                    <th className="border border-slate-400 py-2 px-3">
+                      Processed By
+                    </th>
+                    <th className="border border-slate-400 py-2 px-3">
+                      Process Date
+                    </th>
+                    <th className="border border-slate-400 py-2 px-3">
+                      Action
+                    </th>
+                    <th className="border border-slate-400 py-2 px-3">
+                      Notes
+                    </th>
                   </tr>
                 </thead>
                 <tbody>

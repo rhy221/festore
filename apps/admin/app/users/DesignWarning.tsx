@@ -35,7 +35,7 @@ export default function DesignWarningDialog({
 
   const handleSendWarning = () => {
     console.log("Sending warning:", warningContent);
-    alert("Cảnh cáo đã được gửi qua email!");
+    alert("The warning has been sent via email!");
     onOpenChange(false);
   };
 
@@ -46,7 +46,9 @@ export default function DesignWarningDialog({
         showCloseButton={false}
       >
         <div className="flex items-center justify-between">
-          <DialogTitle className="text-xl font-bold">Cảnh cáo</DialogTitle>
+          <DialogTitle className="text-xl font-bold">
+            Issue Warning
+          </DialogTitle>
 
           <BackspaceIcon
             className="w-8 h-8 pt-1 text-black cursor-pointer"
@@ -64,23 +66,23 @@ export default function DesignWarningDialog({
           </div>
 
           <div className="flex-1 space-y-2 text-sm leading-relaxed">
-            <InfoRow label="Tên mẫu thiết kế" value={design.name} />
-            <InfoRow label="Nhà thiết kế" value={design.designer} />
-            <InfoRow label="Mô tả" value={design.description} />
-            <InfoRow label="Thể loại" value={design.category} />
+            <InfoRow label="Design Name" value={design.name} />
+            <InfoRow label="Designer" value={design.designer} />
+            <InfoRow label="Description" value={design.description} />
+            <InfoRow label="Category" value={design.category} />
 
             <div className="flex gap-8">
-              <InfoRow label="Trạng thái" value={design.status} />
-              <InfoRow label="Ngày đăng mẫu" value={design.datePosted} />
+              <InfoRow label="Status" value={design.status} />
+              <InfoRow label="Date Posted" value={design.datePosted} />
             </div>
 
-            <p className="font-semibold mt-3">Nội dung cảnh cáo</p>
+            <p className="font-semibold mt-3">Warning Message</p>
             <textarea
               rows={3}
               value={warningContent}
               onChange={(e) => setWarningContent(e.target.value)}
               className="w-full border border-gray-300 rounded-md p-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Nhập nội dung cảnh cáo..."
+              placeholder="Enter warning message..."
             />
           </div>
         </div>
@@ -90,7 +92,7 @@ export default function DesignWarningDialog({
             onClick={handleSendWarning}
             className="px-6 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold"
           >
-            Gửi qua email
+            Send via Email
           </button>
         </div>
       </DialogContent>

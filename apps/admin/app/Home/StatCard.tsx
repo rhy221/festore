@@ -19,7 +19,7 @@ function StatCard({ title, value, icon }: StatCardProps) {
               {title}
             </p>
             <p className="text-3xl font-extrabold text-gray-900">
-              {value.toLocaleString("vi-VN")}
+              {value.toLocaleString("en-US")}
             </p>
           </div>
 
@@ -56,7 +56,7 @@ export default function QuickStats() {
     const fetchStats = async () => {
       try {
         setLoading(true);
-        const data = await getQuickStats(); 
+        const data = await getQuickStats();
         setStats({
           userCount: data.userCount ?? 0,
           templateCount: data.templateCount ?? 0,
@@ -64,7 +64,7 @@ export default function QuickStats() {
         });
       } catch (err) {
         console.error("Error fetching stats:", err);
-        setError("Không thể tải dữ liệu thống kê");
+        setError("Unable to load statistics data");
       } finally {
         setLoading(false);
       }
@@ -74,15 +74,15 @@ export default function QuickStats() {
   }, []);
 
   const statCards = [
-    { title: "Người dùng", value: stats.userCount, icon: <Users size={22} /> },
-    { title: "Mẫu thiết kế", value: stats.templateCount, icon: <FileText size={22} /> },
-    { title: "Thể loại", value: stats.categoryCount, icon: <Grid3x3 size={22} /> },
+    { title: "Users", value: stats.userCount, icon: <Users size={22} /> },
+    { title: "Templates", value: stats.templateCount, icon: <FileText size={22} /> },
+    { title: "Categories", value: stats.categoryCount, icon: <Grid3x3 size={22} /> },
   ];
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[180px] text-gray-500 text-sm">
-        Đang tải thống kê...
+        Loading statistics...
       </div>
     );
   }
@@ -90,10 +90,9 @@ export default function QuickStats() {
   return (
     <div className="bg-[#fafafa] py-10 px-6">
       <div className="max-w-6xl mx-auto">
-
         <div className="mb-10">
           <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 mb-2">
-            Thống kê nhanh
+            Quick Statistics
           </h1>
         </div>
 
@@ -105,7 +104,12 @@ export default function QuickStats() {
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
           {statCards.map((stat) => (
-            <StatCard key={stat.title} title={stat.title} value={stat.value} icon={stat.icon} />
+            <StatCard
+              key={stat.title}
+              title={stat.title}
+              value={stat.value}
+              icon={stat.icon}
+            />
           ))}
         </div>
       </div>

@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { BarChart, Bar, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
@@ -37,12 +38,12 @@ export default function WeeklyChart({ data }: WeeklyChartProps) {
           setLoading(false);
           return;
         }
-        
+
         const apiData = await getWeeklyDesigns();
         setChartData(apiData);
       } catch (err) {
         console.error("Error fetching weekly data:", err);
-        setError("Có lỗi xảy ra khi tải dữ liệu");
+        setError("Failed to load weekly chart data");
       } finally {
         setLoading(false);
       }
@@ -54,7 +55,7 @@ export default function WeeklyChart({ data }: WeeklyChartProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[220px] text-sm text-gray-400">
-        Đang tải biểu đồ...
+        Loading chart...
       </div>
     );
   }
@@ -67,9 +68,9 @@ export default function WeeklyChart({ data }: WeeklyChartProps) {
     <div className="w-full rounded-2xl border border-gray-200 bg-white px-5 pt-5 pb-4 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm font-semibold tracking-wide text-gray-900">
-          Thiết kế mới theo tuần
+          Weekly New Designs
         </h2>
-        <span className="text-xs text-gray-400">Weekly Designs</span>
+        <span className="text-xs text-gray-400">Last 7 weeks</span>
       </div>
 
       {error && (
@@ -102,7 +103,7 @@ export default function WeeklyChart({ data }: WeeklyChartProps) {
 
             <ChartTooltip content={<ChartTooltipContent />} />
 
-            <ChartLegend content={<ChartLegendContent />} /> 
+            <ChartLegend content={<ChartLegendContent />} />
 
             <Bar
               dataKey="designs"

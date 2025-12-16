@@ -1,5 +1,5 @@
 import React from "react";
-import { type UnlockRequest } from "./UnlockRequest"; 
+import { type UnlockRequest } from "./UnlockRequest";
 import { displayUnlockStatus } from "./types";
 import { EyeIcon } from "lucide-react";
 
@@ -17,12 +17,18 @@ export default function UnlockRequestTable({
       <table className="min-w-full bg-white rounded-xl border-collapse">
         <thead>
           <tr className="bg-gray-100 text-left">
-            <th className="p-3 font-semibold text-gray-700">STT</th>
-            <th className="p-3 font-semibold text-gray-700">Họ và tên</th>
-            <th className="p-3 font-semibold text-gray-700">Nội dung khiếu nại</th>
-            <th className="p-3 font-semibold text-gray-700">Ngày gửi</th>
-            <th className="p-3 font-semibold text-gray-700">Trạng thái</th>
-            <th className="p-3 font-semibold text-gray-700 text-center">Thao tác</th>
+            <th className="p-3 font-semibold text-gray-700">No.</th>
+            <th className="p-3 font-semibold text-gray-700">Full Name</th>
+            <th className="p-3 font-semibold text-gray-700">
+              Appeal Content
+            </th>
+            <th className="p-3 font-semibold text-gray-700">
+              Submitted Date
+            </th>
+            <th className="p-3 font-semibold text-gray-700">Status</th>
+            <th className="p-3 font-semibold text-gray-700 text-center">
+              Actions
+            </th>
           </tr>
         </thead>
 
@@ -33,9 +39,15 @@ export default function UnlockRequestTable({
               className="border-b border-gray-200 hover:bg-blue-50 transition-colors duration-200"
             >
               <td className="p-3">{i + 1}</td>
-              <td className="p-3 font-medium text-gray-800">{r.name}</td>
+
+              <td className="p-3 font-medium text-gray-800">
+                {r.name}
+              </td>
+
               <td className="p-3">{r.reason}</td>
+
               <td className="p-3">{r.date}</td>
+
               <td className="p-3">
                 <span
                   className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -52,7 +64,7 @@ export default function UnlockRequestTable({
                 <button
                   className="p-2 rounded-full hover:bg-gray-200 transition-colors"
                   onClick={() => onViewRequest(r)}
-                  title="Xem yêu cầu chi tiết"
+                  title="View request details"
                 >
                   <EyeIcon size={24} className="text-gray-700" />
                 </button>
@@ -66,7 +78,7 @@ export default function UnlockRequestTable({
                 colSpan={6}
                 className="px-4 py-12 text-center text-gray-400 text-lg font-medium"
               >
-                Không có yêu cầu mở khóa nào
+                No unlock requests found
               </td>
             </tr>
           )}

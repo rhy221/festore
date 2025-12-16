@@ -21,53 +21,53 @@ const CustomDot = ({ cx, cy }: any) => (
   />
 );
 
-export default function LineChartComponent() {
-  const [data, setData] = useState<DailyAccessData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export default function DailyAccessLineChart() {
+  const [accessData, setAccessData] = useState<DailyAccessData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchDailyData = async () => {
+  useEffect(() => {    
+    const fetchAccessData = async () => {
       try {
-        setLoading(true);       
-        const apiData = await getDailyAccess(); 
-        setData(apiData);
+        setIsLoading(true);
+        const dailyAccessData = await getDailyAccess(); 
+        setAccessData(dailyAccessData);
       } catch (err) {
         console.error("Error fetching daily access data:", err);
-        setError("Có lỗi xảy ra khi tải dữ liệu");
+        setFetchError("An error occurred while loading data");
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
-    fetchDailyData();
+    fetchAccessData();
   }, []);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-[220px] text-sm text-gray-400">
-        Đang tải biểu đồ...
+        Loading chart...
       </div>
     );
   }
 
-  if (error) {
+  if (fetchError) {
     return (
       <div className="rounded-2xl border border-gray-200 bg-white px-5 py-4 shadow-sm">
         <div className="mb-3 rounded-lg border border-yellow-200 bg-yellow-50 px-3 py-2 text-xs text-yellow-800">
-          {error}
+          {fetchError} 
         </div>
       </div>
     );
   }
 
-  const maxValue = Math.max(...data.map((d) => d.value), 0);
+  const maxValue = Math.max(...accessData.map((d) => d.value), 0);
 
   return (
     <div className="w-full rounded-2xl border border-gray-200 bg-white px-5 pt-5 pb-4 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm font-semibold tracking-wide text-gray-900">
-          Lượt truy cập theo ngày
+          Daily Access Visits 
         </h2>
         <span className="text-xs text-gray-400">Daily Access</span>
       </div>
@@ -75,7 +75,7 @@ export default function LineChartComponent() {
       <div className="w-full h-[180px]">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
-            data={data}
+            data={accessData} // Uses accessData
             margin={{ top: 10, right: 10, left: -15, bottom: 0 }}
           >
             <defs>

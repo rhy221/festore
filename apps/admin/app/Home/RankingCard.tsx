@@ -13,7 +13,7 @@ interface RankingCardProps {
   isTopOne?: boolean;
 }
 
-function RankingCard({ icon, title, subtitle, metric, isTopOne }: RankingCardProps) {
+function RankItemCard({ icon, title, subtitle, metric, isTopOne }: RankingCardProps) {
   return (
     <Card
       className={`
@@ -28,7 +28,6 @@ function RankingCard({ icon, title, subtitle, metric, isTopOne }: RankingCardPro
     >
       <CardContent className="p-4">
         <div className="flex flex-col gap-4">
-
           <div
             className={`
               w-10 h-10 rounded-xl flex items-center justify-center transition
@@ -79,11 +78,11 @@ function RankingCard({ icon, title, subtitle, metric, isTopOne }: RankingCardPro
   );
 }
 
-export default function TopThreeRankings() {
-  const [templates, setTemplates] = useState<TopTemplate[]>([]);
-  const [designers, setDesigners] = useState<TopDesigner[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export default function TopRankingsSection() {
+  const [topTemplates, setTopTemplates] = useState<TopTemplate[]>([]);
+  const [topDesigners, setTopDesigners] = useState<TopDesigner[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   const getIcon = (iconName?: string, size = 18) => {
     switch (iconName) {
@@ -101,25 +100,25 @@ export default function TopThreeRankings() {
   useEffect(() => {
     const fetchRankings = async () => {
       try {
-        setLoading(true);
-        const data = await getTopRankings(); 
-        setTemplates(data.topTemplates ?? []);
-        setDesigners(data.topDesigners ?? []);
+        setIsLoading(true);
+        const data = await getTopRankings();
+        setTopTemplates(data.topTemplates ?? []);
+        setTopDesigners(data.topDesigners ?? []);
       } catch (err) {
         console.error("Error fetching rankings:", err);
-        setError("Không thể tải dữ liệu bảng xếp hạng");
+        setFetchError("Unable to load ranking data");
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
     fetchRankings();
   }, []);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[260px] text-gray-500 text-sm">
-        Đang tải dữ liệu...
+        Loading data...
       </div>
     );
   }
@@ -127,31 +126,29 @@ export default function TopThreeRankings() {
   return (
     <div className="min-h-screen bg-[#fafafa] py-10 px-6">
       <div className="max-w-5xl mx-auto">
-
         <div className="mb-10">
           <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 mb-2">
-            Bảng xếp hạng
+            Top Rankings
           </h1>
           <p className="text-sm text-gray-500 max-w-lg">
-            Những mẫu thiết kế và nhà thiết kế nổi bật nhất.
+            The most outstanding templates and designers.
           </p>
         </div>
 
-        {error && (
+        {fetchError && (
           <div className="mb-8 p-3 rounded-xl border border-red-200 bg-red-50 text-red-600 text-sm">
-            {error}
+            {fetchError}
           </div>
         )}
 
-        {/* TOP TEMPLATES */}
         <section className="mb-14">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold text-gray-900">Top mẫu thiết kế</h2>
+            <h2 className="text-lg font-bold text-gray-900">Top Templates</h2>
             <div className="h-px flex-1 ml-5 bg-gray-200"></div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 justify-items-center">
-            {templates.map((item, index) => (              
+            {topTemplates.map((item, index) => (
               <div key={`${item.title}-${item.subtitle || index}`} className="relative">
                 <div
                   className={`
@@ -162,7 +159,7 @@ export default function TopThreeRankings() {
                   {index + 1}
                 </div>
 
-                <RankingCard
+                <RankItemCard
                   icon={getIcon(item.icon)}
                   title={item.title}
                   subtitle={item.subtitle}
@@ -174,15 +171,14 @@ export default function TopThreeRankings() {
           </div>
         </section>
 
-        {/* TOP DESIGNERS */}
         <section>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold text-gray-900">Top nhà thiết kế</h2>
+            <h2 className="text-lg font-bold text-gray-900">Top Designers</h2>
             <div className="h-px flex-1 ml-5 bg-gray-200"></div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 justify-items-center">
-            {designers.map((item, index) => (             
+            {topDesigners.map((item, index) => (
               <div key={`${item.title}-${item.subtitle || index}`} className="relative">
                 <div
                   className={`
@@ -193,7 +189,7 @@ export default function TopThreeRankings() {
                   {index + 1}
                 </div>
 
-                <RankingCard
+                <RankItemCard
                   icon={getIcon(item.icon)}
                   title={item.title}
                   subtitle={item.subtitle}

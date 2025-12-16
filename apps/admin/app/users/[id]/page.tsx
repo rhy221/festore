@@ -47,7 +47,7 @@ export default function AdminDashboard() {
   const [showDialog, setShowDialog] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeFilter, setActiveFilter] = useState("Tất cả");
+  const [activeFilter, setActiveFilter] = useState("All");
 
   const [designs, setDesigns] = useState<Design[]>([]);
 
@@ -56,7 +56,7 @@ export default function AdminDashboard() {
       const parsedUserId = parseInt(userId);
       if (!userId || isNaN(parsedUserId)) {
         setLoading(false);
-        if (userId) toast.error("ID người dùng không hợp lệ.");
+        if (userId) toast.error("Invalid user ID.");
         return;
       }
 
@@ -68,8 +68,8 @@ export default function AdminDashboard() {
         setUser(userData);
       } catch (error: any) {
         toast.error(
-          `Không thể tải thông tin người dùng. Mã lỗi: ${
-            error.response?.status || "Mạng/Server"
+          `Failed to load user information. Error code: ${
+            error.response?.status || "Network/Server"
           }`
         );
         setUser(null);
@@ -97,7 +97,7 @@ export default function AdminDashboard() {
           : [];
         setDesigns(designList);
       } catch {
-        toast.error("Không thể tải danh sách mẫu thiết kế.");
+        toast.error("Failed to load design list.");
         setDesigns([]);
       } finally {
         setDesignLoading(false);
@@ -112,7 +112,7 @@ export default function AdminDashboard() {
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
     const matchFilter =
-      activeFilter === "Tất cả" || design.status === activeFilter;
+      activeFilter === "All" || design.status === activeFilter;
     return matchSearch && matchFilter;
   });
 
@@ -139,11 +139,11 @@ export default function AdminDashboard() {
         >
           {loading ? (
             <div className="flex items-center justify-center h-64 text-xl">
-              Đang tải thông tin người dùng...
+              Loading user information...
             </div>
           ) : !user ? (
             <div className="flex items-center justify-center h-64 text-xl text-red-500">
-              Không tìm thấy thông tin người dùng
+              User information not found
             </div>
           ) : (
             <>
@@ -158,24 +158,24 @@ export default function AdminDashboard() {
                     className="w-48 h-48 rounded-full border mb-3"
                   />
                   <h2 className="text-2xl font-bold text-black">
-                    {user.type === "designer" ? "NHÀ THIẾT KẾ" : "KHÁCH HÀNG"}
+                    {user.type === "designer" ? "DESIGNER" : "CUSTOMER"}
                   </h2>
                 </div>
 
                 <div className="grid grid-cols-2 gap-x-12 gap-y-2">
-                  <InfoRow label="Họ và tên đầy đủ" value={user.name || ""} />
-                  <InfoRow label="Giới tính" value={user.gender || ""} />
-                  <InfoRow label="Tên đăng nhập" value={user.username || ""} />
-                  <InfoRow label="Ngày sinh" value={user.dateOfBirth || ""} />
-                  <InfoRow label="Địa chỉ email" value={user.email || ""} />
+                  <InfoRow label="Full Name" value={user.name || ""} />
+                  <InfoRow label="Gender" value={user.gender || ""} />
+                  <InfoRow label="Username" value={user.username || ""} />
+                  <InfoRow label="Date of Birth" value={user.dateOfBirth || ""} />
+                  <InfoRow label="Email Address" value={user.email || ""} />
                   <InfoRow
-                    label="Ngày tạo tài khoản"
+                    label="Account Created At"
                     value={user.createdAt || ""}
                   />
-                  <InfoRow label="Số điện thoại" value={user.phone || ""} />
-                  <InfoRow label="Trạng thái" value={user.status || ""} />
+                  <InfoRow label="Phone Number" value={user.phone || ""} />
+                  <InfoRow label="Status" value={user.status || ""} />
                   <div className="col-span-2">
-                    <InfoRow label="Mô tả" value={user.description || ""} />
+                    <InfoRow label="Description" value={user.description || ""} />
                   </div>
                 </div>
               </div>
@@ -184,7 +184,7 @@ export default function AdminDashboard() {
                 <>
                   <div className="flex gap-2 mb-4">
                     <input
-                      placeholder="Nhập tên mẫu thiết kế để tìm kiếm"
+                      placeholder="Search designs by name"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="bg-[#BFE3F3] flex-1 rounded-full px-4 py-2 border text-lg"
@@ -193,11 +193,11 @@ export default function AdminDashboard() {
 
                   <div className="flex gap-7 mb-4">
                     {[
-                      "Tất cả",
-                      "Đang bán",
-                      "Đang đấu giá",
-                      "Đã bán",
-                      "Chia sẻ",
+                      "All",
+                      "On Sale",
+                      "Auctioning",
+                      "Sold",
+                      "Shared",
                     ].map((filter) => (
                       <button
                         key={filter}
@@ -215,7 +215,7 @@ export default function AdminDashboard() {
 
                   {designLoading ? (
                     <div className="text-center py-8 text-gray-500 text-lg">
-                      Đang tải mẫu thiết kế...
+                      Loading designs...
                     </div>
                   ) : filteredDesigns.length > 0 ? (
                     <div className="grid grid-cols-3 gap-6">
@@ -234,7 +234,7 @@ export default function AdminDashboard() {
                     </div>
                   ) : (
                     <div className="text-center py-8 text-gray-500 text-lg">
-                      Không tìm thấy mẫu thiết kế nào
+                      No designs found
                     </div>
                   )}
                 </>

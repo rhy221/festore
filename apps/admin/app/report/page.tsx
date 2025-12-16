@@ -31,7 +31,7 @@ const users: User[] = [
     email: "an.nguyen@example.com",
     phone: "0123456789",
     status: "active",
-    reportContent: "Nội dung vi phạm bản quyền",
+    reportContent: "Copyright violation details",
     reportDate: new Date(),
     annunciator: "Admin",
   },
@@ -43,7 +43,7 @@ const users: User[] = [
     email: "binh.pham@example.com",
     phone: "0123456789",
     status: "active",
-    reportContent: "Nội dung vi phạm bình luận",
+    reportContent: "Comment violation details",
     reportDate: new Date(),
     annunciator: "Admin",
   },
@@ -55,21 +55,20 @@ const users: User[] = [
     email: "cuong.trinh@example.com",
     phone: "0123456789",
     status: "active",
-    reportContent: "Nội dung vi phạm bản quyền",
+    reportContent: "Copyright violation details",
     reportDate: new Date(),
     annunciator: "Admin",
   },
 ];
 
-const displayUserViolate = (v: string) =>
-  v === "copyright" ? "Vi phạm bản quyền" : "Vi phạm bình luận";
+const displayUserViolation = (v: string) =>
+  v === "copyright" ? "Copyright Violation" : "Comment Violation";
 
 export default function AdminReportPage() {
   const [search, setSearch] = useState("");
-  const [showDetailViolate, setShowDetailViolate] = useState(false);
+  const [showDetailViolation, setShowDetailViolation] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  // Filter
   const filteredUsers = users.filter((u) => {
     const s = search.toLowerCase();
     return (
@@ -86,42 +85,38 @@ export default function AdminReportPage() {
       <Sidebar />
 
       <main className="bg-[#F7F7F8] ml-[296px] mt-32 p-8 min-h-[calc(100vh-8rem)]">
-        {/* Title */}
         <h2 className="text-2xl font-semibold tracking-tight mt-8">
-          Danh sách đang xử lý
+          Reports Under Review
         </h2>
 
-        {/* Search */}
         <div className="flex items-center gap-3 pt-3">
           <Input
             className="text-base py-2 px-4 rounded-xl border border-neutral-300 focus:ring-2 focus:ring-black/20"
-            placeholder="Nhập tên người dùng để tìm kiếm"
+            placeholder="Search by user name, email, or phone"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
 
           <Button className="bg-black text-base px-6 py-2 rounded-xl hover:bg-neutral-800 transition">
-            Tìm kiếm
+            Search
           </Button>
         </div>
 
-        {/* Table */}
         <div className="mt-6 bg-white rounded-xl shadow-sm border border-neutral-200 overflow-hidden">
           <UserTable
             users={filteredUsers}
             onClickRow={(u) => {
               setSelectedUser(u);
-              setShowDetailViolate(true);
+              setShowDetailViolation(true);
             }}
           />
         </div>
 
-        {/* Popup */}
-        {showDetailViolate && selectedUser && (
+        {showDetailViolation && selectedUser && (
           <AdminReportDetailPopup
             user={selectedUser}
             onClose={() => {
-              setShowDetailViolate(false);
+              setShowDetailViolation(false);
               setSelectedUser(null);
             }}
           />
@@ -142,9 +137,9 @@ function UserTable({
     <table className="w-full text-base">
       <thead className="bg-neutral-100 text-neutral-900">
         <tr>
-          <th className="p-4 font-semibold text-left">STT</th>
-          <th className="p-4 font-semibold text-left">Họ và tên</th>
-          <th className="p-4 font-semibold text-left">Vi phạm</th>
+          <th className="p-4 font-semibold text-left">No.</th>
+          <th className="p-4 font-semibold text-left">Full Name</th>
+          <th className="p-4 font-semibold text-left">Violation</th>
           <th className="p-4"></th>
         </tr>
       </thead>
@@ -158,7 +153,7 @@ function UserTable({
             <td className="p-4 text-neutral-700">{i + 1}</td>
             <td className="p-4 text-neutral-800">{u.name}</td>
             <td className="p-4 text-neutral-700">
-              {displayUserViolate(u.violate)}
+              {displayUserViolation(u.violate)}
             </td>
 
             <td className="p-4 text-right">
