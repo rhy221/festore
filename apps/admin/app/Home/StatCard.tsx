@@ -56,7 +56,7 @@ export default function QuickStats() {
     const fetchStats = async () => {
       try {
         setLoading(true);
-        const data = await getQuickStats(); // API thật
+        const data = await getQuickStats(); 
         setStats({
           userCount: data.userCount ?? 0,
           templateCount: data.templateCount ?? 0,
@@ -104,8 +104,8 @@ export default function QuickStats() {
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-          {statCards.map((stat, index) => (
-            <StatCard key={index} title={stat.title} value={stat.value} icon={stat.icon} />
+          {statCards.map((stat) => (
+            <StatCard key={stat.title} title={stat.title} value={stat.value} icon={stat.icon} />
           ))}
         </div>
       </div>

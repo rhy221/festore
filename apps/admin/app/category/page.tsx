@@ -1,10 +1,10 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "../../../../packages/ui/src/components/button";
 import { toast } from "sonner";
 import Sidebar from "components/Sidebar/Sidebar";
 import Header from "components/Header/Header";
-import { CategoriesAPI, Category } from "@/api/categories.api";
+import { CategoriesAPI, type Category } from "@/api/categories.api";
 import AdminCategoryAddPopup from "./AddCategory";
 import AdminCategoryEditPopup from "./EditCategory";
 import AdminCategoryDeletePopup from "./DeleteCategory";
@@ -74,21 +74,36 @@ export default function AdminCategoryPage() {
 
   const router = useRouter();
 
-  const loadCategories = async () => {
+  const loadCategories = useCallback(async () => {
     try {
       setLoading(true);
       const data = await CategoriesAPI.getCategories({});
-      setCategories(data);
-    } catch {
+
+      const rawData: any = data;
+      const categoryList: Category[] = (
+        Array.isArray(rawData)
+          ? rawData
+          : Array.isArray(rawData?.data)
+            ? rawData.data
+            : []
+      ).map((c: any) => ({
+        ...c,
+        id: c.id ?? c._id,
+      }));
+
+      setCategories(categoryList);
+    } catch (error) {
+      console.error("Lỗi tải danh mục:", error);
       toast.error("Không thể tải danh sách danh mục");
+      setCategories([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadCategories();
-  }, []);
+  }, [loadCategories]);
 
   const handleActionClick = (categoryId: string) => {
     setOpenDropdownId(openDropdownId === categoryId ? null : categoryId);

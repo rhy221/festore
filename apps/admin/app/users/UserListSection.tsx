@@ -7,6 +7,7 @@ import { Filter } from "lucide-react";
 import { User, UserStatusFilterType } from "./types";
 import { UsersAPI } from "@/api/users.api";
 import UserTable from "./UserTable";
+import { toast } from "sonner";
 
 export default function UserListSection() {
   const [search, setSearch] = useState("");
@@ -25,7 +26,19 @@ export default function UserListSection() {
     setLoading(true);
     try {
       const data = await UsersAPI.getUsers();
-      setUsers(data);
+      
+      const rawData: any = data;
+      const userList: User[] = Array.isArray(rawData) 
+          ? rawData 
+          : Array.isArray(rawData?.data) 
+              ? rawData.data 
+              : [];
+
+      setUsers(userList);
+    } catch (error) { 
+      console.error("Error fetching users:", error);
+      toast.error("Không thể tải danh sách người dùng.");
+      setUsers([]);
     } finally {
       setLoading(false);
     }
@@ -61,7 +74,7 @@ export default function UserListSection() {
         : u.status === userStatusFilter;
 
     const matchSearch = debouncedSearch
-      ? u.fullName
+      ? (u.fullName ?? "") 
           .toLowerCase()
           .includes(debouncedSearch.toLowerCase())
       : true;
@@ -82,6 +95,10 @@ export default function UserListSection() {
         await UsersAPI.blockUserAccount(userId);
       }
       await fetchUsers();
+      toast.success("Cập nhật trạng thái người dùng thành công.");
+    } catch (error) {
+      console.error("Error toggling lock:", error);
+      toast.error("Không thể cập nhật trạng thái người dùng.");
     } finally {
       setActionLoading(false);
     }
@@ -93,6 +110,10 @@ export default function UserListSection() {
     try {
       await UsersAPI.deleteUser(userId);
       await fetchUsers();
+      toast.success("Đã xóa người dùng thành công.");
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      toast.error("Không thể xóa người dùng.");
     } finally {
       setActionLoading(false);
     }

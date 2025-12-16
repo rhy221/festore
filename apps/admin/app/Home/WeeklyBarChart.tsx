@@ -37,7 +37,7 @@ export default function WeeklyChart({ data }: WeeklyChartProps) {
           setLoading(false);
           return;
         }
-
+        
         const apiData = await getWeeklyDesigns();
         setChartData(apiData);
       } catch (err) {
@@ -101,7 +101,8 @@ export default function WeeklyChart({ data }: WeeklyChartProps) {
             />
 
             <ChartTooltip content={<ChartTooltipContent />} />
-            <ChartLegend content={<ChartLegendContent />} />
+
+            <ChartLegend content={<ChartLegendContent />} /> 
 
             <Bar
               dataKey="designs"

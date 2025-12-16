@@ -35,7 +35,7 @@ export default function UserTable({
         <tbody>
           {users.map((u, i) => (
             <tr
-              key={u.id}
+              key={u.id || i} 
               className="border-b border-gray-200 hover:bg-blue-50 transition-colors"
             >
               <td className="p-3">{i + 1}</td>

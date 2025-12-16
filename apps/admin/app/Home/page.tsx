@@ -2,7 +2,6 @@
 
 import Header from "../../components/Header/Header";
 import Sidebar from "../../components/Sidebar/Sidebar";
-
 import QuickStats from "./StatCard";
 import TopThreeRankings from "./RankingCard";
 import WeeklyChart from "./WeeklyBarChart";
@@ -14,8 +13,6 @@ const HEADER_HEIGHT = "80px";
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-50">
-
-      {/* HEADER */}
       <div
         className="fixed top-0 left-0 right-0 z-20 bg-white shadow-md"
         style={{ height: HEADER_HEIGHT }}
@@ -23,10 +20,8 @@ export default function HomePage() {
         <Header role="admin" name="ABC" />
       </div>
 
-      {/* SIDEBAR */}
       <Sidebar />
 
-      {/* MAIN */}
       <main
         className="grow p-6"
         style={{ paddingTop: HEADER_HEIGHT, marginLeft: SIDEBAR_WIDTH }}

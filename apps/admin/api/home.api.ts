@@ -1,6 +1,6 @@
 import api from "@/lib/http";
 
-const BASE_URL = "/admin/api";
+const BASE_URL = "/api/admin";
 
 export interface StatsData {
   userCount: number;

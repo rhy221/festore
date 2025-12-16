@@ -3,9 +3,11 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import DesignDetailDialog, { type Design } from "../DesignDetail";
-import { UsersAPI, type User } from "@/api/users.api";
+import { UsersAPI } from "@/api/users.api";
 import Header from "@/components/Header/Header";
 import Sidebar from "@/components/Sidebar/Sidebar";
+import { toast } from "sonner";
+import api from "@/lib/http";
 
 const SIDEBAR_WIDTH = 240;
 const HEADER_HEIGHT = 80;
@@ -33,13 +35,13 @@ export interface UserDetail {
   };
 }
 
-
 export default function AdminDashboard() {
   const params = useParams();
   const userId = params?.id as string;
 
   const [user, setUser] = useState<UserDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [designLoading, setDesignLoading] = useState(false);
 
   const [selectedDesign, setSelectedDesign] = useState<Design | null>(null);
   const [showDialog, setShowDialog] = useState(false);
@@ -51,13 +53,26 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      if (!userId) return;
+      const parsedUserId = parseInt(userId);
+      if (!userId || isNaN(parsedUserId)) {
+        setLoading(false);
+        if (userId) toast.error("ID người dùng không hợp lệ.");
+        return;
+      }
+
       try {
         setLoading(true);
-        const response = await UsersAPI.getUserDetail(parseInt(userId));
-        setUser(response.data);
-      } catch (error) {
-        console.error("Error fetching user:", error);
+        const response = await UsersAPI.getUserDetail(parsedUserId);
+        const rawData: any = response;
+        const userData: UserDetail | null = rawData?.data || rawData;
+        setUser(userData);
+      } catch (error: any) {
+        toast.error(
+          `Không thể tải thông tin người dùng. Mã lỗi: ${
+            error.response?.status || "Mạng/Server"
+          }`
+        );
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -66,9 +81,38 @@ export default function AdminDashboard() {
     fetchUser();
   }, [userId]);
 
+  useEffect(() => {
+    const fetchDesigns = async () => {
+      const parsedUserId = parseInt(userId);
+      if (!userId || isNaN(parsedUserId) || user?.type !== "designer") return;
+
+      setDesignLoading(true);
+      try {
+        const res = await api.get(`/api/admin/users/${userId}/designs`);
+        const rawData: any = res.data;
+        const designList: Design[] = Array.isArray(rawData)
+          ? rawData
+          : Array.isArray(rawData?.data)
+          ? rawData.data
+          : [];
+        setDesigns(designList);
+      } catch {
+        toast.error("Không thể tải danh sách mẫu thiết kế.");
+        setDesigns([]);
+      } finally {
+        setDesignLoading(false);
+      }
+    };
+
+    if (user?.type === "designer") fetchDesigns();
+  }, [userId, user?.type]);
+
   const filteredDesigns = designs.filter((design) => {
-    const matchSearch = design.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchFilter = activeFilter === "Tất cả" || design.status === activeFilter;
+    const matchSearch = design.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchFilter =
+      activeFilter === "Tất cả" || design.status === activeFilter;
     return matchSearch && matchFilter;
   });
 
@@ -81,7 +125,7 @@ export default function AdminDashboard() {
         <Header role="admin" name="ABC" />
       </div>
 
-      <div className="flex-1 ml-0" style={{ marginLeft: SIDEBAR_WIDTH }}>
+      <div className="flex-1" style={{ marginLeft: SIDEBAR_WIDTH }}>
         <div
           className="fixed top-0 left-0 h-full bg-white shadow-lg"
           style={{ width: SIDEBAR_WIDTH }}
@@ -107,33 +151,36 @@ export default function AdminDashboard() {
                 <div className="flex flex-col items-center">
                   <img
                     src={
-                      user?.avatar ||
+                      user.avatar ||
                       "https://via.placeholder.com/200x200/6B7280/FFFFFF?text=User"
                     }
                     alt="Avatar"
                     className="w-48 h-48 rounded-full border mb-3"
                   />
                   <h2 className="text-2xl font-bold text-black">
-                    {user?.type === "designer" ? "NHÀ THIẾT KẾ" : "KHÁCH HÀNG"}
+                    {user.type === "designer" ? "NHÀ THIẾT KẾ" : "KHÁCH HÀNG"}
                   </h2>
                 </div>
 
                 <div className="grid grid-cols-2 gap-x-12 gap-y-2">
-                  <InfoRow label="Họ và tên đầy đủ" value={user?.name || ""} />
-                  <InfoRow label="Giới tính" value={user?.gender || ""} />
-                  <InfoRow label="Tên đăng nhập" value={user?.username || ""} />
-                  <InfoRow label="Ngày sinh" value={user?.dateOfBirth || ""} />
-                  <InfoRow label="Địa chỉ email" value={user?.email || ""} />
-                  <InfoRow label="Ngày tạo tài khoản" value={user?.createdAt || ""} />
-                  <InfoRow label="Số điện thoại" value={user?.phone || ""} />
-                  <InfoRow label="Trạng thái" value={user?.status || ""} />
+                  <InfoRow label="Họ và tên đầy đủ" value={user.name || ""} />
+                  <InfoRow label="Giới tính" value={user.gender || ""} />
+                  <InfoRow label="Tên đăng nhập" value={user.username || ""} />
+                  <InfoRow label="Ngày sinh" value={user.dateOfBirth || ""} />
+                  <InfoRow label="Địa chỉ email" value={user.email || ""} />
+                  <InfoRow
+                    label="Ngày tạo tài khoản"
+                    value={user.createdAt || ""}
+                  />
+                  <InfoRow label="Số điện thoại" value={user.phone || ""} />
+                  <InfoRow label="Trạng thái" value={user.status || ""} />
                   <div className="col-span-2">
-                    <InfoRow label="Mô tả" value={user?.description || ""} />
+                    <InfoRow label="Mô tả" value={user.description || ""} />
                   </div>
                 </div>
               </div>
 
-              {user?.type === "designer" && (
+              {user.type === "designer" && (
                 <>
                   <div className="flex gap-2 mb-4">
                     <input
@@ -145,28 +192,36 @@ export default function AdminDashboard() {
                   </div>
 
                   <div className="flex gap-7 mb-4">
-                    {["Tất cả", "Đang bán", "Đang đấu giá", "Đã bán", "Chia sẻ"].map(
-                      (filter) => (
-                        <button
-                          key={filter}
-                          onClick={() => setActiveFilter(filter)}
-                          className={`px-4 py-2 rounded-full text-lg ${
-                            activeFilter === filter
-                              ? "bg-blue-500 text-white"
-                              : "bg-gray-200 hover:bg-gray-300"
-                          }`}
-                        >
-                          {filter}
-                        </button>
-                      )
-                    )}
+                    {[
+                      "Tất cả",
+                      "Đang bán",
+                      "Đang đấu giá",
+                      "Đã bán",
+                      "Chia sẻ",
+                    ].map((filter) => (
+                      <button
+                        key={filter}
+                        onClick={() => setActiveFilter(filter)}
+                        className={`px-4 py-2 rounded-full text-lg ${
+                          activeFilter === filter
+                            ? "bg-blue-500 text-white"
+                            : "bg-gray-200 hover:bg-gray-300"
+                        }`}
+                      >
+                        {filter}
+                      </button>
+                    ))}
                   </div>
 
-                  {filteredDesigns.length > 0 ? (
+                  {designLoading ? (
+                    <div className="text-center py-8 text-gray-500 text-lg">
+                      Đang tải mẫu thiết kế...
+                    </div>
+                  ) : filteredDesigns.length > 0 ? (
                     <div className="grid grid-cols-3 gap-6">
-                      {filteredDesigns.map((design, index) => (
+                      {filteredDesigns.map((design) => (
                         <DesignCard
-                          key={index}
+                          key={design.id}
                           image={design.image}
                           title={design.name}
                           status={design.status}

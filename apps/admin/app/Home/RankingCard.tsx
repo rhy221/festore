@@ -102,7 +102,7 @@ export default function TopThreeRankings() {
     const fetchRankings = async () => {
       try {
         setLoading(true);
-        const data = await getTopRankings(); // API thật
+        const data = await getTopRankings(); 
         setTemplates(data.topTemplates ?? []);
         setDesigners(data.topDesigners ?? []);
       } catch (err) {
@@ -151,8 +151,8 @@ export default function TopThreeRankings() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 justify-items-center">
-            {templates.map((item, index) => (
-              <div key={index} className="relative">
+            {templates.map((item, index) => (              
+              <div key={`${item.title}-${item.subtitle || index}`} className="relative">
                 <div
                   className={`
                     absolute -top-2.5 -right-2.5 z-10 w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center shadow
@@ -182,8 +182,8 @@ export default function TopThreeRankings() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 justify-items-center">
-            {designers.map((item, index) => (
-              <div key={index} className="relative">
+            {designers.map((item, index) => (             
+              <div key={`${item.title}-${item.subtitle || index}`} className="relative">
                 <div
                   className={`
                     absolute -top-2.5 -right-2.5 z-10 w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center shadow

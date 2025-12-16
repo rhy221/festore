@@ -29,8 +29,8 @@ export default function LineChartComponent() {
   useEffect(() => {
     const fetchDailyData = async () => {
       try {
-        setLoading(true);
-        const apiData = await getDailyAccess(); // ⬅ API thật
+        setLoading(true);       
+        const apiData = await getDailyAccess(); 
         setData(apiData);
       } catch (err) {
         console.error("Error fetching daily access data:", err);

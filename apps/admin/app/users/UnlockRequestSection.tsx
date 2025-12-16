@@ -6,6 +6,7 @@ import UnlockRequestDialog, { type UnlockRequest } from "./UnlockRequest";
 import { UnlockStatusFilterType, displayUnlockStatus } from "./types";
 import UnlockRequestTable from "./UnlockRequestTable";
 import api from "@/lib/http";
+import { toast } from "sonner"; 
 
 export default function UnlockRequestSection() {
   const [search, setSearch] = useState("");
@@ -22,11 +23,27 @@ export default function UnlockRequestSection() {
   const [requests, setRequests] = useState<UnlockRequest[]>([]);
   const unlockStatusRef = useRef<HTMLDivElement | null>(null);
 
+  const fetchUnlockRequests = async () => {
+    try {
+      const res = await api.get("/api/admin/unlock-requests");
+      
+      const rawData: any = res.data;
+      const data = Array.isArray(rawData) ? rawData : rawData?.data;
+      
+      if (Array.isArray(data)) {
+        setRequests(data);
+      } else { 
+        setRequests([]); 
+      }
+    } catch (error) { 
+        console.error("Error fetching unlock requests:", error);
+        toast.error("Không thể tải yêu cầu mở khóa.");
+        setRequests([]); 
+    }
+  };
+
   useEffect(() => {
-    api
-      .get("/admin/api/unlock-requests")
-      .then((res) => setRequests(res.data))
-      .catch(() => {});
+    fetchUnlockRequests();
   }, []);
 
   useEffect(() => {
@@ -47,7 +64,7 @@ export default function UnlockRequestSection() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  const filteredRequests = requests.filter((r) => {
+  const filteredRequests = requests.filter((r) => { 
     const matchesStatus =
       unlockStatusFilter === "all"
         ? true
