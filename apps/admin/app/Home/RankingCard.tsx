@@ -2,73 +2,42 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@workspace/ui/components/card";
-import { ShoppingBag, Shirt, User } from "lucide-react";
+import { Shirt, User } from "lucide-react";
 import { getTopRankings, type TopTemplate, type TopDesigner } from "@/api/home.api";
 
-interface RankingCardProps {
+interface RankItemProps {
   icon: React.ReactNode;
   title: string;
-  subtitle: string;
   metric: string;
   isTopOne?: boolean;
 }
 
-function RankItemCard({ icon, title, subtitle, metric, isTopOne }: RankingCardProps) {
+function RankItem({ icon, title, metric, isTopOne }: RankItemProps) {
   return (
     <Card
-      className={`
-        group w-[220px] rounded-2xl bg-white transition-all duration-300 mx-auto
+      className={`group w-[220px] rounded-2xl transition-all duration-300 mx-auto
         hover:-translate-y-1
-        ${
-          isTopOne
-            ? "border-2 border-yellow-400 shadow-lg scale-[1.04] ring-2 ring-yellow-300/40"
-            : "border border-gray-200 shadow-sm hover:shadow-md"
-        }
-      `}
+        ${isTopOne
+          ? "border-2 border-yellow-400 shadow-lg scale-[1.04] ring-2 ring-yellow-300/40"
+          : "border border-gray-200 shadow-sm hover:shadow-md"
+        }`}
     >
       <CardContent className="p-4">
         <div className="flex flex-col gap-4">
           <div
-            className={`
-              w-10 h-10 rounded-xl flex items-center justify-center transition
-              ${
-                isTopOne
-                  ? "bg-yellow-400 text-black"
-                  : "bg-gray-100 text-gray-800 group-hover:bg-black group-hover:text-white"
-              }
-            `}
+            className={`w-10 h-10 rounded-xl flex items-center justify-center transition
+              ${isTopOne
+                ? "bg-yellow-400 text-black"
+                : "bg-gray-100 text-gray-800 group-hover:bg-black group-hover:text-white"
+              }`}
           >
             {icon}
           </div>
-
           <div>
-            <h3
-              className={`leading-tight mb-1 line-clamp-1 ${
-                isTopOne
-                  ? "text-sm font-bold text-gray-900"
-                  : "text-sm font-semibold text-gray-900"
-              }`}
-            >
+            <h3 className={`leading-tight mb-1 line-clamp-1 ${isTopOne ? "text-sm font-bold" : "text-sm font-semibold"}`}>
               {title}
             </h3>
-
-            {subtitle && (
-              <p
-                className={`line-clamp-1 mb-1 ${
-                  isTopOne ? "text-xs text-gray-600" : "text-xs text-gray-500"
-                }`}
-              >
-                {subtitle}
-              </p>
-            )}
-
-            <p
-              className={`tracking-wide ${
-                isTopOne
-                  ? "text-xs font-semibold text-yellow-600"
-                  : "text-xs font-medium text-gray-800"
-              }`}
-            >
+            <p className={`tracking-wide ${isTopOne ? "text-xs font-semibold text-yellow-600" : "text-xs font-medium text-gray-800"}`}>
               {metric}
             </p>
           </div>
@@ -78,24 +47,54 @@ function RankItemCard({ icon, title, subtitle, metric, isTopOne }: RankingCardPr
   );
 }
 
+function RankingSection<T extends { title: string; icon: string; metric: string }>({
+  title,
+  items
+}: {
+  title: string;
+  items: T[];
+}) {
+  const getIcon = (iconName: string, size = 18) => {
+    switch (iconName) {
+      case "shirt": return <Shirt size={size} />;
+      case "user": return <User size={size} />;
+      default: return <Shirt size={size} />;
+    }
+  };
+
+  return (
+    <section className="mb-14">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-lg font-bold text-gray-900">{title}</h2>
+        <div className="h-px flex-1 ml-5 bg-gray-200"></div>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 justify-items-center">
+        {items.map((item, index) => (
+          <div key={`${item.title}-${index}`} className="relative">
+            <div
+              className={`absolute -top-2.5 -right-2.5 z-10 w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center shadow
+                ${index === 0 ? "bg-yellow-400 text-black" : "bg-black text-white"}`}
+            >
+              {index + 1}
+            </div>
+            <RankItem
+              icon={getIcon(item.icon)}
+              title={item.title}
+              metric={item.metric}
+              isTopOne={index === 0}
+            />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default function TopRankingsSection() {
   const [topTemplates, setTopTemplates] = useState<TopTemplate[]>([]);
   const [topDesigners, setTopDesigners] = useState<TopDesigner[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
-
-  const getIcon = (iconName?: string, size = 18) => {
-    switch (iconName) {
-      case "bag":
-        return <ShoppingBag size={size} />;
-      case "shirt":
-        return <Shirt size={size} />;
-      case "user":
-        return <User size={size} />;
-      default:
-        return <ShoppingBag size={size} />;
-    }
-  };
 
   useEffect(() => {
     const fetchRankings = async () => {
@@ -105,13 +104,12 @@ export default function TopRankingsSection() {
         setTopTemplates(data.topTemplates ?? []);
         setTopDesigners(data.topDesigners ?? []);
       } catch (err) {
-        console.error("Error fetching rankings:", err);
-        setFetchError("Unable to load ranking data");
+        console.error(err);
+        setFetchError("Failed to fetch rankings.");
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchRankings();
   }, []);
 
@@ -141,65 +139,8 @@ export default function TopRankingsSection() {
           </div>
         )}
 
-        <section className="mb-14">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold text-gray-900">Top Templates</h2>
-            <div className="h-px flex-1 ml-5 bg-gray-200"></div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 justify-items-center">
-            {topTemplates.map((item, index) => (
-              <div key={`${item.title}-${item.subtitle || index}`} className="relative">
-                <div
-                  className={`
-                    absolute -top-2.5 -right-2.5 z-10 w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center shadow
-                    ${index === 0 ? "bg-yellow-400 text-black" : "bg-black text-white"}
-                  `}
-                >
-                  {index + 1}
-                </div>
-
-                <RankItemCard
-                  icon={getIcon(item.icon)}
-                  title={item.title}
-                  subtitle={item.subtitle}
-                  metric={item.metric}
-                  isTopOne={index === 0}
-                />
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold text-gray-900">Top Designers</h2>
-            <div className="h-px flex-1 ml-5 bg-gray-200"></div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 justify-items-center">
-            {topDesigners.map((item, index) => (
-              <div key={`${item.title}-${item.subtitle || index}`} className="relative">
-                <div
-                  className={`
-                    absolute -top-2.5 -right-2.5 z-10 w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center shadow
-                    ${index === 0 ? "bg-yellow-400 text-black" : "bg-black text-white"}
-                  `}
-                >
-                  {index + 1}
-                </div>
-
-                <RankItemCard
-                  icon={getIcon(item.icon)}
-                  title={item.title}
-                  subtitle={item.subtitle}
-                  metric={item.metric}
-                  isTopOne={index === 0}
-                />
-              </div>
-            ))}
-          </div>
-        </section>
+        <RankingSection title="Top Templates" items={topTemplates} />
+        <RankingSection title="Top Designers" items={topDesigners} />
       </div>
     </div>
   );

@@ -1,7 +1,9 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@workspace/ui/components/card";
 import { Users, FileText, Grid3x3 } from "lucide-react";
-import { getQuickStats } from "@/api/home.api";
+import { getQuickStats, type StatsData } from "@/api/home.api";
 
 interface StatCardProps {
   title: string;
@@ -19,10 +21,9 @@ function StatCard({ title, value, icon }: StatCardProps) {
               {title}
             </p>
             <p className="text-3xl font-extrabold text-gray-900">
-              {value.toLocaleString("en-US")}
+              {value?.toLocaleString("en-US") ?? 0}
             </p>
           </div>
-
           <div className="w-12 h-12 rounded-xl border border-gray-200 flex items-center justify-center text-gray-700 group-hover:bg-black group-hover:text-white transition">
             {icon}
           </div>
@@ -36,19 +37,12 @@ function StatCard({ title, value, icon }: StatCardProps) {
   );
 }
 
-interface StatsData {
-  userCount: number;
-  templateCount: number;
-  categoryCount: number;
-}
-
 export default function QuickStats() {
   const [stats, setStats] = useState<StatsData>({
     userCount: 0,
     templateCount: 0,
     categoryCount: 0,
   });
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -57,6 +51,9 @@ export default function QuickStats() {
       try {
         setLoading(true);
         const data = await getQuickStats();
+        console.log("Fetched Quick Stats:", data); // ✅ log dữ liệu backend
+
+        // fallback 0 nếu backend trả undefined
         setStats({
           userCount: data.userCount ?? 0,
           templateCount: data.templateCount ?? 0,
@@ -73,7 +70,7 @@ export default function QuickStats() {
     fetchStats();
   }, []);
 
-  const statCards = [
+  const statCards: StatCardProps[] = [
     { title: "Users", value: stats.userCount, icon: <Users size={22} /> },
     { title: "Templates", value: stats.templateCount, icon: <FileText size={22} /> },
     { title: "Categories", value: stats.categoryCount, icon: <Grid3x3 size={22} /> },
