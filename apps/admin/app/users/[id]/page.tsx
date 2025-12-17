@@ -1,99 +1,99 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
-import DesignDetailDialog, { type Design } from "../DesignDetail";
 import Header from "@/components/Header/Header";
 import Sidebar from "@/components/Sidebar/Sidebar";
+import DesignDetailDialog from "../DesignDetail";
+import { UsersAPI, type Design } from "@/api/users.api";
+import { ArrowUpDown } from "lucide-react";
 import { toast } from "sonner";
-import api from "@/lib/http";
+
 
 const SIDEBAR_WIDTH = 240;
 const HEADER_HEIGHT = 80;
 
-export interface UserDetail {
+interface UserDetail {
   id: string;
   type: "designer" | "customer";
   email?: string;
-  phone?: string;
   createdAt?: string;
-  lastLogin?: string;
-  gender?: string;
-  dateOfBirth?: string;
   name?: string;
   avatar?: string;
   bio?: string;
   status?: string;
-  stats?: {
-    designsPosted: number;
-    totalRevenue: number;
-    totalSold: number;
-    followers: number;
-    rating?: number;
-  };
 }
 
-export default function AdminDashboard() {
+const resolveDesignTitle = (design?: Design) => {
+  if (!design) return "Untitled";
+  if (typeof design.title === "string" && design.title.trim()) {
+    return design.title;
+  }
+  return "Untitled";
+};
+
+const resolveDesignImage = (design?: Design) => {
+  if (!design) return "";
+
+  const raw = design.imageUrls?.[0];
+  if (!raw || typeof raw !== "string") return "";
+
+  if (raw.startsWith("http")) return raw;
+
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (!baseUrl) return "";
+
+  return `${baseUrl}/${raw.replace(/^\/+/, "")}`;
+};
+
+
+export default function AdminUserDetailPage() {
   const params = useParams();
-  const userId = params?.id as string;
+  const userId = params?.id as string | undefined;
 
   const [user, setUser] = useState<UserDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [designLoading, setDesignLoading] = useState(false);
+
   const [designs, setDesigns] = useState<Design[]>([]);
+  const [designLoading, setDesignLoading] = useState(false);
+
   const [selectedDesign, setSelectedDesign] = useState<Design | null>(null);
-  const [showDialog, setShowDialog] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeFilter, setActiveFilter] = useState("All");
+  const [sortAsc, setSortAsc] = useState(true);
 
   useEffect(() => {
-    if (!userId) {
-      toast.error("Invalid user ID.");
-      setLoading(false);
-      return;
-    }
+    if (!userId) return;
 
     const fetchUser = async () => {
       setLoading(true);
       try {
-        const res = await api.get(`/api/admin/users/${userId}`);
-        const data = res.data;
-        if (!data?.user) {
-          toast.error("User information not found");
+        const res = await UsersAPI.getUserDetail(userId);
+        const userBase = res?.user;
+        const profile = res?.profile;
+
+        if (!userBase) {
           setUser(null);
           return;
         }
 
-        const userBase = data.user;
-        const profile = data.profile || {};
-        const userData: UserDetail = {
+        setUser({
           id: userBase._id,
-          type: userBase.role?.includes("designer") ? "designer" : "customer",
+          type: Array.isArray(userBase.role) &&
+            userBase.role.includes("designer")
+            ? "designer"
+            : "customer",
           email: userBase.email,
           createdAt: userBase.createdAt,
           status: userBase.state,
-          name: profile.name || userBase.email,
-          avatar: profile.avatarUrl,
-          bio: profile.bio,
-          stats:
-            userBase.role?.includes("designer")
-              ? {
-                  designsPosted: profile.totalDesigns || 0,
-                  totalRevenue: profile.totalRevenue || 0,
-                  totalSold: profile.totalSold || 0,
-                  followers: profile.followerCount || 0,
-                  rating: profile.rating,
-                }
-              : undefined,
-        };
-        setUser(userData);
-      } catch (err: any) {
-        console.error("Error fetching user:", err);
-        toast.error(
-          `Failed to load user information. ${
-            err.response?.status ? "Error code: " + err.response.status : "Network/Server error"
-          }`
-        );
+          name: profile?.name ?? userBase.email ?? "Unknown",
+          avatar: profile?.avatarUrl,
+          bio: profile?.bio,
+        });
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to load user information");
         setUser(null);
       } finally {
         setLoading(false);
@@ -109,24 +109,11 @@ export default function AdminDashboard() {
     const fetchDesigns = async () => {
       setDesignLoading(true);
       try {
-        const res = await api.get(`/api/admin/users/${userId}/designs`);
-        const designList: Design[] = Array.isArray(res.data)
-          ? res.data
-          : Array.isArray(res.data?.data)
-          ? res.data.data
-          : [];
-        setDesigns(designList);
-      } catch (err: any) {
-        if (err.response) {
-          console.error("Error fetching designs: Response error", err.response.data, err.response.status);
-          toast.error(`Failed to load designs. Status: ${err.response.status}`);
-        } else if (err.request) {
-          console.error("Error fetching designs: No response", err.request);
-          toast.error("Failed to load designs. No response from server.");
-        } else {
-          console.error("Error fetching designs:", err.message);
-          toast.error("Failed to load designs. " + err.message);
-        }
+        const data = await UsersAPI.getUserDesigns(userId);
+        setDesigns(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to load designs");
         setDesigns([]);
       } finally {
         setDesignLoading(false);
@@ -136,22 +123,32 @@ export default function AdminDashboard() {
     fetchDesigns();
   }, [userId, user?.type]);
 
-  const filteredDesigns = designs.filter(
-    (design) =>
-      design.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (activeFilter === "All" || design.status === activeFilter)
-  );
+  const filteredDesigns = useMemo(() => {
+    const keyword = (searchTerm ?? "").toLowerCase();
+
+    return designs
+      .filter((d) =>
+        resolveDesignTitle(d).toLowerCase().includes(keyword)
+      )
+      .sort((a, b) =>
+        sortAsc
+          ? resolveDesignTitle(a).localeCompare(resolveDesignTitle(b))
+          : resolveDesignTitle(b).localeCompare(resolveDesignTitle(a))
+      );
+  }, [designs, searchTerm, sortAsc]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex text-black">
+      {/* HEADER */}
       <div
         className="fixed top-0 right-0 z-20 bg-white shadow-md"
         style={{ height: HEADER_HEIGHT, left: SIDEBAR_WIDTH }}
       >
-        <Header role="admin" name="ABC" />
+        <Header role="admin" name="Admin" />
       </div>
 
       <div className="flex-1" style={{ marginLeft: SIDEBAR_WIDTH }}>
+        {/* SIDEBAR */}
         <div
           className="fixed top-0 left-0 h-full bg-white shadow-lg"
           style={{ width: SIDEBAR_WIDTH }}
@@ -159,91 +156,86 @@ export default function AdminDashboard() {
           <Sidebar />
         </div>
 
+        {/* CONTENT */}
         <main
-          className="flex-1 bg-white p-6 overflow-y-auto text-lg"
+          className="p-6 bg-white overflow-y-auto"
           style={{ marginTop: HEADER_HEIGHT }}
         >
           {loading ? (
-            <div className="flex items-center justify-center h-64 text-xl">
-              Loading user information...
-            </div>
+            <div className="text-center text-xl py-20">Loading...</div>
           ) : !user ? (
-            <div className="flex items-center justify-center h-64 text-xl text-red-500">
-              User information not found
+            <div className="text-center text-xl text-red-500 py-20">
+              User not found
             </div>
           ) : (
             <>
-              <div className="flex gap-6 items-center mb-6">
-                <div className="flex flex-col items-center">
-                  <img
-                    src={user.avatar || "https://via.placeholder.com/200x200/6B7280/FFFFFF?text=User"}
-                    alt="Avatar"
-                    className="w-48 h-48 rounded-full border mb-3"
-                  />
-                  <h2 className="text-2xl font-bold text-black">
-                    {user.type === "designer" ? "DESIGNER" : "CUSTOMER"}
-                  </h2>
-                </div>
+              {/* USER INFO */}
+              <div className="flex gap-6 mb-8">
+                <img
+                  src={
+                    user.avatar ||
+                    "https://via.placeholder.com/200x200/6B7280/FFFFFF?text=User"
+                  }
+                  alt="User avatar"
+                  className="w-48 h-48 rounded-full border object-cover"
+                />
 
-                <div className="grid grid-cols-2 gap-x-12 gap-y-2">
-                  <InfoRow label="Full Name" value={user.name || ""} />
-                  <InfoRow label="Email" value={user.email || ""} />
-                  <InfoRow label="Status" value={user.status || ""} />
-                  <InfoRow label="Account Created At" value={user.createdAt || ""} />
+                <div className="grid grid-cols-2 gap-x-10 gap-y-2">
+                  <InfoRow label="Name" value={user.name ?? "-"} />
+                  <InfoRow label="Email" value={user.email ?? "-"} />
+                  <InfoRow label="Status" value={user.status ?? "-"} />
+                  <InfoRow label="Created At" value={user.createdAt ?? "-"} />
                   <div className="col-span-2">
-                    <InfoRow label="Bio" value={user.bio || ""} />
+                    <InfoRow label="Bio" value={user.bio ?? "-"} />
                   </div>
                 </div>
               </div>
 
+              {/* DESIGNS */}
               {user.type === "designer" && (
                 <>
-                  <div className="flex gap-2 mb-4">
+                  <div className="flex gap-4 mb-4">
                     <input
-                      placeholder="Search designs by name"
                       value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="bg-[#BFE3F3] flex-1 rounded-full px-4 py-2 border text-lg"
+                      onChange={(e) => setSearchTerm(e.target.value ?? "")}
+                      placeholder="Search designs"
+                      className="flex-1 px-4 py-2 border rounded-lg"
                     />
-                  </div>
-
-                  <div className="flex gap-7 mb-4">
-                    {["All", "On Sale", "Auctioning", "Sold", "Shared"].map((filter) => (
-                      <button
-                        key={filter}
-                        onClick={() => setActiveFilter(filter)}
-                        className={`px-4 py-2 rounded-full text-lg ${
-                          activeFilter === filter
-                            ? "bg-blue-500 text-white"
-                            : "bg-gray-200 hover:bg-gray-300"
+                    <button
+                      onClick={() => setSortAsc((v) => !v)}
+                      className="w-11 h-11 border rounded-lg flex items-center justify-center"
+                    >
+                      <ArrowUpDown
+                        className={`transition-transform ${
+                          sortAsc ? "" : "rotate-180"
                         }`}
-                      >
-                        {filter}
-                      </button>
-                    ))}
+                      />
+                    </button>
                   </div>
 
                   {designLoading ? (
-                    <div className="text-center py-8 text-gray-500 text-lg">
+                    <div className="py-10 text-center text-gray-500">
                       Loading designs...
                     </div>
                   ) : filteredDesigns.length > 0 ? (
                     <div className="grid grid-cols-3 gap-6">
-                      {filteredDesigns.map((design) => (
-                        <DesignCard
-                          key={design.id}
-                          image={design.image}
-                          title={design.name}
-                          status={design.status}
-                          onClick={() => {
-                            setSelectedDesign(design);
-                            setShowDialog(true);
-                          }}
-                        />
-                      ))}
+                      {filteredDesigns.map((design, index) => {
+                        const key = design._id ? design._id : `design-${index}`;
+                        return (
+                          <DesignCard
+                            key={key}
+                            design={design}
+                            onClick={() => {
+                              setSelectedDesign(design);
+                              setOpenDialog(true);
+                            }}
+                          />
+                        );
+                      })}
                     </div>
+
                   ) : (
-                    <div className="text-center py-8 text-gray-500 text-lg">
+                    <div className="py-10 text-center text-gray-500">
                       No designs found
                     </div>
                   )}
@@ -254,11 +246,12 @@ export default function AdminDashboard() {
         </main>
       </div>
 
+      {/* DIALOG */}
       {user?.type === "designer" && (
         <DesignDetailDialog
           design={selectedDesign}
-          open={showDialog}
-          onOpenChange={setShowDialog}
+          open={openDialog}
+          onOpenChange={setOpenDialog}
         />
       )}
     </div>
@@ -267,7 +260,7 @@ export default function AdminDashboard() {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <p className="leading-snug">
+    <p>
       <span className="font-semibold">{label}: </span>
       {value}
     </p>
@@ -275,28 +268,34 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 }
 
 function DesignCard({
-  image,
-  title,
-  status,
+  design,
   onClick,
 }: {
-  image: string;
-  title: string;
-  status: string;
+  design: Design;
   onClick: () => void;
 }) {
+  const image = resolveDesignImage(design);
+  const title = resolveDesignTitle(design);
+
   return (
     <div
-      className="rounded-lg border border-[#6a360e] p-4 shadow-sm hover:shadow-md bg-[#faf0e6] text-black flex flex-col items-center text-center h-72 justify-center cursor-pointer transition-shadow"
       onClick={onClick}
+      className="cursor-pointer border rounded-lg p-4 text-center bg-[#faf0e6] hover:shadow-md"
     >
-      <img
-        src={image}
-        alt={title}
-        className="w-40 h-40 object-cover rounded-md mb-4 border border-white/20"
-      />
-      <p className="font-semibold text-lg">{title}</p>
-      <p className="font-semibold text-lg mt-1">{status}</p>
+      {image ? (
+        <img
+          src={image}
+          alt={title}
+          className="w-40 h-40 mx-auto object-cover rounded mb-3"
+        />
+      ) : (
+        <div className="w-40 h-40 mx-auto flex items-center justify-center bg-gray-200 rounded mb-3 text-sm text-gray-500">
+          No image
+        </div>
+      )}
+
+      <p className="font-semibold truncate">{title}</p>
+      <p className="text-sm">{design.status ?? "-"}</p>
     </div>
   );
 }

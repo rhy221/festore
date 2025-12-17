@@ -2,6 +2,8 @@ import api from "@/lib/http";
 
 const BASE_URL = "/api/admin";
 
+/* ===================== USER ===================== */
+
 export interface User {
   _id: string;
   email: string;
@@ -24,6 +26,53 @@ export interface User {
   }>;
 }
 
+/* ===================== DESIGN ===================== */
+
+export interface Design {
+  _id: string;
+  designerId: string;
+
+  title: string;
+  description: string;
+
+  imageUrls?: string[];
+  displayModelUrl?: string;
+
+  categoryId?: string;
+  style?: string;
+  gender?: string;
+  tags?: string[];
+
+  type?: "fixed" | "auction";
+  price?: number;
+
+  purchaseCount?: number;
+  totalEarning?: number;
+
+  modelFiles?: {
+    publicId: string;
+    format: string;
+    originalName: string;
+    size: number;
+  }[];
+
+  status?: string;
+  state?: string;
+
+  totalBids?: number;
+  viewCount?: number;
+  likeCount?: number;
+
+  averageRating?: number;
+  ratingCount?: number;
+  commentCount?: number;
+
+  isDeleted?: boolean;
+
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface UnlockRequest {
   id: string;
   name: string;
@@ -43,6 +92,15 @@ export const UsersAPI = {
     return res.data;
   },
 
+  getUserDesigns: async (id: string): Promise<Design[]> => {
+    const res = await api.get(`${BASE_URL}/users/${id}/designs`);
+    return Array.isArray(res.data)
+      ? res.data
+      : Array.isArray(res.data?.data)
+      ? res.data.data
+      : [];
+  },
+
   blockUserAccount: async (id: string) => {
     const res = await api.patch(`${BASE_URL}/users/block/${id}`);
     return res.data;
@@ -59,36 +117,22 @@ export const UsersAPI = {
   },
 
   getUnlockRequests: async (): Promise<UnlockRequest[]> => {
-    try {
-      const res = await api.get(`${BASE_URL}/unlock-requests`);
-      if (Array.isArray(res.data)) return res.data;
-      if (Array.isArray(res.data?.data)) return res.data.data;
-      console.warn("Unexpected unlock requests response:", res.data);
-      return [];
-    } catch (err) {
-      console.error("Error fetching unlock requests:", err);
-      return [];
-    }
+    const res = await api.get(`${BASE_URL}/unlock-requests`);
+    return Array.isArray(res.data)
+      ? res.data
+      : Array.isArray(res.data?.data)
+      ? res.data.data
+      : [];
   },
 
   approveUnlockRequest: async (id: string) => {
-    try {
-      const res = await api.patch(`${BASE_URL}/unlock-requests/approve/${id}`);
-      return res.data;
-    } catch (err) {
-      console.error("Error approving unlock request:", err);
-      throw err;
-    }
+    const res = await api.patch(`${BASE_URL}/unlock-requests/approve/${id}`);
+    return res.data;
   },
 
   rejectUnlockRequest: async (id: string) => {
-    try {
-      const res = await api.patch(`${BASE_URL}/unlock-requests/reject/${id}`);
-      return res.data;
-    } catch (err) {
-      console.error("Error rejecting unlock request:", err);
-      throw err;
-    }
+    const res = await api.patch(`${BASE_URL}/unlock-requests/reject/${id}`);
+    return res.data;
   },
 };
 

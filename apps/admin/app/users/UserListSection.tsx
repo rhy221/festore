@@ -3,20 +3,21 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Input } from "@workspace/ui/components/input";
 import { Filter } from "lucide-react";
-
-import { User, UserStatusFilterType } from "./types";
-import { UsersAPI } from "@/api/users.api";
+import { User, UsersAPI } from "@/api/users.api";
 import UserTable from "./UserTable";
 import { toast } from "sonner";
+
+type UserStateFilterType = "all" | "active" | "blocked";
 
 export default function UserListSection() {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [showUserStatusDropdown, setShowUserStatusDropdown] = useState(false);
-  const [userStatusFilter, setUserStatusFilter] =
-    useState<UserStatusFilterType>("all");
 
-  const userStatusRef = useRef<HTMLDivElement | null>(null);
+  const [showUserStateDropdown, setShowUserStateDropdown] = useState(false);
+  const [userStateFilter, setUserStateFilter] =
+    useState<UserStateFilterType>("all");
+
+  const userStateRef = useRef<HTMLDivElement | null>(null);
 
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
@@ -26,17 +27,13 @@ export default function UserListSection() {
     setLoading(true);
     try {
       const res = await UsersAPI.getUsers();
-
-      const rawData: any = res;
-      const userList: User[] = Array.isArray(rawData)
-        ? rawData
-        : Array.isArray(rawData?.data)
-        ? rawData.data
+      const list = Array.isArray(res)
+        ? res
+        : Array.isArray(res?.data)
+        ? res.data
         : [];
-
-      setUsers(userList);
-    } catch (error) {
-      console.error("Error fetching users:", error);
+      setUsers(list);
+    } catch {
       toast.error("Failed to load user list.");
       setUsers([]);
     } finally {
@@ -54,37 +51,35 @@ export default function UserListSection() {
   }, [search]);
 
   useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
+    const handleClickOutside = (e: MouseEvent) => {
       if (
-        userStatusRef.current &&
-        !userStatusRef.current.contains(e.target as Node)
+        userStateRef.current &&
+        !userStateRef.current.contains(e.target as Node)
       ) {
-        setShowUserStatusDropdown(false);
+        setShowUserStateDropdown(false);
       }
-    }
+    };
     document.addEventListener("mousedown", handleClickOutside);
     return () =>
       document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const filteredUsers = users.filter((u) => {
-    const matchStatus =
-      userStatusFilter === "all" ? true : u.status === userStatusFilter;
+    const matchState =
+      userStateFilter === "all" ? true : u.state === userStateFilter;
 
     const matchSearch = debouncedSearch
-      ? (u.fullName ?? "")
-          .toLowerCase()
-          .includes(debouncedSearch.toLowerCase())
+      ? u.email.toLowerCase().includes(debouncedSearch.toLowerCase())
       : true;
 
-    return matchStatus && matchSearch;
+    return matchState && matchSearch;
   });
 
-  const handleViewDetail = (userId: number) => {
+  const handleViewDetail = (userId: string) => {
     window.location.href = `/admin/users/${userId}`;
   };
 
-  const handleToggleLock = async (userId: number, isLocked: boolean) => {
+  const handleToggleLock = async (userId: string, isLocked: boolean) => {
     setActionLoading(true);
     try {
       if (isLocked) {
@@ -93,25 +88,22 @@ export default function UserListSection() {
         await UsersAPI.blockUserAccount(userId);
       }
       await fetchUsers();
-      toast.success("User status updated successfully.");
-    } catch (error) {
-      console.error("Error toggling lock:", error);
-      toast.error("Failed to update user status.");
+      toast.success("User state updated successfully.");
+    } catch {
+      toast.error("Failed to update user state.");
     } finally {
       setActionLoading(false);
     }
   };
 
-  const handleDeleteUser = async (userId: number) => {
+  const handleDeleteUser = async (userId: string) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
-
     setActionLoading(true);
     try {
       await UsersAPI.deleteUser(userId);
       await fetchUsers();
       toast.success("User deleted successfully.");
-    } catch (error) {
-      console.error("Error deleting user:", error);
+    } catch {
       toast.error("Failed to delete user.");
     } finally {
       setActionLoading(false);
@@ -128,42 +120,42 @@ export default function UserListSection() {
       <div className="flex flex-1 max-w-lg mb-6">
         <Input
           className="flex-1 px-4 py-3 rounded-full border border-gray-200"
-          placeholder="Search by user name"
+          placeholder="Search by email"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
       </div>
 
-      {/* Filters */}
+      {/* State filter */}
       <div className="flex flex-wrap gap-4 mb-6">
-        <div className="relative" ref={userStatusRef}>
+        <div className="relative" ref={userStateRef}>
           <div
             className="flex items-center gap-2 cursor-pointer px-4 py-2 bg-white border rounded-full"
-            onClick={() => setShowUserStatusDropdown((s) => !s)}
+            onClick={() => setShowUserStateDropdown((s) => !s)}
           >
-            <span className="text-gray-700 font-medium">Status</span>
+            <span className="text-gray-700 font-medium">State</span>
             <Filter className="h-5 w-5 text-gray-500" />
           </div>
 
-          {showUserStatusDropdown && (
+          {showUserStateDropdown && (
             <div className="absolute mt-2 w-44 bg-white border rounded-xl shadow-lg z-50">
-              {(["all", "ACTIVE", "BLOCKED"] as UserStatusFilterType[]).map(
-                (status) => (
+              {(["all", "active", "blocked"] as UserStateFilterType[]).map(
+                (state) => (
                   <button
-                    key={status}
+                    key={state}
                     className={`w-full text-left px-4 py-2 hover:bg-blue-50 ${
-                      userStatusFilter === status
+                      userStateFilter === state
                         ? "bg-blue-100 font-semibold"
                         : ""
                     }`}
                     onClick={() => {
-                      setUserStatusFilter(status);
-                      setShowUserStatusDropdown(false);
+                      setUserStateFilter(state);
+                      setShowUserStateDropdown(false);
                     }}
                   >
-                    {status === "all"
+                    {state === "all"
                       ? "All"
-                      : status === "ACTIVE"
+                      : state === "active"
                       ? "Active"
                       : "Blocked"}
                   </button>
@@ -174,13 +166,13 @@ export default function UserListSection() {
         </div>
       </div>
 
-      {/* Table */}
       <UserTable
         users={filteredUsers}
         onViewDetail={handleViewDetail}
         onToggleLock={handleToggleLock}
         onDeleteUser={handleDeleteUser}
-        isLoading={loading || actionLoading}
+        isLoading={loading}      
+        actionLoading={actionLoading}
       />
     </section>
   );

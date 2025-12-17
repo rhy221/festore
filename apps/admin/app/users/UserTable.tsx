@@ -7,7 +7,8 @@ type UserTableProps = {
   onViewDetail: (userId: string) => void;
   onToggleLock: (userId: string, willLock: boolean) => void;
   onDeleteUser: (userId: string) => void;
-  isLoading?: boolean;
+  isLoading?: boolean;       
+  actionLoading?: boolean;  
 };
 
 export default function UserTable({
@@ -16,6 +17,7 @@ export default function UserTable({
   onToggleLock,
   onDeleteUser,
   isLoading = false,
+  actionLoading = false,
 }: UserTableProps) {
   const filteredUsers = users.filter(u => u.email && u.email.trim() !== "");
 
@@ -34,7 +36,7 @@ export default function UserTable({
         <tbody>
           {filteredUsers.map((u, i) => (
             <tr
-              key={u._id ?? i}
+              key={u._id}
               className="border-b border-gray-200 hover:bg-blue-50 transition-colors"
             >
               <td className="p-3">{i + 1}</td>
@@ -52,16 +54,18 @@ export default function UserTable({
               </td>
               <td className="p-3 flex justify-center items-center gap-4">
                 <button
-                  className={`p-2 rounded-full hover:bg-gray-200 ${isLoading ? "opacity-50 pointer-events-none" : ""}`}
+                  className="p-2 rounded-full hover:bg-gray-200"
                   onClick={() => onViewDetail(u._id)}
                   title="View details"
                 >
                   <EyeIcon size={22} />
                 </button>
-
+               
                 {u.state === "blocked" ? (
                   <button
-                    className={`p-2 rounded-full hover:bg-green-100 ${isLoading ? "opacity-50 pointer-events-none" : ""}`}
+                    className={`p-2 rounded-full hover:bg-green-100 ${
+                      actionLoading ? "opacity-50 pointer-events-none" : ""
+                    }`}
                     onClick={() => onToggleLock(u._id, false)}
                     title="Unlock account"
                   >
@@ -69,7 +73,9 @@ export default function UserTable({
                   </button>
                 ) : (
                   <button
-                    className={`p-2 rounded-full hover:bg-red-100 ${isLoading ? "opacity-50 pointer-events-none" : ""}`}
+                    className={`p-2 rounded-full hover:bg-red-100 ${
+                      actionLoading ? "opacity-50 pointer-events-none" : ""
+                    }`}
                     onClick={() => onToggleLock(u._id, true)}
                     title="Lock account"
                   >
@@ -78,7 +84,9 @@ export default function UserTable({
                 )}
 
                 <button
-                  className={`p-2 rounded-full hover:bg-red-100 ${isLoading ? "opacity-50 pointer-events-none" : ""}`}
+                  className={`p-2 rounded-full hover:bg-red-100 ${
+                    actionLoading ? "opacity-50 pointer-events-none" : ""
+                  }`}
                   onClick={() => onDeleteUser(u._id)}
                   title="Delete account"
                 >
@@ -91,7 +99,9 @@ export default function UserTable({
       </table>
 
       {filteredUsers.length === 0 && (
-        <div className="text-center py-12 text-gray-400">No users found</div>
+        <div className="text-center py-12 text-gray-400">
+          {isLoading ? "Loading users..." : "No users found"}
+        </div>
       )}
     </div>
   );
