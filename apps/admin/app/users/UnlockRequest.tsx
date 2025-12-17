@@ -6,8 +6,9 @@ import { BackspaceIcon } from "@heroicons/react/24/solid";
 import { CheckCircle2Icon, MinusCircle } from "lucide-react";
 
 type UnlockRequest = {
-  id: number;
-  name: string;
+  id: string; // id của unlock request
+  email: string; // email người dùng
+  role: string[]; 
   reason: string;
   date: string;
   status: "pending" | "processed";
@@ -33,29 +34,18 @@ export default function UnlockRequestDialog({
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [tempUser, setTempUser] = useState<User | null>(null);
 
-
   useEffect(() => {
     if (request && open && !currentUser) {
+      // Sử dụng trực tiếp dữ liệu từ request
       const initialUser: User = {
-        id: request.id, 
-        fullName: request.name,
-        role: "Designer",
-        email: "maicuong123@gmail.com",
-        phone: "0123456789",
-        status: "Locked",
-        lockDate: "10/07/2025",
-        lockReason:
-          "The account was locked due to more than three copyright violation reports within seven days.",
-        appealReason: request.reason,
-        processingHistory: [
-          {
-            id: 1,
-            processor: "Nguyen Thi Binh",
-            processDate: "15/07/2025",
-            action: "Rejected",
-            note: "Previous violation, infringing designs not removed.",
-          },
-        ],
+        _id: request.id,
+        email: request.email,
+        role: request.role,
+        state: "blocked", // trạng thái mặc định có thể lấy từ request
+        verified: true,   // hoặc lấy từ API backend
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        processingHistory: [], // backend thật sẽ trả history, nếu có
       };
 
       setCurrentUser(initialUser);
@@ -99,8 +89,8 @@ export default function UnlockRequestDialog({
 
     const updatedUser: User = {
       ...currentUser,
-      status: action === "unlock" ? "Active" : "Locked",
-      processingHistory: [...currentUser.processingHistory, newRecord],
+      state: action === "unlock" ? "active" : "blocked",
+      processingHistory: [...(currentUser.processingHistory ?? []), newRecord],
     };
 
     setTempUser(updatedUser);
@@ -124,7 +114,6 @@ export default function UnlockRequestDialog({
   return (
     <>
       <div className="fixed inset-0 bg-black/50 z-40" />
-
       <div className="fixed inset-0 z-50 flex justify-center items-start overflow-y-auto">
         <div className="mt-6 w-full max-w-4xl bg-white rounded-2xl shadow-xl">
           {/* Header */}
@@ -142,28 +131,17 @@ export default function UnlockRequestDialog({
           <div className="px-8 py-6 space-y-6">
             {/* User info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <InfoRow label="Full Name" value={currentUser.fullName} />
-              <InfoRow label="Role" value={currentUser.role} />
               <InfoRow label="Email" value={currentUser.email} />
-              <InfoRow label="Phone Number" value={currentUser.phone} />
-              <InfoRow label="Status" value={currentUser.status} />
-              <InfoRow label="Lock Date" value={currentUser.lockDate} />
+              <InfoRow label="Role" value={currentUser.role.join(", ")} />
+              <InfoRow label="Status" value={currentUser.state} />
             </div>
 
             {/* Reasons */}
-            <ReasonSection
-              label="Account Lock Reason"
-              value={currentUser.lockReason}
-            />
-            <ReasonSection
-              label="Appeal Reason"
-              value={currentUser.appealReason}
-            />
+            <ReasonSection label="Appeal Reason" value={request.reason} />
 
             {/* Action */}
             <div>
               <p className="font-semibold mb-4">Administrative Action</p>
-
               <div className="grid md:grid-cols-2 gap-6">
                 {/* Unlock */}
                 <div className="space-y-4">
@@ -245,13 +223,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function ReasonSection({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
+function ReasonSection({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <p className="font-semibold">{label}</p>

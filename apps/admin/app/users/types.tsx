@@ -7,8 +7,8 @@ export type UserStatusFilterType = "all" | "ACTIVE" | "BLOCKED";
 export type UserTypeFilterType = "all" | "designer" | "customer";
 export type UnlockStatusFilterType = "all" | "pending" | "processed";
 
-export const displayUserStatus = (status: string) =>
-  status === "ACTIVE" ? "Active" : "Blocked";
+export const displayUserStatus = (state: string) =>
+  state === "ACTIVE" ? "active" : "blocked";
 
 export const displayUserType = (type: string) =>
   type === "designer" ? "Designer" : "Customer";

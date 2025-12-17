@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import DesignDetailDialog, { type Design } from "../DesignDetail";
-import { UsersAPI } from "@/api/users.api";
 import Header from "@/components/Header/Header";
 import Sidebar from "@/components/Sidebar/Sidebar";
 import { toast } from "sonner";
@@ -13,9 +12,7 @@ const SIDEBAR_WIDTH = 240;
 const HEADER_HEIGHT = 80;
 
 export interface UserDetail {
-  id: number;
-  name: string;
-  username: string;
+  id: string;
   type: "designer" | "customer";
   email?: string;
   phone?: string;
@@ -23,15 +20,16 @@ export interface UserDetail {
   lastLogin?: string;
   gender?: string;
   dateOfBirth?: string;
-  description?: string;
+  name?: string;
   avatar?: string;
+  bio?: string;
   status?: string;
   stats?: {
     designsPosted: number;
-    revenue: string;
-    reportedDesigns: number;
-    mostAppealingDesign: string;
+    totalRevenue: number;
+    totalSold: number;
     followers: number;
+    rating?: number;
   };
 }
 
@@ -42,34 +40,58 @@ export default function AdminDashboard() {
   const [user, setUser] = useState<UserDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [designLoading, setDesignLoading] = useState(false);
-
+  const [designs, setDesigns] = useState<Design[]>([]);
   const [selectedDesign, setSelectedDesign] = useState<Design | null>(null);
   const [showDialog, setShowDialog] = useState(false);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
 
-  const [designs, setDesigns] = useState<Design[]>([]);
-
   useEffect(() => {
-    const fetchUser = async () => {
-      const parsedUserId = parseInt(userId);
-      if (!userId || isNaN(parsedUserId)) {
-        setLoading(false);
-        if (userId) toast.error("Invalid user ID.");
-        return;
-      }
+    if (!userId) {
+      toast.error("Invalid user ID.");
+      setLoading(false);
+      return;
+    }
 
+    const fetchUser = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
-        const response = await UsersAPI.getUserDetail(parsedUserId);
-        const rawData: any = response;
-        const userData: UserDetail | null = rawData?.data || rawData;
+        const res = await api.get(`/api/admin/users/${userId}`);
+        const data = res.data;
+        if (!data?.user) {
+          toast.error("User information not found");
+          setUser(null);
+          return;
+        }
+
+        const userBase = data.user;
+        const profile = data.profile || {};
+        const userData: UserDetail = {
+          id: userBase._id,
+          type: userBase.role?.includes("designer") ? "designer" : "customer",
+          email: userBase.email,
+          createdAt: userBase.createdAt,
+          status: userBase.state,
+          name: profile.name || userBase.email,
+          avatar: profile.avatarUrl,
+          bio: profile.bio,
+          stats:
+            userBase.role?.includes("designer")
+              ? {
+                  designsPosted: profile.totalDesigns || 0,
+                  totalRevenue: profile.totalRevenue || 0,
+                  totalSold: profile.totalSold || 0,
+                  followers: profile.followerCount || 0,
+                  rating: profile.rating,
+                }
+              : undefined,
+        };
         setUser(userData);
-      } catch (error: any) {
+      } catch (err: any) {
+        console.error("Error fetching user:", err);
         toast.error(
-          `Failed to load user information. Error code: ${
-            error.response?.status || "Network/Server"
+          `Failed to load user information. ${
+            err.response?.status ? "Error code: " + err.response.status : "Network/Server error"
           }`
         );
         setUser(null);
@@ -82,39 +104,43 @@ export default function AdminDashboard() {
   }, [userId]);
 
   useEffect(() => {
-    const fetchDesigns = async () => {
-      const parsedUserId = parseInt(userId);
-      if (!userId || isNaN(parsedUserId) || user?.type !== "designer") return;
+    if (!userId || user?.type !== "designer") return;
 
+    const fetchDesigns = async () => {
       setDesignLoading(true);
       try {
         const res = await api.get(`/api/admin/users/${userId}/designs`);
-        const rawData: any = res.data;
-        const designList: Design[] = Array.isArray(rawData)
-          ? rawData
-          : Array.isArray(rawData?.data)
-          ? rawData.data
+        const designList: Design[] = Array.isArray(res.data)
+          ? res.data
+          : Array.isArray(res.data?.data)
+          ? res.data.data
           : [];
         setDesigns(designList);
-      } catch {
-        toast.error("Failed to load design list.");
+      } catch (err: any) {
+        if (err.response) {
+          console.error("Error fetching designs: Response error", err.response.data, err.response.status);
+          toast.error(`Failed to load designs. Status: ${err.response.status}`);
+        } else if (err.request) {
+          console.error("Error fetching designs: No response", err.request);
+          toast.error("Failed to load designs. No response from server.");
+        } else {
+          console.error("Error fetching designs:", err.message);
+          toast.error("Failed to load designs. " + err.message);
+        }
         setDesigns([]);
       } finally {
         setDesignLoading(false);
       }
     };
 
-    if (user?.type === "designer") fetchDesigns();
+    fetchDesigns();
   }, [userId, user?.type]);
 
-  const filteredDesigns = designs.filter((design) => {
-    const matchSearch = design.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchFilter =
-      activeFilter === "All" || design.status === activeFilter;
-    return matchSearch && matchFilter;
-  });
+  const filteredDesigns = designs.filter(
+    (design) =>
+      design.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (activeFilter === "All" || design.status === activeFilter)
+  );
 
   return (
     <div className="min-h-screen bg-gray-50 flex text-black">
@@ -150,10 +176,7 @@ export default function AdminDashboard() {
               <div className="flex gap-6 items-center mb-6">
                 <div className="flex flex-col items-center">
                   <img
-                    src={
-                      user.avatar ||
-                      "https://via.placeholder.com/200x200/6B7280/FFFFFF?text=User"
-                    }
+                    src={user.avatar || "https://via.placeholder.com/200x200/6B7280/FFFFFF?text=User"}
                     alt="Avatar"
                     className="w-48 h-48 rounded-full border mb-3"
                   />
@@ -164,18 +187,11 @@ export default function AdminDashboard() {
 
                 <div className="grid grid-cols-2 gap-x-12 gap-y-2">
                   <InfoRow label="Full Name" value={user.name || ""} />
-                  <InfoRow label="Gender" value={user.gender || ""} />
-                  <InfoRow label="Username" value={user.username || ""} />
-                  <InfoRow label="Date of Birth" value={user.dateOfBirth || ""} />
-                  <InfoRow label="Email Address" value={user.email || ""} />
-                  <InfoRow
-                    label="Account Created At"
-                    value={user.createdAt || ""}
-                  />
-                  <InfoRow label="Phone Number" value={user.phone || ""} />
+                  <InfoRow label="Email" value={user.email || ""} />
                   <InfoRow label="Status" value={user.status || ""} />
+                  <InfoRow label="Account Created At" value={user.createdAt || ""} />
                   <div className="col-span-2">
-                    <InfoRow label="Description" value={user.description || ""} />
+                    <InfoRow label="Bio" value={user.bio || ""} />
                   </div>
                 </div>
               </div>
@@ -192,13 +208,7 @@ export default function AdminDashboard() {
                   </div>
 
                   <div className="flex gap-7 mb-4">
-                    {[
-                      "All",
-                      "On Sale",
-                      "Auctioning",
-                      "Sold",
-                      "Shared",
-                    ].map((filter) => (
+                    {["All", "On Sale", "Auctioning", "Sold", "Shared"].map((filter) => (
                       <button
                         key={filter}
                         onClick={() => setActiveFilter(filter)}

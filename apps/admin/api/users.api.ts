@@ -1,18 +1,21 @@
 import api from "@/lib/http";
 
-const BASE_URL = "/api/admin"; 
+const BASE_URL = "/api/admin";
 
 export interface User {
-  id: number;
-  fullName: string;
-  role: string;
+  _id: string;
   email: string;
-  phone: string;
-  status: string;
-  lockDate: string;
-  lockReason: string;
-  appealReason: string;
-  processingHistory: Array<{
+  role: string[];
+  verified: boolean;
+  createdAt: string;
+  updatedAt: string;
+  state: "active" | "blocked" | "pending" | string;
+  fullName?: string;
+  phone?: string;
+  lockDate?: string;
+  lockReason?: string;
+  appealReason?: string;
+  processingHistory?: Array<{
     id: number;
     processor: string;
     processDate: string;
@@ -22,7 +25,7 @@ export interface User {
 }
 
 export interface UnlockRequest {
-  id: number;
+  id: string;
   name: string;
   reason: string;
   date: string;
@@ -35,22 +38,22 @@ export const UsersAPI = {
     return res.data;
   },
 
-  getUserDetail: async (id: number) => {
+  getUserDetail: async (id: string) => {
     const res = await api.get(`${BASE_URL}/users/${id}`);
     return res.data;
   },
 
-  blockUserAccount: async (id: number) => {
+  blockUserAccount: async (id: string) => {
     const res = await api.patch(`${BASE_URL}/users/block/${id}`);
     return res.data;
   },
 
-  unlockUser: async (id: number) => {
+  unlockUser: async (id: string) => {
     const res = await api.patch(`${BASE_URL}/users/unlock/${id}`);
     return res.data;
   },
 
-  deleteUser: async (id: number) => {
+  deleteUser: async (id: string) => {
     const res = await api.delete(`${BASE_URL}/users/${id}`);
     return res.data;
   },
@@ -68,7 +71,7 @@ export const UsersAPI = {
     }
   },
 
-  approveUnlockRequest: async (id: number) => {
+  approveUnlockRequest: async (id: string) => {
     try {
       const res = await api.patch(`${BASE_URL}/unlock-requests/approve/${id}`);
       return res.data;
@@ -78,7 +81,7 @@ export const UsersAPI = {
     }
   },
 
-  rejectUnlockRequest: async (id: number) => {
+  rejectUnlockRequest: async (id: string) => {
     try {
       const res = await api.patch(`${BASE_URL}/unlock-requests/reject/${id}`);
       return res.data;
