@@ -35,6 +35,11 @@ export interface DailyAccessData {
   value: number;
 }
 
+export interface ProductData {      // ✅ Thêm interface cho product chart
+  productName: string;
+  quantity: number;
+}
+
 export interface Template {
   _id: string;
   title: string;
@@ -47,6 +52,11 @@ export interface Designer {
   name: string;
   email: string;
   followerCount: number;
+}
+
+export interface RoleStatsData {
+  designerCount: number;
+  customerCount: number;
 }
 
 export const getQuickStats = async (): Promise<StatsData> => {
@@ -93,4 +103,14 @@ export const getWeeklyDesigns = async (): Promise<WeeklyData[]> => {
 export const getDailyAccess = async (): Promise<DailyAccessData[]> => {
   const response = await api.get<DailyAccessData[]>(`${BASE_URL}/daily-access`);
   return Array.isArray(response.data) ? response.data : [];
+};
+
+export const getProductStats = async (): Promise<ProductData[]> => {
+  const response = await api.get<ProductData[]>(`${BASE_URL}/product-stats`);
+  return Array.isArray(response.data) ? response.data : [];
+};
+
+export const getRoleStats = async (): Promise<RoleStatsData> => {
+  const response = await api.get<RoleStatsData>(`${BASE_URL}/role-stats`);
+  return response.data;
 };

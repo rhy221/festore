@@ -10,46 +10,42 @@ import {
   ChartLegendContent,
   ChartConfig,
 } from "@workspace/ui/components/chart";
-import { getWeeklyDesigns, type WeeklyData } from "@/api/home.api";
+import { getProductStats, type ProductData } from "@/api/home.api";
 
 const chartConfig = {
-  designs: {
-    label: "2025",
+  products: {
+    label: "Số lượng",
     color: "#111827",
   },
 } satisfies ChartConfig;
 
-interface WeeklyChartProps {
-  data?: WeeklyData[];
+interface ProductChartProps {
+  data?: ProductData[];
 }
 
-export default function WeeklyChart({ data }: WeeklyChartProps) {
-  const [chartData, setChartData] = useState<WeeklyData[]>([]);
+export default function ProductChart({ data }: ProductChartProps) {
+  const [chartData, setChartData] = useState<ProductData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchWeeklyData = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-
         if (data && data.length > 0) {
           setChartData(data);
-          setLoading(false);
-          return;
+        } else {
+          const apiData = await getProductStats();
+          setChartData(apiData);
         }
-
-        const apiData = await getWeeklyDesigns();
-        setChartData(apiData);
       } catch (err) {
-        console.error("Error fetching weekly data:", err);
-        setError("Failed to load weekly chart data");
+        console.error(err);
+        setError("Failed to load product chart data");
       } finally {
         setLoading(false);
       }
     };
-
-    fetchWeeklyData();
+    fetchData();
   }, [data]);
 
   if (loading) {
@@ -60,17 +56,17 @@ export default function WeeklyChart({ data }: WeeklyChartProps) {
     );
   }
 
-  const maxDesigns = chartData.length
-    ? Math.max(...chartData.map((d) => d.designs))
+  const maxQuantity = chartData.length
+    ? Math.max(...chartData.map((d) => d.quantity))
     : 0;
 
   return (
     <div className="w-full rounded-2xl border border-gray-200 bg-white px-5 pt-5 pb-4 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm font-semibold tracking-wide text-gray-900">
-          Weekly New Designs
+          Category Product Statistics
         </h2>
-        <span className="text-xs text-gray-400">Last 7 weeks</span>
+        <span className="text-xs text-gray-400">All Categories</span>
       </div>
 
       {error && (
@@ -83,31 +79,26 @@ export default function WeeklyChart({ data }: WeeklyChartProps) {
         <ChartContainer config={chartConfig} className="w-full h-full">
           <BarChart data={chartData} barCategoryGap="35%">
             <CartesianGrid strokeDasharray="2 6" stroke="#eee" vertical={false} />
-
             <XAxis
-              dataKey="week"
+              dataKey="categoryName"
               tickLine={false}
               axisLine={false}
               tickMargin={10}
               tick={{ fill: "#9ca3af", fontSize: 10 }}
             />
-
             <YAxis
               tickLine={false}
               axisLine={false}
               tick={{ fill: "#9ca3af", fontSize: 10 }}
               tickCount={6}
-              domain={[0, maxDesigns + 5]}
+              domain={[0, maxQuantity + 5]}
               allowDecimals={false}
             />
-
             <ChartTooltip content={<ChartTooltipContent />} />
-
             <ChartLegend content={<ChartLegendContent />} />
-
             <Bar
-              dataKey="designs"
-              fill="var(--color-designs)"
+              dataKey="quantity"
+              fill="var(--color-products)"
               barSize={22}
               radius={[6, 6, 0, 0]}
               background={{ fill: "#f3f4f6" }}

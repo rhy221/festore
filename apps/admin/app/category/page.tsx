@@ -19,7 +19,6 @@ type CategoryFixed = {
   isDeleted: boolean;
 };
 
-/* ----- DROPDOWN COMPONENT ----- */
 const AdminCategoryActionsDropdown: React.FC<{
   category: CategoryFixed;
   onEdit: (category: CategoryFixed) => void;
@@ -46,28 +45,19 @@ const AdminCategoryActionsDropdown: React.FC<{
     >
       <div
         className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer rounded-t-lg"
-        onClick={() => {
-          onView(category.id);
-          onClose();
-        }}
+        onClick={() => { onView(category.id); onClose(); }}
       >
         View details
       </div>
       <div
         className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-        onClick={() => {
-          onEdit(category);
-          onClose();
-        }}
+        onClick={() => { onEdit(category); onClose(); }}
       >
         Edit
       </div>
       <div
         className="px-4 py-2 text-sm text-red-600 hover:bg-red-50 cursor-pointer rounded-b-lg"
-        onClick={() => {
-          onDelete(category);
-          onClose();
-        }}
+        onClick={() => { onDelete(category); onClose(); }}
       >
         Delete
       </div>
@@ -75,12 +65,10 @@ const AdminCategoryActionsDropdown: React.FC<{
   );
 };
 
-/* ----- MAIN PAGE COMPONENT ----- */
 export default function AdminCategoryPage() {
   const [categories, setCategories] = useState<CategoryFixed[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
-
   const [showAddPopup, setShowAddPopup] = useState(false);
   const [editCategory, setEditCategory] = useState<CategoryFixed | null>(null);
   const [deleteCategory, setDeleteCategory] = useState<CategoryFixed | null>(null);
@@ -92,17 +80,13 @@ export default function AdminCategoryPage() {
     try {
       setLoading(true);
       const data: any = await CategoriesAPI.getCategories({});
-
-      const list: CategoryFixed[] = (
-        Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : []
-      ).map((c: any) => ({
-        id: String(c._id),
+      const list: CategoryFixed[] = (Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : []).map((c: any) => ({
+        id: String(c.id ?? c._id),
         name: c.name,
         slug: c.slug,
         styles: Array.isArray(c.styles) ? c.styles : [],
         isDeleted: Boolean(c.isDeleted),
       }));
-
       setCategories(list);
     } catch {
       toast.error("Failed to load categories");
@@ -112,46 +96,32 @@ export default function AdminCategoryPage() {
     }
   }, []);
 
-  useEffect(() => {
-    loadCategories();
-  }, [loadCategories]);
+  useEffect(() => { loadCategories(); }, [loadCategories]);
 
   const handleView = (id: string) => {
-    router.push(`/admin/category/${id}`);
+    router.push(`/category/${id}`);
     setOpenDropdownId(null);
   };
 
-  // 🔹 FILTER LOGIC (NAME OR STYLES)
   const filteredCategories = categories.filter((c) => {
     if (!search) return true;
-
     const keyword = search.toLowerCase();
-    const matchName = c.name.toLowerCase().includes(keyword);
-    const matchStyles = c.styles.some((s) => s.toLowerCase().includes(keyword));
-
-    return matchName || matchStyles;
+    return c.name.toLowerCase().includes(keyword) || c.styles.some((s) => s.toLowerCase().includes(keyword));
   });
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <Header />
       <div className="flex flex-1 pt-24">
-        <div className="w-[296px]">
-          <Sidebar />
-        </div>
-
+        <div className="w-[296px]"><Sidebar /></div>
         <main className="flex-1 p-6 overflow-y-auto font-sans text-gray-800">
           <div className="flex justify-between items-center mb-4 border-b pb-2 border-gray-200">
             <h1 className="text-xl font-medium text-black">Category List</h1>
-            <Button
-              className="bg-black text-white px-4 py-2 text-sm font-medium hover:bg-gray-800"
-              onClick={() => setShowAddPopup(true)}
-            >
+            <Button className="bg-black text-white px-4 py-2 text-sm font-medium hover:bg-gray-800" onClick={() => setShowAddPopup(true)}>
               + Add category
             </Button>
           </div>
 
-          {/* 🔹 SEARCH BAR */}
           <div className="mb-4 max-w-sm">
             <input
               type="text"
@@ -182,17 +152,9 @@ export default function AdminCategoryPage() {
                       <td className="px-6 py-3 font-medium text-gray-900" onClick={() => handleView(category.id)}>
                         {category.name}
                       </td>
-                      <td className="px-6 py-3 text-sm text-gray-600">
-                        {category.styles.length > 0 ? category.styles.join(", ") : "—"}
-                      </td>
+                      <td className="px-6 py-3 text-sm text-gray-600">{category.styles.length > 0 ? category.styles.join(", ") : "—"}</td>
                       <td className="px-6 py-3 relative">
-                        <Button
-                          className="bg-transparent"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setOpenDropdownId(openDropdownId === category.id ? null : category.id);
-                          }}
-                        >
+                        <Button className="bg-transparent" onClick={(e) => { e.stopPropagation(); setOpenDropdownId(openDropdownId === category.id ? null : category.id); }}>
                           ⋮
                         </Button>
                         {openDropdownId === category.id && (
@@ -212,35 +174,9 @@ export default function AdminCategoryPage() {
             </div>
           )}
 
-          {showAddPopup && (
-            <AdminCategoryAddPopup
-              onClose={() => setShowAddPopup(false)}
-              onSuccess={() => {
-                setShowAddPopup(false);
-                loadCategories();
-              }}
-            />
-          )}
-          {editCategory && (
-            <AdminCategoryEditPopup
-              category={editCategory}
-              onClose={() => setEditCategory(null)}
-              onSuccess={() => {
-                setEditCategory(null);
-                loadCategories();
-              }}
-            />
-          )}
-          {deleteCategory && (
-            <AdminCategoryDeletePopup
-              category={deleteCategory}
-              onClose={() => setDeleteCategory(null)}
-              onSuccess={() => {
-                setDeleteCategory(null);
-                loadCategories();
-              }}
-            />
-          )}
+          {showAddPopup && <AdminCategoryAddPopup onClose={() => setShowAddPopup(false)} onSuccess={() => { setShowAddPopup(false); loadCategories(); }} />}
+          {editCategory && <AdminCategoryEditPopup category={editCategory} onClose={() => setEditCategory(null)} onSuccess={() => { setEditCategory(null); loadCategories(); }} />}
+          {deleteCategory && <AdminCategoryDeletePopup category={deleteCategory} onClose={() => setDeleteCategory(null)} onSuccess={() => { setDeleteCategory(null); loadCategories(); }} />}
         </main>
       </div>
     </div>

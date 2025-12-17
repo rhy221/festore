@@ -4,8 +4,8 @@ import Header from "../../components/Header/Header";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import QuickStatsSection from "./StatCard"; 
 import TopRankingsSection from "./RankingCard"; 
-import WeeklyAccessChart from "./WeeklyBarChart"; 
-import LoginTrendChart from "./LoginAmountChart"; 
+import ProductChart from "./ProductChart"; 
+import RolePieChart from "./RolePieChart"; 
 
 const SIDEBAR_WIDTH_PX = "240px"; 
 const HEADER_HEIGHT_PX = "80px"; 
@@ -39,11 +39,11 @@ export default function AdminDashboardPage() {
         </h2>
 
         <div className="mb-6 rounded-lg border shadow-md p-4 bg-white">
-          <WeeklyAccessChart />
+          <ProductChart />
         </div>
 
         <div className="mb-6 rounded-lg border shadow-md p-4 bg-white">
-          <LoginTrendChart />
+          <RolePieChart/>
         </div>
       </main>
     </div>

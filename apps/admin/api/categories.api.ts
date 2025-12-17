@@ -12,7 +12,7 @@ export interface Category {
 export interface Product {
   id: string;
   name: string;
-  imageUrl: string;
+  imageUrl?: string;
   createdAt: string;
 }
 
