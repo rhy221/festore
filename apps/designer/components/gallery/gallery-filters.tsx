@@ -33,7 +33,7 @@ export function GalleryFilters(
       const pathname = usePathname();
       const router = useRouter();
       const { data: categories, isLoading: categoriesLoading } = useCategories();
-    
+      const [isOpen, setIsOpen] = useState(false);
     
       const currentCategorySlug = params?.categorySlug?.[0]; 
     
@@ -62,7 +62,7 @@ export function GalleryFilters(
 if(categoriesLoading || !categories)
     return(<></>)
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 sticky top-16 z-30 backdrop-blur py-4  text-white">
       <div className="flex gap-4 overflow-x-auto pb-2">
         <button
                 className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors 
@@ -96,7 +96,8 @@ if(categoriesLoading || !categories)
           )}
       </div>
 
-      <Collapsible>
+      <Collapsible open={isOpen}
+      onOpenChange={setIsOpen}>
           <div className="flex gap-4 items-center">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/40" />
@@ -138,7 +139,7 @@ onKeyDown={(e) => {
       </div>
 
        <CollapsibleContent>
-       <div className=" top-16 z-30 bg-black/95 backdrop-blur border-b border-zinc-800 py-4 text-white">
+       <div className=" top-16 z-30 backdrop-blur border-b border-zinc-800 py-4 text-white">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-2 flex-wrap">

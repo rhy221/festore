@@ -1,26 +1,42 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { X, Heart, Bookmark, Share2, Download, Info, ShoppingCart, Link } from 'lucide-react';
 import { Button } from '@workspace/ui/components/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui/components/avatar';
 import { Badge } from '@workspace/ui/components/badge';
-import { useFollowDesignerMutation, useLikeDesignMutation, useProduct } from '@/queries/useProduct';
+import { useCategories, useFollowDesignerMutation, useLikeDesignMutation, useProduct } from '@/queries/useProduct';
 import { useAddToCart } from '@/queries/useCart';
 import { useOnScreen } from '@/hooks/useOnScreen';
 import { ProductCommentTabs } from './Comment';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@workspace/ui/lib/utils';
+import { VirtualTryOnModal } from './VirtualTryOn';
+import { copyToClipboard } from '@/lib/utils';
 
 export function GalleryItemModal({ id }: { id: string }) {
   const [mainActionElement, setMainActionElement] = useState<HTMLButtonElement | null>(null);
   const isMainVisible = useOnScreen(mainActionElement);
 
   const { data: design, isLoading: designLoading } = useProduct(id);
+  const { data: categories } = useCategories();
+
+  // 2. Tính toán slug dựa trên design.categoryId
+  const categorySlug = useMemo(() => {
+    if (!design || !categories) return "";
+    
+    const foundCategory = categories.find((cat: any) => {
+        if (cat._id === design.categoryId) return true;
+        return false;
+    });
+
+    return foundCategory ? foundCategory.slug : "";
+  }, [design, categories]);
+
   const likeMutation = useLikeDesignMutation();
   const followMutation = useFollowDesignerMutation(id);
   const addToCartMutation = useAddToCart();
-  const { execute } = useAuth();
+  const { execute } = useAuth(); 
 
   const handleLike = async () => {
     execute(async () => {
@@ -138,6 +154,14 @@ export function GalleryItemModal({ id }: { id: string }) {
                   >
                     ADD TO CART
                   </Button>
+
+                   <div className="pt-2">
+                    <VirtualTryOnModal 
+                      productImages={design.imageUrls} 
+                      productTitle={design.title}
+                      categorySlug={categorySlug}
+                    />
+                  </div>
                 </div>
               )}
             </div>
@@ -234,7 +258,7 @@ export function GalleryItemModal({ id }: { id: string }) {
             </div>
 
             {/* Share */}
-            <div className="flex flex-col items-center gap-1 group cursor-pointer">
+            <div className="flex flex-col items-center gap-1 group cursor-pointer" onClick={() => {copyToClipboard()}}>
               <div className="p-3 bg-zinc-800 text-white rounded-full group-hover:bg-zinc-700 transition-all">
                 <Share2 size={20} />
               </div>

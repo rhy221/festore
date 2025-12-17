@@ -30,7 +30,7 @@ export function StoreHeader() {
   if(categoriesLoading || !categories)
     return(<></>)
   return (
-    <div className="bg-gradient-to-b from-black via-black to-black/80 py-16 space-y-8">
+    <div className=" py-16 space-y-8">
       <div className="container mx-auto px-4 space-y-6">
         <div>
           <h1 className="text-5xl font-bold text-white mb-2">

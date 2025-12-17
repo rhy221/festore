@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 
 
  export const formatCurrency = (amount: number) =>
@@ -35,6 +36,7 @@ export async function copyToClipboard(text?: string, onlyPath: boolean = false):
     }
 
     await navigator.clipboard.writeText(contentToCopy);
+    toast.success("Copied link")
     return true;
   } catch (error) {
     console.error('Failed to copy:', error);

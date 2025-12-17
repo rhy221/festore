@@ -12,6 +12,8 @@ import { Button } from '@workspace/ui/components/button';
 import { useFollowDesignerMutation } from '@/queries/useProduct';
 import { useAuth } from '@/hooks/useAuth';
 import { set } from 'date-fns';
+import { copyToClipboard } from '@/lib/utils';
+import { usePathname } from 'next/navigation';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -26,7 +28,6 @@ export default function PortfolioLayout({ children, params }: LayoutProps) {
   
   // Lưu ý: Đảm bảo key này khớp với key trong hook useUserPortfolio của bạn
   const QUERY_KEY = ["userPortfolio", id]; 
-
 
   const {execute} = useAuth();
 
@@ -202,7 +203,8 @@ export default function PortfolioLayout({ children, params }: LayoutProps) {
         {/* Tabs Navigation */}
         <div className="relative">
            <ProfileTabs userId={id} />
-           <button className="absolute right-0 top-0 -mt-2 text-gray-500 hover:text-white p-2">
+           <button className="absolute right-0 top-0 -mt-2 text-gray-500 hover:text-white p-2"
+           onClick={() => {copyToClipboard()}}>
               <Share2 size={18} />
            </button>
         </div>

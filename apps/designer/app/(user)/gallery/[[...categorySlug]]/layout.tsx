@@ -9,15 +9,11 @@ export default function GalleryLayout({
 }) {
   return (
     <div className="min-h-screen px-8 pb-20">
-     
-      <main className="container mx-auto py-8">
-
-        <div className="flex items-center justify-center gap-8 mb-12">
+        <div className="flex items-center justify-center gap-8 my-12">
           <h1 className="text-4xl font-bold text-white tracking-wider">GALLERY</h1>
         </div>
-
-       
-        <GalleryFilters />
+     <GalleryFilters />
+      <main className="container mx-auto py-8">
 
         {children}
       </main>

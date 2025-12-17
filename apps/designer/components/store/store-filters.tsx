@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from '@workspace/ui/components/dropdown-menu';
 import { useQueryClient } from '@tanstack/react-query';
-import { QueryProps } from '@/app/(user)/store/[[...categorySlug]]/page';
 import { CategoryType } from '@/schema/product.schema';
 import { useCategories } from '@/queries/useProduct';
 
@@ -60,7 +59,7 @@ export function StoreFilters() {
   }
 
   return (
-    <div className="sticky top-16 z-30 bg-black/95 backdrop-blur border-b border-zinc-800 py-4 text-white">
+    <div className="sticky top-16 z-30  backdrop-blur border-b border-zinc-800 py-4 text-white">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-2 flex-wrap">

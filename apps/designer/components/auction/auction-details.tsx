@@ -346,7 +346,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@workspace/ui/componen
 import { AuctionCountdown } from './auction-countdown';
 import { useEffect, useRef, useState } from 'react';
 import { BidsHistory } from './auction-bids-history';
-import { formatCurrency } from '@/lib/utils';
+import { copyToClipboard, formatCurrency } from '@/lib/utils';
 import { useAuctionQuery, usePlaceAuctionBidMutation } from '@/queries/useAuction';
 import { AuctionGallery } from './auction-gallery';
 import CountUp from '../CountUp';
@@ -475,6 +475,20 @@ export function AuctionDetails({auctionId, viewerCount} : {auctionId: string, vi
                 }`}
               />
               </Button>
+               <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {copyToClipboard()}}
+                className={cn(
+                    "rounded-full h-12 w-12 border border-border bg-secondary/50 hover:bg-secondary transition-colors"
+                    
+                )}
+              >
+                <Share2
+                className={`w-4 h-4 `}
+              />
+              </Button>
+              
 
               <Button
                 onClick={() => handleFollow()}
@@ -482,9 +496,12 @@ export function AuctionDetails({auctionId, viewerCount} : {auctionId: string, vi
               >
                 {!isFolllowed ? 'Follow' : 'Following'}
               </Button>
+
+             
                 </div>
               
             </div>
+
 
             {/* Price Section */}
             <div className="flex items-end gap-4 flex-wrap">

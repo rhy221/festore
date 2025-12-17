@@ -1,4 +1,5 @@
 
+import Footer from "@/components/Footer";
 import NavBar from "@/components/NavBar";
 import Link from "next/link";
 import { Toaster } from "react-hot-toast";
@@ -15,6 +16,7 @@ export default function RootLayout({
         {children}
         {modal}
         <Toaster position="top-center"/>
+        <Footer />
     </div>
   );
 }

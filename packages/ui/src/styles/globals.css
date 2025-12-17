@@ -56,37 +56,53 @@
 }
 
 :root {
-  /* Dark Mode based on Screenshots (True Black Background) */
-  --background: oklch(0 0 0);       /* Pure Black background as seen in images */
-  --primary-background: oklch(0.3576 0.002 161);
-  --foreground: oklch(1 0 0);       /* Pure White text */
+  /* --- CÁC THAY ĐỔI CHÍNH --- */
   
-  --card: oklch(0.12 0 0);          /* Dark Gray for cards/dropdowns */
-  --card-foreground: oklch(1 0 0);
+  /* Nền chính: Tăng từ 0 (đen tuyệt đối) lên 0.15 (xám đen sâu) */
+  --background: oklch(0.15 0 0); 
   
-  --popover: oklch(0.12 0 0);
-  --popover-foreground: oklch(1 0 0);
+  /* Nền phụ: Tăng độ sáng để tạo layer rõ ràng hơn */
+  --primary-background: oklch(0.40 0.002 161);
+
+  /* Chữ: Giữ nguyên trắng hoặc giảm nhẹ xuống 0.98 để đỡ chói trên nền xám */
+  --foreground: oklch(0.98 0 0);
+
+  /* Card/Dropdown: Phải sáng hơn nền chính một chút để nổi bật (tăng từ 0.12 lên 0.20) */
+  --card: oklch(0.20 0 0);
+  --card-foreground: oklch(0.98 0 0);
   
-  --primary: oklch(1 0 0);          /* White "UPLOAD" button as seen in header */
-  --primary-foreground: oklch(0 0 0); /* Black text on White button */
+  /* Popover: Tương tự Card */
+  --popover: oklch(0.20 0 0);
+  --popover-foreground: oklch(0.98 0 0);
   
-  --secondary: oklch(0.18 0 0);     /* Dark gray for inactive pills/buttons */
-  --secondary-foreground: oklch(1 0 0);
+  /* Button chính: Giữ nguyên để tạo điểm nhấn tương phản cao */
+  --primary: oklch(0.98 0 0);
+  --primary-foreground: oklch(0.15 0 0); /* Chữ đen trên nút trắng */
+
+  /* Các thành phần phụ (nút phụ, tab inactive): Tăng độ sáng (từ 0.18 lên 0.25) */
+  --secondary: oklch(0.25 0 0);
+  --secondary-foreground: oklch(0.98 0 0);
   
-  --muted: oklch(0.18 0 0);
-  --muted-foreground: oklch(0.65 0 0); /* Lighter gray for secondary text */
+  /* Màu nền khi hover: Sáng hơn secondary một chút */
+  --muted: oklch(0.25 0 0);
+  /* Chữ phụ: Tăng độ sáng để dễ đọc hơn trên nền xám (từ 0.65 lên 0.70) */
+  --muted-foreground: oklch(0.70 0 0); 
   
-  --accent: oklch(0.18 0 0);        /* Hover state background */
-  --accent-foreground: oklch(1 0 0);
+  --accent: oklch(0.28 0 0); /* Hover sáng hơn nữa */
+  --accent-foreground: oklch(0.98 0 0);
   
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(1 0 0);
+  --destructive: oklch(0.45 0.141 25.723); /* Làm màu đỏ tươi hơn xíu */
+  --destructive-foreground: oklch(0.98 0 0);
   
-  --border: oklch(0.2 0 0);         /* Subtle borders */
-  --input: oklch(0.2 0 0);          /* Search bar input background */
-  --ring: oklch(0.78 0.15 190);     /* Cyan/Teal accent color from logo/tabs */
+  /* Viền: Cần sáng hơn nền card để nhìn thấy rõ (tăng từ 0.2 lên 0.3) */
+  --border: oklch(0.30 0 0);
+  --input: oklch(0.25 0 0);
   
-  --chart-1: oklch(0.78 0.15 190);  /* Matching the Cyan accent */
+  /* Màu nhấn (Cyan/Teal): Giữ nguyên hoặc tăng nhẹ độ rực (Chroma) */
+  --ring: oklch(0.78 0.15 190);
+  
+  /* Chart colors: Giữ nguyên hoặc tinh chỉnh nhẹ */
+  --chart-1: oklch(0.78 0.15 190);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
@@ -94,13 +110,14 @@
   
   --radius: 0.625rem;
 
-  --sidebar: oklch(0 0 0);
-  --sidebar-foreground: oklch(1 0 0);
-  --sidebar-primary: oklch(0.78 0.15 190); /* Cyan accent for sidebar active states */
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.18 0 0);
-  --sidebar-accent-foreground: oklch(1 0 0);
-  --sidebar-border: oklch(0.2 0 0);
+  /* Sidebar: Đồng bộ với màu nền mới */
+  --sidebar: oklch(0.15 0 0);
+  --sidebar-foreground: oklch(0.98 0 0);
+  --sidebar-primary: oklch(0.78 0.15 190);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.25 0 0);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(0.30 0 0);
   --sidebar-ring: oklch(0.78 0.15 190);
 }
 

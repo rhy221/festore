@@ -33,7 +33,9 @@ const NavBar = () => {
     };
 
   return (
-    <div className='flex justify-between items-center bg-background px-8 py-4 border-b border-border sticky top-0 z-50 transition-colors duration-300'>
+
+    <nav className='sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-gray-200 px-8 py-6'>
+        <div className='flex justify-between items-centerpx-8  transition-colors duration-300'>
         {/*Left*/}
         <div className='flex items-center basis-[700px] gap-4'>
             {/* Title */}
@@ -169,6 +171,7 @@ const NavBar = () => {
             </div>
         </div>
     </div>
+    </nav>
   )
 }
 
