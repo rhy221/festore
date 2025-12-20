@@ -79,14 +79,16 @@ export default function UserListSection() {
     window.location.href = `/admin/users/${userId}`;
   };
 
-  const handleToggleLock = async (userId: string, isLocked: boolean) => {
+  const handleToggleLock = async (
+    userId: string,
+    willLock: boolean
+  ) => {
     setActionLoading(true);
     try {
-      if (isLocked) {
-        await UsersAPI.unlockUser(userId);
-      } else {
-        await UsersAPI.blockUserAccount(userId);
-      }
+      await UsersAPI.updateUserState(
+        userId,
+        willLock ? "blocked" : "active"
+      );
       await fetchUsers();
       toast.success("User state updated successfully.");
     } catch {
@@ -95,6 +97,7 @@ export default function UserListSection() {
       setActionLoading(false);
     }
   };
+
 
   const handleDeleteUser = async (userId: string) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
@@ -170,7 +173,6 @@ export default function UserListSection() {
         users={filteredUsers}
         onViewDetail={handleViewDetail}
         onToggleLock={handleToggleLock}
-        onDeleteUser={handleDeleteUser}
         isLoading={loading}      
         actionLoading={actionLoading}
       />

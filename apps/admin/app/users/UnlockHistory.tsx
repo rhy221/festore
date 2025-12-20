@@ -16,6 +16,10 @@ export default function UnlockHistoryDialog({
 }: UnlockHistoryDialogProps) {
   if (!user || !open) return null;
 
+  const roles = Array.isArray(user.role)
+    ? user.role.join(", ")
+    : user.role ?? "—";
+
   return (
     <>
       {/* Overlay */}
@@ -38,30 +42,30 @@ export default function UnlockHistoryDialog({
             </button>
           </div>
 
-          {/* Two-column info */}
+          {/* User info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-12 mt-6 text-slate-900">
-            <InfoRow label="Full Name" value={user.fullName} />
-            <InfoRow label="Role" value={user.role} />
-            <InfoRow label="Email Address" value={user.email} />
-            <InfoRow label="Phone Number" value={user.phone} />
-            <InfoRow label="Account Status" value={user.status} />
-            <InfoRow label="Lock Date" value={user.lockDate} />
+            <InfoRow label="Full Name" value={user.fullName ?? "—"} />
+            <InfoRow label="Role" value={roles} />
+            <InfoRow label="Email Address" value={user.email ?? "—"} />
+            <InfoRow label="Phone Number" value={user.phone ?? "—"} />
+            <InfoRow label="Account Status" value={user.state ?? "—"} />
+            <InfoRow label="Lock Date" value={user.lockDate ?? "—"} />
           </div>
 
           {/* Reasons */}
           <div className="mt-6 text-slate-900">
             <ReasonSection
               label="Account Lock Reason"
-              value={user.lockReason}
+              value={user.lockReason ?? "—"}
             />
             <ReasonSection
               label="Appeal Reason"
-              value={user.appealReason}
+              value={user.appealReason ?? "—"}
               className="mt-4"
             />
           </div>
 
-          {/* History table */}
+          {/* History */}
           <div className="mt-6">
             <p className="font-semibold mb-3">Processing History</p>
 
@@ -85,37 +89,46 @@ export default function UnlockHistoryDialog({
                   </tr>
                 </thead>
                 <tbody>
-                  {user.processingHistory?.map((record, idx) => (
-                    <tr key={record.id ?? idx}>
-                      <td className="border border-slate-400 py-2 px-3 text-center">
-                        {idx + 1}
-                      </td>
-                      <td className="border border-slate-400 py-2 px-3">
-                        {record.processor}
-                      </td>
-                      <td className="border border-slate-400 py-2 px-3 text-center">
-                        {record.processDate}
-                      </td>
-                      <td className="border border-slate-400 py-2 px-3 text-center">
-                        {record.action}
-                      </td>
-                      <td className="border border-slate-400 py-2 px-3">
-                        {record.note}
+                  {user.processingHistory?.length ? (
+                    user.processingHistory.map((record, idx) => (
+                      <tr key={record.id ?? idx}>
+                        <td className="border border-slate-400 py-2 px-3 text-center">
+                          {idx + 1}
+                        </td>
+                        <td className="border border-slate-400 py-2 px-3">
+                          {record.processor}
+                        </td>
+                        <td className="border border-slate-400 py-2 px-3 text-center">
+                          {record.processDate}
+                        </td>
+                        <td className="border border-slate-400 py-2 px-3 text-center">
+                          {record.action}
+                        </td>
+                        <td className="border border-slate-400 py-2 px-3">
+                          {record.note}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan={5}
+                        className="border border-slate-400 py-4 px-3 text-center text-gray-400"
+                      >
+                        No processing history
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
           </div>
-
         </div>
       </div>
     </>
   );
 }
 
-/* --- Components --- */
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div>
@@ -141,5 +154,3 @@ function ReasonSection({
     </div>
   );
 }
-
-export type { User };

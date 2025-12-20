@@ -74,11 +74,11 @@ export interface Design {
 }
 
 export interface UnlockRequest {
-  id: string;
-  name: string;
+  _id: string;
+  userId: User;
   reason: string;
-  date: string;
   status: "pending" | "approved" | "rejected";
+  createdAt: string;
 }
 
 export const UsersAPI = {
@@ -101,15 +101,17 @@ export const UsersAPI = {
       : [];
   },
 
-  blockUserAccount: async (id: string) => {
-    const res = await api.patch(`${BASE_URL}/users/block/${id}`);
+  updateUserState: async (
+    id: string,
+    state: "active" | "blocked"
+  ) => {
+    const res = await api.patch(
+      `${BASE_URL}/users/${id}/state`,
+      { state }
+    );
     return res.data;
   },
 
-  unlockUser: async (id: string) => {
-    const res = await api.patch(`${BASE_URL}/users/unlock/${id}`);
-    return res.data;
-  },
 
   deleteUser: async (id: string) => {
     const res = await api.delete(`${BASE_URL}/users/${id}`);

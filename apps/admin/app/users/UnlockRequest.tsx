@@ -1,17 +1,17 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import UnlockHistoryDialog, { type User } from "./UnlockHistory";
+import UnlockHistoryDialog from "./UnlockHistory";
 import { BackspaceIcon } from "@heroicons/react/24/solid";
 import { CheckCircle2Icon, MinusCircle } from "lucide-react";
+import { type User } from "@/api/users.api";
 
 type UnlockRequest = {
-  id: string; // id của unlock request
-  email: string; // email người dùng
-  role: string[]; 
+  _id: string;
+  userId: User;
   reason: string;
-  date: string;
-  status: "pending" | "processed";
+  status: "pending" | "approved" | "rejected";
+  createdAt: string;
 };
 
 interface UnlockRequestDialogProps {
@@ -33,24 +33,15 @@ export default function UnlockRequestDialog({
   const [showHistoryDialog, setShowHistoryDialog] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [tempUser, setTempUser] = useState<User | null>(null);
-
+  
   useEffect(() => {
-    if (request && open && !currentUser) {
-      // Sử dụng trực tiếp dữ liệu từ request
-      const initialUser: User = {
-        _id: request.id,
-        email: request.email,
-        role: request.role,
-        state: "blocked", // trạng thái mặc định có thể lấy từ request
-        verified: true,   // hoặc lấy từ API backend
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        processingHistory: [], // backend thật sẽ trả history, nếu có
-      };
-
-      setCurrentUser(initialUser);
+    if (request && open) {
+      setCurrentUser({
+        ...request.userId,
+        processingHistory: request.userId.processingHistory ?? [],
+      });
     }
-  }, [request, open, currentUser]);
+  }, [request, open]);
 
   if (!request || !open || !currentUser) return null;
 
@@ -65,6 +56,8 @@ export default function UnlockRequestDialog({
   };
 
   const handleSubmit = () => {
+    if (!action) return;
+
     const now = new Date();
     const formatDate = (d: Date) =>
       `${d.getDate().toString().padStart(2, "0")}/${(d.getMonth() + 1)
@@ -90,7 +83,10 @@ export default function UnlockRequestDialog({
     const updatedUser: User = {
       ...currentUser,
       state: action === "unlock" ? "active" : "blocked",
-      processingHistory: [...(currentUser.processingHistory ?? []), newRecord],
+      processingHistory: [
+        ...(currentUser.processingHistory ?? []),
+        newRecord,
+      ],
     };
 
     setTempUser(updatedUser);
@@ -114,6 +110,7 @@ export default function UnlockRequestDialog({
   return (
     <>
       <div className="fixed inset-0 bg-black/50 z-40" />
+
       <div className="fixed inset-0 z-50 flex justify-center items-start overflow-y-auto">
         <div className="mt-6 w-full max-w-4xl bg-white rounded-2xl shadow-xl">
           {/* Header */}
@@ -132,16 +129,20 @@ export default function UnlockRequestDialog({
             {/* User info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <InfoRow label="Email" value={currentUser.email} />
-              <InfoRow label="Role" value={currentUser.role.join(", ")} />
-              <InfoRow label="Status" value={currentUser.state} />
+              <InfoRow
+                label="Role"
+                value={currentUser.role?.join(", ") ?? "—"}
+              />
+              <InfoRow label="Status" value={currentUser.state ?? "—"} />
             </div>
 
-            {/* Reasons */}
+            {/* Appeal reason */}
             <ReasonSection label="Appeal Reason" value={request.reason} />
 
             {/* Action */}
             <div>
               <p className="font-semibold mb-4">Administrative Action</p>
+
               <div className="grid md:grid-cols-2 gap-6">
                 {/* Unlock */}
                 <div className="space-y-4">
@@ -200,10 +201,10 @@ export default function UnlockRequestDialog({
               </div>
             </div>
 
-            {/* Submit */}
             <button
               onClick={handleSubmit}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-full text-lg font-semibold"
+              disabled={!action}
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white py-4 rounded-full text-lg font-semibold"
             >
               Complete
             </button>
@@ -213,6 +214,7 @@ export default function UnlockRequestDialog({
     </>
   );
 }
+
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (

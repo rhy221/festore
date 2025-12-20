@@ -1,25 +1,45 @@
 import React from "react";
 import { User } from "@/api/users.api";
-import { EyeIcon, LockKeyhole, LockKeyholeOpen, Trash2 } from "lucide-react";
+import {
+  EyeIcon,
+  LockKeyhole,
+  LockKeyholeOpen,
+} from "lucide-react";
 
 type UserTableProps = {
   users: User[];
   onViewDetail: (userId: string) => void;
   onToggleLock: (userId: string, willLock: boolean) => void;
-  onDeleteUser: (userId: string) => void;
-  isLoading?: boolean;       
-  actionLoading?: boolean;  
+  isLoading?: boolean;
+  actionLoading?: boolean;
 };
 
 export default function UserTable({
   users,
   onViewDetail,
   onToggleLock,
-  onDeleteUser,
   isLoading = false,
   actionLoading = false,
 }: UserTableProps) {
-  const filteredUsers = users.filter(u => u.email && u.email.trim() !== "");
+  const validUsers = users.filter(
+    (u) => u.email && u.email.trim() !== ""
+  );
+
+  if (isLoading) {
+    return (
+      <div className="py-12 text-center text-gray-400">
+        Loading users...
+      </div>
+    );
+  }
+
+  if (validUsers.length === 0) {
+    return (
+      <div className="py-12 text-center text-gray-400">
+        No users found
+      </div>
+    );
+  }
 
   return (
     <div className="overflow-x-auto shadow-lg rounded-xl">
@@ -29,80 +49,91 @@ export default function UserTable({
             <th className="p-3 font-semibold text-gray-700">No.</th>
             <th className="p-3 font-semibold text-gray-700">Email</th>
             <th className="p-3 font-semibold text-gray-700">State</th>
-            <th className="p-3 font-semibold text-gray-700 text-center">Actions</th>
+            <th className="p-3 font-semibold text-gray-700 text-center">
+              Actions
+            </th>
           </tr>
         </thead>
 
         <tbody>
-          {filteredUsers.map((u, i) => (
-            <tr
-              key={u._id}
-              className="border-b border-gray-200 hover:bg-blue-50 transition-colors"
-            >
-              <td className="p-3">{i + 1}</td>
-              <td className="p-3 font-medium text-gray-800">{u.email}</td>
-              <td className="p-3">
-                <span
-                  className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    u.state === "active"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-red-100 text-red-700"
-                  }`}
-                >
-                  {u.state?.toUpperCase()}
-                </span>
-              </td>
-              <td className="p-3 flex justify-center items-center gap-4">
-                <button
-                  className="p-2 rounded-full hover:bg-gray-200"
-                  onClick={() => onViewDetail(u._id)}
-                  title="View details"
-                >
-                  <EyeIcon size={22} />
-                </button>
-               
-                {u.state === "blocked" ? (
-                  <button
-                    className={`p-2 rounded-full hover:bg-green-100 ${
-                      actionLoading ? "opacity-50 pointer-events-none" : ""
-                    }`}
-                    onClick={() => onToggleLock(u._id, false)}
-                    title="Unlock account"
-                  >
-                    <LockKeyholeOpen size={22} className="text-green-500" />
-                  </button>
-                ) : (
-                  <button
-                    className={`p-2 rounded-full hover:bg-red-100 ${
-                      actionLoading ? "opacity-50 pointer-events-none" : ""
-                    }`}
-                    onClick={() => onToggleLock(u._id, true)}
-                    title="Lock account"
-                  >
-                    <LockKeyhole size={22} className="text-red-500" />
-                  </button>
-                )}
+          {validUsers.map((user, index) => {
+            const isBlocked = user.state === "blocked";
 
-                <button
-                  className={`p-2 rounded-full hover:bg-red-100 ${
-                    actionLoading ? "opacity-50 pointer-events-none" : ""
-                  }`}
-                  onClick={() => onDeleteUser(u._id)}
-                  title="Delete account"
-                >
-                  <Trash2 size={22} className="text-gray-500 hover:text-red-700" />
-                </button>
-              </td>
-            </tr>
-          ))}
+            return (
+              <tr
+                key={user._id}
+                className="border-b border-gray-200 hover:bg-blue-50 transition-colors"
+              >
+                <td className="p-3">{index + 1}</td>
+
+                <td className="p-3 font-medium text-gray-800">
+                  {user.email}
+                </td>
+
+                <td className="p-3">
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      isBlocked
+                        ? "bg-red-100 text-red-700"
+                        : "bg-green-100 text-green-700"
+                    }`}
+                  >
+                    {(user.state ?? "unknown").toUpperCase()}
+                  </span>
+                </td>
+
+                <td className="p-3 flex justify-center items-center gap-4">
+                  {/* View detail */}
+                  <button
+                    className="p-2 rounded-full hover:bg-gray-200"
+                    onClick={() => onViewDetail(user._id)}
+                    title="View details"
+                  >
+                    <EyeIcon size={22} />
+                  </button>
+
+                  {/* Lock / Unlock */}
+                  {isBlocked ? (
+                    <button
+                      className={`p-2 rounded-full hover:bg-green-100 ${
+                        actionLoading
+                          ? "opacity-50 pointer-events-none"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        onToggleLock(user._id, false)
+                      }
+                      title="Unlock account"
+                    >
+                      <LockKeyholeOpen
+                        size={22}
+                        className="text-green-500"
+                      />
+                    </button>
+                  ) : (
+                    <button
+                      className={`p-2 rounded-full hover:bg-red-100 ${
+                        actionLoading
+                          ? "opacity-50 pointer-events-none"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        onToggleLock(user._id, true)
+                      }
+                      title="Lock account"
+                    >
+                      <LockKeyhole
+                        size={22}
+                        className="text-red-500"
+                      />
+                    </button>
+                  )}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
-
-      {filteredUsers.length === 0 && (
-        <div className="text-center py-12 text-gray-400">
-          {isLoading ? "Loading users..." : "No users found"}
-        </div>
-      )}
     </div>
   );
 }
