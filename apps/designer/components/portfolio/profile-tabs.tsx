@@ -17,7 +17,7 @@ export function ProfileTabs({ userId }: ProfileTabsProps){
   const tabs = [
     { id: 'INFO', label: 'INFO', href: `/portfolio/${userId}/infor`, locked: false },
     { id: 'MODELS', label: 'MODELS', href: `/portfolio/${userId}/models`, locked: false },
-    { id: 'FOLLOWING', label: 'FOLLOWING', href: `/portfolio/${userId}/following`, locked: false }, 
+    // { id: 'FOLLOWING', label: 'FOLLOWING', href: `/portfolio/${userId}/following`, locked: false }, 
     { id: 'LIKES', label: 'LIKES', href: `/portfolio/${userId}/likes`, locked: false },
   ];
 

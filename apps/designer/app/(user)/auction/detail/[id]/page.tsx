@@ -8,6 +8,7 @@ import { useParams } from 'next/navigation';
 import { AuctionGallery } from '@/components/auction/auction-gallery';
 import { AuctionDetails } from '@/components/auction/auction-details';
 import { useQueryClient } from '@tanstack/react-query';
+import envConfig from '@/config';
 
 
 interface AuctionDetailClientProps {
@@ -38,7 +39,7 @@ export default function AuctionDetailClient({ mockAuctionData }: AuctionDetailCl
   // WebSocket connection
   useEffect(() => {
     if (!auction) return;
-    const newSocket = io('http://localhost:3003');
+    const newSocket = io(`${envConfig.NEXT_PUBLIC_API_ENDPOINT}/auctions`);
     setSocket(newSocket);
 
     newSocket.emit('joinAuction', auctionId);

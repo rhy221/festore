@@ -234,7 +234,6 @@ export default function CreateAuctionPage() {
                 {...field}
                 id={field.name}
                 rows={6}
-                required
                 placeholder="Describe your item in detail..."
               >
               </Textarea>

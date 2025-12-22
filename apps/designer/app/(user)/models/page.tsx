@@ -1157,8 +1157,8 @@ import {
   PaginationState,
   ColumnDef,
 } from '@tanstack/react-table';
-import { ArrowUpDown, Pencil, Trash2, Search, Ban, Loader2 } from 'lucide-react'; // Thêm Loader2
-import { useRouter } from 'next/navigation';
+import { ArrowUpDown, Pencil, Trash2, Search, Ban, Loader2 } from 'lucide-react';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'; // 1. Import hooks
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@workspace/ui/components/table';
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
@@ -1166,17 +1166,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useDeleteProduct, useMyProducts } from '@/queries/useProduct';
 import { useCancelAuction } from '@/queries/useAuction';
 import { cn } from '@workspace/ui/lib/utils';
-import { preconnect } from 'react-dom';
-
-// Hook debounce để tránh spam API khi gõ search
-function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-  useEffect(() => {
-    const handler = setTimeout(() => setDebouncedValue(value), delay);
-    return () => clearTimeout(handler);
-  }, [value, delay]);
-  return debouncedValue;
-}
+import { formatCurrency } from '@/lib/utils';
 
 // Interface (Giữ nguyên)
 interface DesignData {
@@ -1197,33 +1187,85 @@ interface DesignData {
 
 export default function ManageModelsPage() {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  // --- 1. STATE QUẢN LÝ TABLE (Server-side) ---
-  const [sorting, setSorting] = useState<SortingState>([{ id: 'createdAt', desc: true }]);
-  const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
-  const [globalFilter, setGlobalFilter] = useState(''); // Search text input
-  const debouncedSearch = useDebounce(globalFilter, 500); // Delay 500ms
-  
-  const [typeFilter, setTypeFilter] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [showDeleted, setShowDeleted] = useState(false); // Chưa implement ở API, nhưng giữ placeholder
+  // --- 1. LẤY PARAMS TỪ URL ---
+  const pageParam = searchParams.get('page');
+  const limitParam = searchParams.get('limit');
+  const searchParam = searchParams.get('search') || '';
+  const typeParam = searchParams.get('type') || 'all';
+  const statusParam = searchParams.get('status') || 'all';
+  const sortByParam = searchParams.get('sortBy') || 'createdAt';
+  const sortOrderParam = searchParams.get('sortOrder') || 'desc';
 
-  // --- 2. TẠO QUERY PARAMS ---
-  // Mỗi khi state thay đổi, object này đổi -> Trigger hook useMyProducts gọi lại API
-  const queryParams = useMemo(() => ({
-    page: pagination.pageIndex + 1, // API dùng index 1, Table dùng index 0
+  // --- 2. STATE LOCAL ---
+  const [globalFilter, setGlobalFilter] = useState(searchParam); // Input search text
+
+  // Tanstack Table States (Sync với URL)
+  const pagination: PaginationState = useMemo(() => ({
+    pageIndex: (pageParam ? Number(pageParam) : 1) - 1, // URL là 1-based, Table là 0-based
+    pageSize: limitParam ? Number(limitParam) : 10,
+  }), [pageParam, limitParam]);
+
+  const sorting: SortingState = useMemo(() => ([{
+    id: sortByParam,
+    desc: sortOrderParam === 'desc',
+  }]), [sortByParam, sortOrderParam]);
+
+  // Sync globalFilter khi URL thay đổi (VD: User back/forward)
+  useEffect(() => {
+    setGlobalFilter(searchParam);
+  }, [searchParam]);
+
+  // --- 3. HELPER UPDATE URL ---
+  const updateUrl = (newParams: Record<string, string | number | undefined>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    
+    Object.entries(newParams).forEach(([key, value]) => {
+      if (value === undefined || value === '' || value === null) {
+        params.delete(key);
+      } else {
+        params.set(key, String(value));
+      }
+    });
+
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  // --- 4. HANDLERS ---
+  const handleSearch = () => {
+    updateUrl({ search: globalFilter, page: 1 }); // Reset về trang 1 khi search
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const handleTypeChange = (val: string) => {
+    updateUrl({ type: val, page: 1 });
+  };
+
+  const handleStatusChange = (val: string) => {
+    updateUrl({ status: val, page: 1 });
+  };
+
+  // --- 5. QUERY PARAMS FOR API HOOK ---
+  const apiQueryParams = useMemo(() => ({
+    page: pagination.pageIndex + 1,
     limit: pagination.pageSize,
-    search: debouncedSearch,
-    type: typeFilter,
-    status: statusFilter,
-    sortBy: sorting[0]?.id || 'createdAt',
+    search: searchParam, // Dùng search từ URL
+    type: typeParam,
+    status: statusParam,
+    sortBy: sorting[0]?.id,
     sortOrder: sorting[0]?.desc ? 'desc' : 'asc',
-  }), [pagination.pageIndex, pagination.pageSize, debouncedSearch, typeFilter, statusFilter, sorting]);
+  }), [pagination, searchParam, typeParam, statusParam, sorting]);
 
-  // --- 3. FETCH DATA ---
-  const { data: apiResponse, isLoading, isFetching } = useMyProducts(queryParams);
+  // --- 6. FETCH DATA ---
+  const { data: apiResponse, isLoading, isFetching } = useMyProducts(apiQueryParams);
   
-  // Mapping dữ liệu từ API trả về (data, meta)
   const tableData = apiResponse?.data || [];
   const pageCount = apiResponse?.meta?.totalPages || 0;
   const totalRows = apiResponse?.meta?.total || 0;
@@ -1231,7 +1273,7 @@ export default function ManageModelsPage() {
   const deleteMutation = useDeleteProduct();
   const cancelAuctionMutation = useCancelAuction();
 
-  // --- HANDLERS ---
+  // Handlers actions (giữ nguyên)
   const onCancelAuction = async (id: string) => {
     if(cancelAuctionMutation.isPending) return;
     try { await cancelAuctionMutation.mutateAsync(id); } catch(err) { console.error(err); }
@@ -1257,23 +1299,33 @@ export default function ManageModelsPage() {
       {
         accessorKey: 'type',
         header: 'Type',
-        enableSorting: false, // Type thường không sort
-        cell: ({ row }) => {
+        enableSorting: false,
+         cell: ({ row }) => {
           const type = row.getValue('type') as string;
-          const styles = {
+          // DARK MODE COLORS: Dùng màu text sáng trên nền tối mờ (opacity) + border
+          const typeStyles = {
             gallery: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
             fixed: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
             auction: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
           };
+          const typeLabels = {
+            gallery: 'Gallery',
+            fixed: 'Store',
+            auction: 'Auction',
+          };
+          
           return (
-            <span className={cn("px-2.5 py-1 rounded-md text-xs font-medium border capitalize", styles[type as keyof typeof styles])}>
-              {type}
+            <span className={cn(
+                "px-2.5 py-1 rounded-md text-xs font-medium border",
+                typeStyles[type as keyof typeof typeStyles]
+            )}>
+              {typeLabels[type as keyof typeof typeLabels]}
             </span>
           );
         },
       },
       {
-        accessorKey: 'price', // Backend cần hỗ trợ sort theo 'price'
+        accessorKey: 'price',
         header: ({ column }) => (
             <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')} className="px-0 hover:bg-transparent">
               Price <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -1292,7 +1344,7 @@ export default function ManageModelsPage() {
         enableSorting: false,
         cell: ({ row }) => {
             const s = row.original.status;
-            if(!s) return <span className="text-muted-foreground">-</span>;
+            if(row.original.type !== "auction" || !s) return <span className="text-muted-foreground">-</span>;
             const styles: any = {
                 upcoming: 'text-blue-400', active: 'text-green-400 animate-pulse', ended: 'text-zinc-400', cancelled: 'text-red-400'
             }
@@ -1308,14 +1360,25 @@ export default function ManageModelsPage() {
         ),
         cell: ({ row }) => <span className="text-muted-foreground text-sm">{new Date(row.getValue('createdAt')).toLocaleDateString('vi-VN')}</span>
       },
-      {
+     {
         accessorKey: 'viewCount',
         header: ({ column }) => (
-            <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')} className="px-0 hover:bg-transparent">
+            <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')} className="px-0 hover:bg-transparent w-full justify-center">
               Views <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div className="text-center">{row.getValue('viewCount')}</div>
+        cell: ({ row }) => <div className="text-center text-muted-foreground">{row.getValue('viewCount')}</div>,
+      },
+      {
+        accessorKey: 'purchaseCount',
+        header: 'Sales/Bids',
+        cell: ({ row }) => {
+          const design = row.original;
+          if (design.type === 'auction') {
+            return <div className="text-center text-orange-300">{design.totalBids || 0} bids</div>;
+          }
+          return <div className="text-center text-muted-foreground">{row.getValue('purchaseCount')}</div>;
+        },
       },
       {
         accessorKey: 'totalEarning',
@@ -1324,48 +1387,117 @@ export default function ManageModelsPage() {
               Rev <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div className="text-emerald-400 font-medium">${Number(row.getValue('totalEarning')).toLocaleString()}</div>
+        cell: ({ row }) => <div className="text-emerald-400 font-medium">{ formatCurrency(Number(row.getValue('totalEarning')))}</div>
       },
       {
         id: 'actions',
         header: 'Actions',
         cell: ({ row }) => {
-            const design = row.original;
-            // ... (Code Actions giữ nguyên như phiên bản trước) ...
+          const design = row.original;
+
+          const ActionButton = ({ onClick, icon: Icon, className, title }: any) => (
+            <Button
+                variant="ghost"
+                size="icon"
+                onClick={onClick}
+                title={title}
+                className={cn("h-8 w-8 hover:bg-accent", className)}
+            >
+                <Icon className="h-4 w-4" />
+            </Button>
+          );
+
+          // Gallery & Fixed
+          if (design.type === 'gallery' || design.type === 'fixed') {
             return (
-                <div className="flex gap-2">
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-400" onClick={() => router.push(`/models/edit/${design._id}`)}><Pencil className="w-4 h-4"/></Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-red-400" onClick={() => confirm('Delete?') && onDeleteProduct(design._id)}><Trash2 className="w-4 h-4"/></Button>
+              <div className="flex gap-1">
+                <ActionButton 
+                    onClick={() => router.push(`/models/edit/${design._id}`)}
+                    icon={Pencil}
+                    className="text-blue-400 hover:text-blue-300"
+                    title="Edit"
+                />
+                <ActionButton 
+                    onClick={() => { if (confirm('Delete this design?')) onDeleteProduct(design._id); }}
+                    icon={Trash2}
+                    className="text-destructive hover:text-red-400"
+                    title="Delete"
+                />
+              </div>
+            );
+          }
+
+          // Auction
+          if (design.type === 'auction') {
+            if (design.status === 'upcoming') {
+              return (
+                <div className="flex gap-1">
+                  <ActionButton 
+                    onClick={() => router.push(`/models/edit/${design._id}`)}
+                    icon={Pencil}
+                    className="text-blue-400 hover:text-blue-300"
+                  />
+                  <ActionButton 
+                    onClick={() => { if (confirm('Cancel auction?')) onCancelAuction(design._id); }}
+                    icon={Ban}
+                    className="text-orange-400 hover:text-orange-300"
+                    title="Cancel Auction"
+                  />
+                  <ActionButton 
+                    onClick={() => { if (confirm('Delete this design?')) onDeleteProduct(design._id); }}
+                    icon={Trash2}
+                    className="text-destructive hover:text-red-400"
+                  />
                 </div>
-            )
-        }
-      }
+              );
+            }
+            if (design.status === 'cancelled') {
+              return (
+                <ActionButton 
+                    onClick={() => { if (confirm('Delete this design?')) onDeleteProduct(design._id); }}
+                    icon={Trash2}
+                    className="text-destructive hover:text-red-400"
+                />
+              );
+            }
+            return <span className="text-xs text-muted-foreground italic">Locked</span>;
+          }
+          return null;
+        },
+      },
     ],
     [router, deleteMutation, cancelAuctionMutation]
   );
+     
 
-  // --- 4. TABLE CONFIGURATION ---
+  // --- 7. TABLE CONFIGURATION ---
   const table = useReactTable({
     data: tableData,
     columns,
-    pageCount: pageCount, // Quan trọng: báo cho table biết tổng số trang từ server
+    pageCount: pageCount,
     state: {
       sorting,
       pagination,
     },
-    // Kích hoạt chế độ Server-side
     manualPagination: true,
     manualSorting: true,
-    // Handlers
-    onSortingChange: setSorting,
-    onPaginationChange: setPagination,
+    // Override Handlers để update URL thay vì update state nội bộ
+    onSortingChange: (updaterOrValue) => {
+        const newSorting = typeof updaterOrValue === 'function' ? updaterOrValue(sorting) : updaterOrValue;
+        updateUrl({
+            sortBy: newSorting[0]?.id,
+            sortOrder: newSorting[0]?.desc ? 'desc' : 'asc'
+        });
+    },
+    onPaginationChange: (updaterOrValue) => {
+        const newPagination = typeof updaterOrValue === 'function' ? updaterOrValue(pagination) : updaterOrValue;
+        updateUrl({
+            page: newPagination.pageIndex + 1,
+            limit: newPagination.pageSize
+        });
+    },
     getCoreRowModel: getCoreRowModel(),
   });
-
-  // Reset về trang 1 khi đổi filter
-  useEffect(() => {
-    setPagination(prev => ({ ...prev, pageIndex: 0 }));
-  }, [typeFilter, statusFilter, debouncedSearch]);
 
   return (
     <div className="min-h-screen bg-background text-foreground space-y-8 p-8">
@@ -1376,13 +1508,21 @@ export default function ManageModelsPage() {
         {/* Toolbar */}
         <div className="flex flex-col md:flex-row gap-4 justify-between">
             <div className="flex flex-1 gap-4">
-                <Input 
-                    placeholder="Search..." 
-                    value={globalFilter} 
-                    onChange={e => setGlobalFilter(e.target.value)} 
-                    className="max-w-sm bg-background" 
-                />
-                <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <div className="relative max-w-sm w-full">
+                    <Input 
+                        placeholder="Search..." 
+                        value={globalFilter} 
+                        onChange={e => setGlobalFilter(e.target.value)} 
+                        onKeyDown={handleKeyDown} // Search on Enter
+                        className="bg-background pr-8" 
+                    />
+                    <Search 
+                        onClick={handleSearch}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" 
+                    />
+                </div>
+                
+                <Select value={typeParam} onValueChange={handleTypeChange}>
                     <SelectTrigger className="w-[140px] bg-background"><SelectValue placeholder="Type" /></SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">All Types</SelectItem>
@@ -1391,24 +1531,28 @@ export default function ManageModelsPage() {
                         <SelectItem value="gallery">Gallery</SelectItem>
                     </SelectContent>
                 </Select>
-                {typeFilter === 'auction' && (
-                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                
+                {typeParam === 'auction' && (
+                    <Select value={statusParam} onValueChange={handleStatusChange}>
                         <SelectTrigger className="w-[140px] bg-background"><SelectValue placeholder="Status" /></SelectTrigger>
                         <SelectContent>
-                         <SelectItem value="all">All Status</SelectItem>
-                   <SelectItem value="upcoming">Upcoming</SelectItem>
-                   <SelectItem value="active">Live</SelectItem>
-                   <SelectItem value="ended">Ended</SelectItem>
-                   <SelectItem value="cancelled">Cancelled</SelectItem>
+                            <SelectItem value="all">All Status</SelectItem>
+                            <SelectItem value="upcoming">Upcoming</SelectItem>
+                            <SelectItem value="active">Live</SelectItem>
+                            <SelectItem value="ended">Ended</SelectItem>
+                            <SelectItem value="cancelled">Cancelled</SelectItem>
                         </SelectContent>
                     </Select>
                 )}
             </div>
 
-                  {/* Page Size Selector (Optional placement) */}
-           {/* <div className="flex items-center gap-2">
+            {/* Page Size Selector */}
+            <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground hidden md:inline">Show</span>
-              <Select value={pagination.pageSize.toString()} onValueChange={(val) => {  setPagination(prev => ({ ...prev, pageSize: Number(val) })); table.setPageSize(Number(val)); }}>
+              <Select 
+                value={pagination.pageSize.toString()} 
+                onValueChange={(val) => updateUrl({ limit: val, page: 1 })}
+              >
                  <SelectTrigger className="w-[70px] bg-background border-input h-9">
                      <SelectValue />
                  </SelectTrigger>
@@ -1419,7 +1563,7 @@ export default function ManageModelsPage() {
                      <SelectItem value="50">50</SelectItem>
                  </SelectContent>
               </Select>
-           </div> */}
+            </div>
         </div>
 
         {/* Table Content */}
@@ -1467,8 +1611,22 @@ export default function ManageModelsPage() {
         <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Showing {tableData.length} of {totalRows} results</span>
             <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>Previous</Button>
-                <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>Next</Button>
+                <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => table.previousPage()} 
+                    disabled={!table.getCanPreviousPage()}
+                >
+                    Previous
+                </Button>
+                <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => table.nextPage()} 
+                    disabled={!table.getCanNextPage()}
+                >
+                    Next
+                </Button>
             </div>
         </div>
       </div>

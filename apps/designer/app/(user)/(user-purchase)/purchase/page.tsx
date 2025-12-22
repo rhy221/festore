@@ -331,6 +331,7 @@ import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'; // Import mới
 import { useDownloadProduct, usePurchasedProducts } from '@/queries/usePurchase';
 import { RatingModal, RatingStatus } from '@/components/Rating';
 import {
@@ -345,37 +346,68 @@ import {
 import { cn } from '@workspace/ui/lib/utils';
 
 export default function PurchasesPage() {
-  // --- State ---
-  const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // --- Lấy State từ URL ---
+  const pageParam = searchParams.get('page');
+  const searchParam = searchParams.get('search');
+
+  const currentPage = pageParam ? parseInt(pageParam) : 1;
+  const currentSearch = searchParam || '';
+
+  // --- Local State ---
+  // searchQuery chỉ dùng để bind vào input, không dùng để fetch data trực tiếp
+  const [searchQuery, setSearchQuery] = useState(currentSearch);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [ratingModalOpen, setRatingModalOpen] = useState(false);
 
-  // Debounce search input
+  // Sync searchQuery với URL khi URL thay đổi (ví dụ user back/forward)
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchQuery);
-      setCurrentPage(1); // Reset về trang 1 khi search thay đổi
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
+    setSearchQuery(currentSearch);
+  }, [currentSearch]);
 
   // --- API Hooks ---
-  // Truyền params vào hook
+  // Truyền params từ URL vào hook
   const { data, isLoading: loadingPurchases } = usePurchasedProducts({
-    search: debouncedSearch,
-    page: currentPage,
+    search: currentSearch, // Fetch theo search từ URL
+    page: currentPage,     // Fetch theo page từ URL
   });
 
   const downloadMutation = useDownloadProduct();
 
   // Extract data & meta
-  // Backend trả về: { data: [], meta: { page, total, totalPages, ... } }
   const purchases = data?.data || [];
   const meta = data?.meta || { page: 1, totalPages: 1, total: 0 };
 
+  // --- Helper cập nhật URL ---
+  const updateUrl = (newParams: Record<string, string | number | null>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    
+    Object.entries(newParams).forEach(([key, value]) => {
+      if (value === null || value === '' || value === undefined) {
+        params.delete(key);
+      } else {
+        params.set(key, String(value));
+      }
+    });
+
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
   // --- Handlers ---
+  const handleSearch = () => {
+    // Khi search mới, luôn reset về trang 1
+    updateUrl({ search: searchQuery, page: 1 });
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   const onDownload = async (productId: string) => {
     if (downloadMutation.isPending) return;
     try {
@@ -392,7 +424,8 @@ export default function PurchasesPage() {
 
   const handlePageChange = (page: number) => {
     if (page < 1 || page > meta.totalPages) return;
-    setCurrentPage(page);
+    // Cập nhật page lên URL -> hook sẽ tự fetch lại
+    updateUrl({ page });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -410,12 +443,16 @@ export default function PurchasesPage() {
             </div>
 
             <div className="relative w-full md:w-80">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+              <Search 
+                onClick={handleSearch} // Click icon cũng trigger search
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 cursor-pointer hover:text-white" 
+              />
               <Input
                 type="text"
                 placeholder="Search purchased items..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleKeyDown} // Trigger search khi Enter
                 className="pl-10 bg-zinc-900 border-zinc-800 text-white placeholder:text-white/40 focus:border-zinc-700 rounded-full"
               />
             </div>
@@ -436,6 +473,11 @@ export default function PurchasesPage() {
                <div className="flex flex-col items-center justify-center py-20 text-white/50 border border-dashed border-zinc-800 rounded-xl bg-zinc-900/30">
                   <Package className="w-12 h-12 mb-4 opacity-50" />
                   <p>No purchased items found.</p>
+                  {currentSearch && (
+                    <Button variant="link" onClick={() => { setSearchQuery(''); updateUrl({ search: '', page: 1 }); }} className="mt-2 text-cyan-400">
+                      Clear search
+                    </Button>
+                  )}
                </div>
             ) : (
               <div className="space-y-4">
@@ -475,7 +517,7 @@ export default function PurchasesPage() {
 
                     {/* Actions */}
                     <div className="flex flex-row sm:flex-col gap-3 w-full sm:w-auto shrink-0">
-                       <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2">
                           <RatingStatus productId={item.product._id} />
                           <Button
                             variant="outline"
@@ -485,7 +527,7 @@ export default function PurchasesPage() {
                           >
                             <Star className="mr-2 h-3 w-3" /> Rate
                           </Button>
-                       </div>
+                        </div>
 
                       <Button
                         onClick={() => onDownload(item.product._id)}
@@ -519,7 +561,7 @@ export default function PurchasesPage() {
                   </PaginationItem>
 
                   {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((page) => {
-                     if (page === 1 || page === meta.totalPages || (page >= currentPage - 1 && page <= currentPage + 1)) {
+                      if (page === 1 || page === meta.totalPages || (page >= currentPage - 1 && page <= currentPage + 1)) {
                         return (
                           <PaginationItem key={page}>
                             <PaginationLink
@@ -534,11 +576,11 @@ export default function PurchasesPage() {
                             </PaginationLink>
                           </PaginationItem>
                         );
-                     }
-                     if (page === currentPage - 2 || page === currentPage + 2) {
+                      }
+                      if (page === currentPage - 2 || page === currentPage + 2) {
                         return <PaginationItem key={page}><PaginationEllipsis className="text-white/50" /></PaginationItem>;
-                     }
-                     return null;
+                      }
+                      return null;
                   })}
 
                   <PaginationItem>

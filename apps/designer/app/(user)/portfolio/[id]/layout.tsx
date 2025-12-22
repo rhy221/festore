@@ -14,6 +14,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { set } from 'date-fns';
 import { copyToClipboard } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
+import { FollowModal } from '@/components/FollowModal';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -105,6 +106,19 @@ export default function PortfolioLayout({ children, params }: LayoutProps) {
       await queryClient.invalidateQueries({ queryKey: QUERY_KEY });
   }
 
+  const [followModal, setFollowModal] = useState<{
+    isOpen: boolean;
+    type: "followers" | "following";
+  }>({
+    isOpen: false,
+    type: "followers" // Default
+  });
+
+  // Hàm mở modal
+  const openFollowModal = (type: "followers" | "following") => {
+    setFollowModal({ isOpen: true, type });
+  };
+
   if (userPortfolioLoading) {
     return <div className="min-h-screen flex items-center justify-center text-white">Loading...</div>;
   }
@@ -166,11 +180,13 @@ export default function PortfolioLayout({ children, params }: LayoutProps) {
                 <h1 className="text-3xl font-bold text-white mb-2">{userPortfolio?.name}</h1>
                 
                 <div className="flex items-center gap-5 text-sm">
-                  <div className="flex flex-col lg:flex-row lg:gap-1">
+                  <div className="flex flex-col lg:flex-row lg:gap-1 cursor-pointer"
+                  onClick={() => openFollowModal("followers")}>
                     <span className="text-white font-bold">{userPortfolio?.followerCount?.toLocaleString() || 0}</span>
                     <span className="text-gray-500">Follower</span>
                   </div>
-                  <div className="flex flex-col lg:flex-row lg:gap-1">
+                  <div className="flex flex-col lg:flex-row lg:gap-1 cursor-pointer"
+                  onClick={() => openFollowModal("following")}>
                     <span className="text-white font-bold">{userPortfolio?.followingCount?.toLocaleString() || 0}</span>
                     <span className="text-gray-500">Following</span>
                   </div>
@@ -213,7 +229,12 @@ export default function PortfolioLayout({ children, params }: LayoutProps) {
         <div className="min-h-[400px] flex gap-2">
           {children}
         </div>
-
+        <FollowModal 
+  isOpen={followModal.isOpen} 
+  onClose={() => setFollowModal(prev => ({ ...prev, isOpen: false }))}
+  userId={id}
+  defaultType={followModal.type} 
+/>
       </main>
     </div>
   );

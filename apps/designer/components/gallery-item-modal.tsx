@@ -13,11 +13,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@workspace/ui/lib/utils';
 import { VirtualTryOnModal } from './VirtualTryOn';
 import { copyToClipboard } from '@/lib/utils';
+import { LikeListModal } from './LikeModal';
 
 export function GalleryItemModal({ id }: { id: string }) {
   const [mainActionElement, setMainActionElement] = useState<HTMLButtonElement | null>(null);
   const isMainVisible = useOnScreen(mainActionElement);
-
+const [isLikeListOpen, setIsLikeListOpen] = useState(false);
   const { data: design, isLoading: designLoading } = useProduct(id);
   const { data: categories } = useCategories();
 
@@ -98,12 +99,18 @@ export function GalleryItemModal({ id }: { id: string }) {
             <div className="space-y-8">
               {/* Stats Badge */}
               <div className="flex justify-start gap-3 items-center">
-                <Badge
-                  onClick={handleLike}
+                <Badge  
                   className="px-3 py-1.5 gap-2 bg-gray-700 text-white border border-white/10 hover:text-zinc-400 cursor-pointer"
                 >
-                  <Heart size={16} fill={design.isLiked ? "white" : "transparent"} />
-                  <span className="text-sm">{design.likeCount.toLocaleString()}</span>
+                  <Heart                   
+                  onClick={handleLike}
+ size={16} fill={design.isLiked ? "white" : "transparent"} />
+                  <span 
+           onClick={(e) => {
+               setIsLikeListOpen(true);
+            }}
+            className="text-sm cursor-pointer hover:underline"
+          >{design.likeCount.toLocaleString()}</span>
                 </Badge>
                 <p className="text-white/60 text-sm">
                   {design.viewCount.toLocaleString()} views
@@ -268,7 +275,11 @@ export function GalleryItemModal({ id }: { id: string }) {
 
         </div>
       </div>
-
+<LikeListModal 
+        isOpen={isLikeListOpen} 
+        onClose={() => setIsLikeListOpen(false)} 
+        designId={id} 
+      />
     </div>
   );
 }

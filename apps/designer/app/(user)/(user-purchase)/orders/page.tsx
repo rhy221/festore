@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'; // 1. Import hooks
 import { 
   Loader2, 
   Search, 
@@ -18,7 +19,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@workspace/ui/components/accordion';
-// Import Pagination Components
 import {
   Pagination,
   PaginationContent,
@@ -58,16 +58,22 @@ interface MetaData {
 }
 
 export default function OrderHistoryPage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   // --- STATE ---
-  const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
+  // 2. Lấy giá trị từ URL
+  const pageParam = searchParams.get('page');
+  const searchParam = searchParams.get('search');
+
+  const currentPage = pageParam ? parseInt(pageParam) : 1;
+  const currentSearch = searchParam || '';
+
+  // Local state cho input (để user gõ)
+  const [searchQuery, setSearchQuery] = useState(currentSearch);
   const [loading, setLoading] = useState(false);
-  
-  // Data State
   const [orders, setOrders] = useState<Order[]>([]);
-  
-  // Pagination State
-  const [currentPage, setCurrentPage] = useState(1);
   const [meta, setMeta] = useState<MetaData>({
     page: 1,
     limit: 10,
@@ -75,18 +81,48 @@ export default function OrderHistoryPage() {
     totalPages: 1
   });
 
-  // Debounce search input
+  // Sync searchQuery khi URL thay đổi (VD: User bấm Back)
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchQuery);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
+    setSearchQuery(currentSearch);
+  }, [currentSearch]);
 
-  // Reset về trang 1 khi search thay đổi
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [debouncedSearch]);
+  // --- HELPER UPDATE URL ---
+  const updateUrl = (newParams: Record<string, string | number | null>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    
+    Object.entries(newParams).forEach(([key, value]) => {
+      if (value === null || value === '' || value === undefined) {
+        params.delete(key);
+      } else {
+        params.set(key, String(value));
+      }
+    });
+
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  // --- HANDLERS ---
+  const handleSearch = () => {
+    // Reset về trang 1 khi search mới
+    updateUrl({ search: searchQuery, page: 1 });
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const handleReset = () => {
+    setSearchQuery('');
+    updateUrl({ search: '', page: 1 });
+  };
+
+  const handlePageChange = (page: number) => {
+    if (page < 1 || page > meta.totalPages) return;
+    updateUrl({ page });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // --- FETCH DATA ---
   const fetchOrders = async () => {
@@ -94,18 +130,15 @@ export default function OrderHistoryPage() {
     try {
       const queryParams = new URLSearchParams();
       
-      if (debouncedSearch) {
-        queryParams.append('search', debouncedSearch);
+      // Dùng giá trị từ URL (currentSearch, currentPage) thay vì state local
+      if (currentSearch) {
+        queryParams.append('search', currentSearch);
       }
       
-      // Thêm params phân trang
       queryParams.append('page', currentPage.toString());
-      queryParams.append('limit', '10'); // Số lượng item mỗi trang
+      queryParams.append('limit', '10'); 
 
       const res = await http.get('/orders/my-orders', { params: queryParams });
-      
-      // Xử lý dữ liệu trả về từ Backend (Giả sử format chuẩn: { data: [], meta: {} })
-      // Nếu backend trả về mảng trực tiếp thì cần điều chỉnh lại logic này
       const responseData = res.data;
 
       if (responseData.data && Array.isArray(responseData.data)) {
@@ -114,7 +147,6 @@ export default function OrderHistoryPage() {
           setMeta(responseData.meta);
         }
       } else if (Array.isArray(responseData)) {
-        // Fallback nếu backend chưa hỗ trợ phân trang chuẩn
         setOrders(responseData); 
       }
       
@@ -125,19 +157,11 @@ export default function OrderHistoryPage() {
     }
   };
 
-  // Gọi API khi search hoặc page thay đổi
+  // 3. Trigger fetch khi URL params thay đổi
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearch, currentPage]);
-
-  // Handler chuyển trang
-  const handlePageChange = (page: number) => {
-    if (page < 1 || page > meta.totalPages) return;
-    setCurrentPage(page);
-    // Scroll lên đầu bảng khi chuyển trang (optional)
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  }, [currentSearch, currentPage]);
 
   return (
     <div className="container py-6 space-y-8 font-sans min-h-screen">
@@ -156,11 +180,16 @@ export default function OrderHistoryPage() {
         {/* --- CONTROLS --- */}
         <div className="flex items-center justify-between gap-4">
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            {/* Icon click để search */}
+            <Search 
+              onClick={handleSearch}
+              className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" 
+            />
             <Input 
               placeholder="Search by Order ID or Product Name..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleKeyDown} // Trigger search khi Enter
               className="pl-9 rounded-full bg-muted/50 border-transparent focus-visible:bg-background focus-visible:ring-1 focus-visible:ring-ring transition-all"
             />
           </div>
@@ -168,9 +197,9 @@ export default function OrderHistoryPage() {
           <Button 
             variant="ghost" 
             size="sm" 
-            onClick={() => { setSearchQuery(''); setCurrentPage(1); }}
+            onClick={handleReset}
             className="text-muted-foreground hover:text-foreground rounded-full px-3"
-            disabled={!searchQuery}
+            disabled={!searchQuery && !currentSearch} // Disabled khi không có query nào
           >
             <RotateCcw className="h-4 w-4 mr-1" /> Reset
           </Button>
@@ -249,22 +278,17 @@ export default function OrderHistoryPage() {
                         {order.items.map((item, index) => (
                           <div key={index} className="flex items-center gap-4 p-3 bg-background rounded-lg border border-border/50 hover:border-border transition-colors">
                             <div className="h-16 w-16 rounded-md bg-muted overflow-hidden shrink-0 border border-border">
-                            <Link href={`/detail/${item.productId}`}>
-                            <img 
+                              <Link href={`/detail/${item.productId}`}>
+                                <img 
                                   src={item.imageUrl || '/placeholder.png'} 
                                   alt={item.title} 
                                   className="object-cover w-full h-full hover:scale-105 transition-transform duration-300"
-                               />
-                            </Link>
-
-                               
+                                />
+                              </Link>
                             </div>
 
                             <Link href={`/detail/${item.productId}`} className="flex-1 min-w-0">
-                              <h4 className="font-medium text-sm text-foreground truncate">{item.title}</h4>
-                              {/* <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                                <span className="bg-muted px-2 py-0.5 rounded">Qty: {item.quantity}</span>
-                              </div> */}
+                              <h4 className="font-medium text-sm text-foreground truncate hover:text-primary transition-colors">{item.title}</h4>
                             </Link>
 
                             <div className="text-right">
@@ -297,30 +321,27 @@ export default function OrderHistoryPage() {
                         />
                       </PaginationItem>
                       
-                      {/* Logic hiển thị số trang */}
                       {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((page) => {
-                         // Hiển thị trang đầu, trang cuối, và trang hiện tại +/- 1
                          if (
-                            page === 1 || 
-                            page === meta.totalPages || 
-                            (page >= currentPage - 1 && page <= currentPage + 1)
+                           page === 1 || 
+                           page === meta.totalPages || 
+                           (page >= currentPage - 1 && page <= currentPage + 1)
                          ) {
-                            return (
-                              <PaginationItem key={page}>
-                                <PaginationLink 
-                                  isActive={page === currentPage}
-                                  onClick={() => handlePageChange(page)}
-                                  className="cursor-pointer"
-                                >
-                                  {page}
-                                </PaginationLink>
-                              </PaginationItem>
-                            )
+                           return (
+                             <PaginationItem key={page}>
+                               <PaginationLink 
+                                 isActive={page === currentPage}
+                                 onClick={() => handlePageChange(page)}
+                                 className="cursor-pointer"
+                               >
+                                 {page}
+                               </PaginationLink>
+                             </PaginationItem>
+                           )
                          }
                          
-                         // Hiển thị dấu ...
                          if (page === currentPage - 2 || page === currentPage + 2) {
-                            return <PaginationItem key={page}><PaginationEllipsis /></PaginationItem>
+                           return <PaginationItem key={page}><PaginationEllipsis /></PaginationItem>
                          }
                          return null;
                       })}

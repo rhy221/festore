@@ -244,7 +244,7 @@ export default function EditForm({ id }: { id: string  })
                 {...field}
                 id={field.name}
                 rows={6}
-                required
+                
                 placeholder="Describe your item in detail..."
               >
               </Textarea>

@@ -792,7 +792,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { format } from 'date-fns';
+import { format, parseISO, subDays } from 'date-fns';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'; // 1. Import hooks
 import { 
   Calendar as CalendarIcon, 
   Loader2, 
@@ -823,11 +824,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@workspace/ui/components/pagination';
 import { Badge } from "@workspace/ui/components/badge";
 import { Card } from '@workspace/ui/components/card';
-import http from '@/lib/http'; // Đảm bảo import đúng
-// Import hàm formatCurrency của bạn
-import { formatCurrency } from '@/lib/utils'; // Hoặc để inline
+import http from '@/lib/http';
+import { formatCurrency } from '@/lib/utils';
+
+interface MetaData {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
 
 // --- INTERFACES ---
 interface SalesItem {
@@ -850,47 +867,102 @@ interface SalesSummary {
 }
 
 export default function SalesReportPage() {
-  // --- STATE ---
-  const [date, setDate] = useState<DateRange | undefined>({
-    from: new Date(new Date().setDate(new Date().getDate() - 30)),
-    to: new Date(),
-  });
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  const [searchQuery, setSearchQuery] = useState(''); // State cho tìm kiếm
-  const [saleType, setSaleType] = useState('all');    // State cho filter type
+  // --- STATE TỪ URL ---
+  const startDateParam = searchParams.get('startDate');
+  const endDateParam = searchParams.get('endDate');
+  const typeParam = searchParams.get('type') || 'all';
+  const searchParam = searchParams.get('search') || '';
+  const pageParam = searchParams.get('page'); // Lấy page từ URL
+
+  const initialDateRange: DateRange = {
+    from: startDateParam ? parseISO(startDateParam) : subDays(new Date(), 30),
+    to: endDateParam ? parseISO(endDateParam) : new Date(),
+  };
+
+  const [date, setDate] = useState<DateRange | undefined>(initialDateRange);
+  const [searchQuery, setSearchQuery] = useState(searchParam);
   
-  // Debounce search value để tránh call API quá nhiều
-  const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
-
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState<SalesSummary>({ totalItemsSold: 0, totalRevenue: 0 });
   const [orders, setOrders] = useState<SalesOrder[]>([]);
+  
+  // State meta cho pagination
+  const [meta, setMeta] = useState<MetaData>({ page: 1, limit: 10, total: 0, totalPages: 1 });
 
-  // Effect để debounce search input (delay 500ms)
+  // Current page từ URL hoặc default 1
+  const currentPage = pageParam ? parseInt(pageParam) : 1;
+
+  // Sync searchQuery & Date
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchQuery);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
+    setSearchQuery(searchParam);
+    if (startDateParam && endDateParam) {
+       setDate({ from: parseISO(startDateParam), to: parseISO(endDateParam) });
+    }
+  }, [searchParam, startDateParam, endDateParam]);
+
+  // --- HELPER UPDATE URL ---
+  const updateUrl = (newParams: Record<string, string | number | undefined>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    Object.entries(newParams).forEach(([key, value]) => {
+      if (value === undefined || value === '' || value === null) params.delete(key);
+      else params.set(key, String(value));
+    });
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  // --- HANDLERS ---
+  // Khi search/filter thay đổi -> Reset về trang 1
+  const handleSearch = () => updateUrl({ search: searchQuery, page: 1 });
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') handleSearch(); };
+  const handleDateSelect = (range: DateRange | undefined) => {
+    setDate(range);
+    if (range?.from && range?.to) {
+      updateUrl({ startDate: range.from.toISOString(), endDate: range.to.toISOString(), page: 1 });
+    }
+  };
+  const handleTypeChange = (value: string) => updateUrl({ type: value, page: 1 });
+  
+  // Handler chuyển trang
+  const handlePageChange = (page: number) => {
+    if (page < 1 || page > meta.totalPages) return;
+    updateUrl({ page });
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll lên đầu
+  };
+
+  const handleReset = () => { /* ... giữ nguyên logic reset ... */ };
 
   // --- FETCH DATA ---
   const fetchSalesData = async () => {
-    if (!date?.from || !date?.to) return;
+    const fromDate = startDateParam || date?.from?.toISOString();
+    const toDate = endDateParam || date?.to?.toISOString();
+
+    if (!fromDate || !toDate) return;
 
     setLoading(true);
     try {
       const queryParams = new URLSearchParams({
-        startDate: date.from.toISOString(),
-        endDate: date.to.toISOString(),
-        type: saleType, // Gửi type
-        search: debouncedSearch, // Gửi search text
+        startDate: fromDate,
+        endDate: toDate,
+        type: typeParam,
+        search: searchParam,
+        page: currentPage.toString(), // Gửi page lên BE
+        limit: '10', // Cố định hoặc lấy từ state
       });
 
       const res = await http.get('/sales', { params: queryParams });
       const data = res.data;
+      
       setSummary(data.summary);
       setOrders(data.orders);
+      
+      // Cập nhật meta từ response BE
+      if (data.meta) {
+        setMeta(data.meta);
+      }
     } catch (error) {
       console.error('Failed to fetch sales:', error);
     } finally {
@@ -898,53 +970,41 @@ export default function SalesReportPage() {
     }
   };
 
-  // Trigger fetch khi Date, Type, hoặc Debounced Search thay đổi
   useEffect(() => {
-    if (date?.from && date?.to) {
-      fetchSalesData();
-    }
+    fetchSalesData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [date, saleType, debouncedSearch]);
+  }, [searchParam, typeParam, startDateParam, endDateParam, currentPage]);
 
-  const handleReset = () => {
-    setSearchQuery('');
-    setSaleType('all');
-    setDate({
-      from: new Date(new Date().setDate(new Date().getDate() - 30)),
-      to: new Date(),
-    });
-  };
-
-  return (
-    <div className="container mx-auto p-6 space-y-8 font-sans">
-      <div className="max-w-7xl mx-auto space-y-8">
+return (
+    <div className="container mx-auto p-4 md:p-6 space-y-6 md:space-y-8 font-sans">
+      <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
         
         {/* --- HEADER --- */}
         <div className="flex items-center gap-6 text-sm font-semibold text-muted-foreground uppercase tracking-wide border-b border-border pb-4">
           <span className="text-foreground cursor-pointer border-b-2 border-primary -mb-[17px] pb-4">Item Sales</span>
         </div>
 
-        {/* --- CONTROLS BAR --- */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        {/* --- CONTROLS BAR (Responsive Updated) --- */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           
-          {/* Left: Date Picker */}
-          <div className="flex justify-start">
+          {/* Left: Date Picker (Full width on mobile) */}
+          <div className="flex justify-start w-full lg:w-auto">
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   id="date"
                   variant="outline"
                   className={cn(
-                    "w-auto justify-start text-left font-normal rounded-full border-border/60 bg-muted/30",
+                    "w-full lg:w-auto justify-start text-left font-normal rounded-full border-border/60 bg-muted/30",
                     !date && "text-muted-foreground"
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {date?.from ? (
                     date.to ? (
-                      <>
+                      <span className="truncate">
                         {format(date.from, "MMM d, yyyy")} - {format(date.to, "MMM d, yyyy")}
-                      </>
+                      </span>
                     ) : (
                       format(date.from, "MMM d, yyyy")
                     )
@@ -955,81 +1015,89 @@ export default function SalesReportPage() {
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
                 <Calendar
-                  initialFocus
                   mode="range"
                   defaultMonth={date?.from}
                   selected={date}
-                  onSelect={setDate}
-                  numberOfMonths={2}
+                  onSelect={handleDateSelect}
+                  numberOfMonths={1} 
+                  className="p-3 pointer-events-auto" 
                 />
               </PopoverContent>
             </Popover>
           </div>
 
-          {/* Right: Search & Filters */}
-          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+          {/* Right: Search & Filters (Wrap on mobile) */}
+          <div className="flex flex-col sm:flex-row flex-wrap items-center gap-3 w-full lg:w-auto">
             {/* Search Input */}
-            <div className="relative flex-1 md:w-80">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <div className="relative w-full sm:flex-1 lg:w-80">
+              <Search 
+                onClick={handleSearch}
+                className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" 
+              />
               <Input 
-                placeholder="Search Order No. or Item Name" 
+                placeholder="Search..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 rounded-full bg-muted/50 border-transparent focus-visible:bg-background focus-visible:ring-1 focus-visible:ring-ring"
+                onKeyDown={handleKeyDown}
+                className="pl-9 rounded-full bg-muted/50 border-transparent focus-visible:bg-background focus-visible:ring-1 focus-visible:ring-ring w-full"
               />
             </div>
 
-            {/* Filter Select */}
-            <Select value={saleType} onValueChange={setSaleType}>
-              <SelectTrigger className="w-[110px] rounded-full bg-muted/50 border-transparent focus:bg-background">
-                <SelectValue placeholder="All" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="fixed">Store</SelectItem>
-                <SelectItem value="auction">Auction</SelectItem>
-              </SelectContent>
-            </Select>
+            {/* Filter & Reset Container */}
+            <div className="flex gap-3 w-full sm:w-auto">
+               {/* Filter Select */}
+               <Select value={typeParam} onValueChange={handleTypeChange}>
+                 <SelectTrigger className="flex-1 sm:w-[130px] rounded-full bg-muted/50 border-transparent focus:bg-background">
+                   <SelectValue placeholder="All" />
+                 </SelectTrigger>
+                 <SelectContent>
+                   <SelectItem value="all">All Types</SelectItem>
+                   <SelectItem value="fixed">Store</SelectItem>
+                   <SelectItem value="auction">Auction</SelectItem>
+                 </SelectContent>
+               </Select>
 
-            {/* Reset Button */}
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={handleReset}
-              className="text-muted-foreground hover:text-foreground rounded-full px-3"
-            >
-              <RotateCcw className="h-4 w-4 mr-1" /> Reset
-            </Button>
+               {/* Reset Button */}
+               <Button 
+                 variant="ghost" 
+                 size="sm" 
+                 onClick={handleReset}
+                 className="text-muted-foreground hover:text-foreground rounded-full px-4 border border-transparent hover:border-border"
+               >
+                 <RotateCcw className="h-4 w-4 sm:mr-1" /> 
+                 <span className="hidden sm:inline">Reset</span>
+               </Button>
+            </div>
           </div>
         </div>
 
-        {/* --- SUMMARY CARDS --- */}
-        <div className="grid grid-cols-2 gap-6">
-          <Card className="flex flex-col items-center justify-center p-8 border-border/60 bg-card/50">
-            <span className="text-muted-foreground text-sm font-medium uppercase tracking-wider mb-2">Items Sold</span>
-            <span className="text-4xl font-bold text-foreground">
+        {/* --- SUMMARY CARDS (Responsive Updated: grid-cols-1 on mobile) --- */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          <Card className="flex flex-col items-center justify-center p-6 md:p-8 border-border/60 bg-card/50 shadow-sm">
+            <span className="text-muted-foreground text-xs md:text-sm font-medium uppercase tracking-wider mb-2">Items Sold</span>
+            <span className="text-3xl md:text-4xl font-bold text-foreground">
                {loading ? <Loader2 className="animate-spin h-8 w-8" /> : summary.totalItemsSold}
             </span>
           </Card>
-          <Card className="flex flex-col items-center justify-center p-8 border-border/60 bg-card/50">
-            <span className="text-muted-foreground text-sm font-medium uppercase tracking-wider mb-2">Total Revenue</span>
-            <span className="text-4xl font-bold text-foreground">
+          <Card className="flex flex-col items-center justify-center p-6 md:p-8 border-border/60 bg-card/50 shadow-sm">
+            <span className="text-muted-foreground text-xs md:text-sm font-medium uppercase tracking-wider mb-2">Total Revenue</span>
+            <span className="text-3xl md:text-4xl font-bold text-foreground">
                {loading ? <Loader2 className="animate-spin h-8 w-8" /> : formatCurrency(summary.totalRevenue)}
             </span>
           </Card>
         </div>
 
-        {/* --- TABLE HEADER --- */}
-        <div className="border-t border-b border-border py-3 grid grid-cols-12 gap-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide px-4">
+        {/* --- TABLE HEADER (Hidden on mobile) --- */}
+        <div className="hidden md:grid border-t border-b border-border py-3 grid-cols-12 gap-4 text-xs font-semibold text-muted-foreground uppercase tracking-wide px-4">
             <div className="col-span-3">Order No.</div>
             <div className="col-span-5 flex items-center gap-1">
-                Item Information
+               Item Information
             </div>
             <div className="col-span-2 text-right">Revenue</div>
             <div className="col-span-2 text-right">Date</div>
         </div>
 
-        {/* --- ORDERS LIST --- */}
+        {/* --- ORDERS LIST (Responsive Updated) --- */}
         <div className="min-h-[200px]">
           {loading ? (
             <div className="flex justify-center py-20">
@@ -1043,35 +1111,50 @@ export default function SalesReportPage() {
                <p>No sales found matching criteria</p>
             </div>
           ) : (
-            <Accordion type="single" collapsible className="w-full">
+            <Accordion type="single" collapsible className="w-full space-y-3 md:space-y-0">
               {orders.map((order) => (
-                <AccordionItem key={order._id} value={order._id} className="border-b border-border last:border-0">
+                <AccordionItem 
+                   key={order._id} 
+                   value={order._id} 
+                   className="border border-border md:border-x-0 md:border-t-0 md:border-b rounded-lg md:rounded-none bg-card md:bg-transparent overflow-hidden"
+                >
                   <AccordionTrigger className="hover:no-underline py-4 px-4 hover:bg-muted/30 rounded-sm group transition-all">
-                    <div className="grid grid-cols-12 gap-4 w-full items-center text-sm">
-                      {/* Order No */}
-                      <div className="col-span-3 text-left font-mono text-muted-foreground truncate" title={order._id}>
-                        #{order._id.slice(-6).toUpperCase()}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 w-full items-start md:items-center text-sm">
+                      
+                      {/* Mobile Row 1: Order No & Date */}
+                      <div className="col-span-1 md:col-span-3 flex justify-between md:block w-full">
+                        <div className="flex flex-col text-left">
+                           <span className="md:hidden text-xs text-muted-foreground font-semibold">Order ID</span>
+                           <span className="font-mono text-muted-foreground truncate" title={order._id}>
+                             #{order._id.slice(-6).toUpperCase()}
+                           </span>
+                        </div>
+                        <div className="md:hidden text-right">
+                           <span className="text-xs text-muted-foreground block font-semibold">Date</span>
+                           <span className="text-xs text-muted-foreground">{format(new Date(order.orderDate), "dd/MM")}</span>
+                        </div>
                       </div>
                       
                       {/* Item Info Summary */}
-                      <div className="col-span-5 text-left">
-                          <div className="text-foreground font-medium truncate flex items-center gap-2">
+                      <div className="col-span-1 md:col-span-5 text-left w-full mt-2 md:mt-0">
+                          <div className="text-foreground font-medium flex items-center gap-2">
                              {order.items.length > 1 ? (
-                                 <Badge variant="secondary" className="px-2 py-0.5">
+                                 <Badge variant="secondary" className="px-2 py-0.5 shrink-0">
                                      {order.items.length} items
                                  </Badge>
                              ) : null}
-                             <span className="truncate">{order.items[0]?.title || 'Unknown Product'}</span>
+                             <span className="truncate flex-1">{order.items[0]?.title || 'Unknown Product'}</span>
                           </div>
                       </div>
 
                       {/* Revenue */}
-                      <div className="col-span-2 text-right font-medium text-foreground">
+                      <div className="col-span-1 md:col-span-2 text-left md:text-right font-medium text-foreground w-full flex justify-between md:block mt-1 md:mt-0">
+                        <span className="md:hidden text-xs text-muted-foreground">Total:</span>
                         {formatCurrency(order.sellerOrderTotal)}
                       </div>
 
-                      {/* Date */}
-                      <div className="col-span-2 text-right text-muted-foreground text-xs">
+                      {/* Date (Desktop Only) */}
+                      <div className="hidden md:block col-span-2 text-right text-muted-foreground text-xs">
                         {format(new Date(order.orderDate), "dd/MM/yyyy")}
                       </div>
                     </div>
@@ -1090,11 +1173,11 @@ export default function SalesReportPage() {
                              />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="font-medium text-sm text-foreground">{item.title}</p>
-                            <p className="text-xs text-muted-foreground font-mono mt-1">ID: {item.productId}</p>
+                            <p className="font-medium text-sm text-foreground line-clamp-2">{item.title}</p>
+                            <p className="text-xs text-muted-foreground font-mono mt-1 truncate">ID: {item.productId}</p>
                           </div>
-                          <div className="text-right">
-                            <div className="font-medium text-foreground">
+                          <div className="text-right shrink-0">
+                            <div className="font-medium text-foreground text-sm">
                               {formatCurrency(item.price)}
                             </div>
                           </div>
@@ -1107,7 +1190,53 @@ export default function SalesReportPage() {
             </Accordion>
           )}
         </div>
+          {meta.totalPages > 0 && !loading && orders.length > 0 && (
+            <div className="flex justify-center pt-4 overflow-x-auto pb-2">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      className={cn("cursor-pointer", currentPage === 1 && "pointer-events-none opacity-50")}
+                    />
+                  </PaginationItem>
+                  
+                  {/* Logic hiển thị trang thông minh */}
+                  {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((page) => {
+                      if (
+                        page === 1 || 
+                        page === meta.totalPages || 
+                        (page >= currentPage - 1 && page <= currentPage + 1)
+                      ) {
+                        return (
+                          <PaginationItem key={page}>
+                            <PaginationLink 
+                              isActive={page === currentPage}
+                              onClick={() => handlePageChange(page)}
+                              className="cursor-pointer"
+                            >
+                              {page}
+                            </PaginationLink>
+                          </PaginationItem>
+                        )
+                      }
+                      
+                      if (page === currentPage - 2 || page === currentPage + 2) {
+                        return <PaginationItem key={page}><PaginationEllipsis /></PaginationItem>
+                      }
+                      return null;
+                  })}
 
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      className={cn("cursor-pointer", currentPage === meta.totalPages && "pointer-events-none opacity-50")}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+        )}
       </div>
     </div>
   );

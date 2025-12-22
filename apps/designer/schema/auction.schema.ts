@@ -22,6 +22,7 @@ export type AuctionType = {
   designerId: string;
   designerProfile: DesignerProfile,
   viewCount: number;
+  likeCount: number;
   currentViewerCount?: number;
   currentWinnerProfile?: DesignerProfile,
   currentWinnerId?: string;

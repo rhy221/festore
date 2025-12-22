@@ -137,6 +137,7 @@ export function CommentsSection({ productId }: CommentsSectionProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!commentText.trim()) return;
+          console.log(replyTo);
 
     createCommentMutation.mutate(
       {

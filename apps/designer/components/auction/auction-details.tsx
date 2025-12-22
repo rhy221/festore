@@ -356,6 +356,7 @@ import { cn } from '@workspace/ui/lib/utils'; // Assuming you have this utility
 import { useAuth } from '@/hooks/useAuth';
 import { useFollowDesignerMutation, useLikeDesignMutation } from '@/queries/useProduct';
 import Link from 'next/link';
+import { LikeListModal } from '../LikeModal';
 
 export function AuctionDetails({auctionId, viewerCount} : {auctionId: string, viewerCount:number}) {
   const [isLiked, setIsLiked] = useState(false);
@@ -367,6 +368,8 @@ export function AuctionDetails({auctionId, viewerCount} : {auctionId: string, vi
   const previousPrice = useRef(0);
   const [isFirstLoad, setFirstLoad] = useState(true);
   const [isSeller, setIsSeller] = useState(false);
+  const [isLikeListOpen, setIsLikeListOpen] = useState(false);
+
   const authStore = useAuthStore();
   const {execute} = useAuth();
       const likeMutation = useLikeDesignMutation();
@@ -453,6 +456,11 @@ export function AuctionDetails({auctionId, viewerCount} : {auctionId: string, vi
                     <div className='flex items-center gap-2'>
                         <Eye className="w-4 h-4" />
                         <span>{viewerCount} watching</span>
+                    </div>
+                    <div className='flex items-center gap-2 cursor-pointer'  onClick={(e) => {
+               setIsLikeListOpen(true);
+            }}>
+                        <span>{auction.likeCount} likes</span>
                     </div>
                   </div>
                   <h1 className="text-4xl font-extrabold tracking-tight text-foreground">{auction.title}</h1>
@@ -673,6 +681,11 @@ export function AuctionDetails({auctionId, viewerCount} : {auctionId: string, vi
             </Tabs>
           </div>
       </div>
+      <LikeListModal 
+        isOpen={isLikeListOpen} 
+        onClose={() => setIsLikeListOpen(false)} 
+        designId={auctionId} 
+      />
     </div>
   );
 }

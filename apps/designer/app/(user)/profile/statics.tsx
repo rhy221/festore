@@ -18,6 +18,7 @@ type UserStatic = {
   name: string;
   value: number;
   icon: React.ElementType;
+  link?: string;
 };
 type StaticsProps = {
   loading?: boolean;
@@ -87,7 +88,7 @@ export default function Statics({userId}: {userId: string}) {
 //   { name: "Likes", value: 100, icon: ThumbsUp },
 // ];
 
-function UserStaticsRow({ name, value, icon: Icon }: UserStatic) {
+function UserStaticsRow({ name, value, icon: Icon, link }: UserStatic) {
   return (
     <div className="m-4">
       <div className="flex justify-between px-2 min-w-44">
