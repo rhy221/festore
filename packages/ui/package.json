@@ -7,7 +7,7 @@
     "lint": "eslint . --max-warnings 0"
   },
   "overrides": {
-  "react-is": "^19.0.0-rc-69d4b800-20241021"
+    "react-is": "^19.0.0-rc-69d4b800-20241021"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",
@@ -51,10 +51,12 @@
     "typescript": "^5.9.2"
   },
   "exports": {
+    ".": "./src/index.ts",
     "./globals.css": "./src/styles/globals.css",
     "./postcss.config": "./postcss.config.mjs",
     "./lib/*": "./src/lib/*.ts",
     "./components/*": "./src/components/*.tsx",
-    "./hooks/*": "./src/hooks/*.ts"
+    "./hooks/*": "./src/hooks/*.ts",
+    "./dialog": "./src/components/dialog.tsx"
   }
 }

@@ -1,19 +1,17 @@
-"using client";
+"use client";
+
 import * as React from "react";
 import Link from "next/link";
 import { MoreVertical } from "lucide-react";
-import Image from "next/image";
-import { useState } from "react";
-import { useRef } from "react";
+import { useState, useRef } from "react";
 
-interface CategoryCardProps {
-  title: string;
-  imageUrl: string;
-  href: string; // link to product page
+/* =======================
+   Helpers
   onMenuClick?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
 }
+
 interface ReportCardProps {
   title: string;
   icon: React.ReactNode;
@@ -21,6 +19,8 @@ interface ReportCardProps {
   color?: string;
 }
 
+/* =======================
+   CategoryCard
 export function CategoryCard({
   title,
   imageUrl,
@@ -30,6 +30,7 @@ export function CategoryCard({
 }: CategoryCardProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -48,104 +49,80 @@ export function CategoryCard({
 
   return (
     <Link href={href} className="block !cursor-default">
-      <div className="rounded-4xl bg-[#FAF0E6] p-5 hover:shadow-lg transition w-70 h-70 relative cursor-pointer">
-        <div className="relative flex justify-between items-center">
-          <h3 className="font-bold text-center absolute left-1/2 -translate-x-1/2">
+      <div className="relative w-70 h-70 rounded-4xl bg-[#FAF0E6] p-5 cursor-pointer transition hover:shadow-lg">
+        {/* Header */}
+        <div className="relative flex items-center justify-between">
+          <h3 className="absolute left-1/2 -translate-x-1/2 font-bold text-center">
             {title}
           </h3>
+
           <div ref={menuRef} className="ml-auto relative">
             <button
               type="button"
+              className="rounded-full cursor-pointer hover:bg-[#ecded0]"
               onClick={(e) => {
                 e.preventDefault();
-                e.stopPropagation(); // prevent triggering Link
+                e.stopPropagation();
                 setIsMenuOpen((prev) => !prev);
               }}
-              className="rounded-full hover:bg-[#ecded0] cursor-pointer"
             >
               <MoreVertical size={20} />
             </button>
           </div>
         </div>
+
+        {/* Menu */}
         {isMenuOpen && (
-          <div className="absolute top-1/2 left-full translate-y-[-70%] translate-x-[-70%] mr-2 bg-[#EFF6FF] border rounded-lg shadow-lg z-10 w-32">
-            {/* Watch Button */}
-            <button className="block px-4 py-1 hover:bg-[#dee8f5] w-full text-left">
-              Xem
+          <div className="absolute top-1/2 left-full z-10 w-32 -translate-x-[70%] -translate-y-[70%] rounded-lg border bg-[#EFF6FF] shadow-lg">
+            <button className="block w-full px-4 py-1 text-left hover:bg-[#dee8f5]">
+              View
             </button>
-            <hr className="mx-1 my-1 h-px bg-black border-0" />
-
-            {/* Edit Button */}
+            <hr className="mx-1 my-1 h-px border-0 bg-black" />
             <button
-              className="block px-4 py-1 hover:bg-[#dee8f5] w-full text-left"
+              className="block w-full px-4 py-1 text-left hover:bg-[#dee8f5]"
               onMouseDown={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                if (onEdit) onEdit();
+                onEdit?.();
               }}
             >
-              Sửa
+              Edit
             </button>
-            <hr className="mx-1 my-1 h-px bg-black border-0" />
-
-            {/* Delete Button */}
+            <hr className="mx-1 my-1 h-px border-0 bg-black" />
             <button
-              className="block px-4 py-1 hover:bg-[#dee8f5] w-full text-left"
+              className="block w-full px-4 py-1 text-left hover:bg-[#dee8f5]"
               onMouseDown={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                if (onDelete) onDelete();
+                onDelete?.();
               }}
             >
-              Xoá
+              Delete
             </button>
           </div>
         )}
-        {/* Popup Event removed; now handled by parent */}
-        <div className="mt-3">
-          <Image
-            src={imageUrl}
-            alt={title}
-            width={800}
-            height={600}
-            className="rounded-4xl object-cover w-75 h-51"
-          />
-        </div>
-      </div>
-    </Link>
-  );
-}
-export function ProductCard({ title, imageUrl, href }: CategoryCardProps) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
 
-  return (
-    <Link href={href} className="block !cursor-default">
-      <div className="bg-[#FAF0E6] p-3 hover:shadow-lg transition w-70 h-70 relative cursor-pointer">
+        {/* Image */}
         <div className="mt-3">
-          <Image
-            src={imageUrl}
+          <img
+            src={resolveImage(imageUrl)}
             alt={title}
-            width={800}
-            height={600}
-            className="object-cover w-75 h-51"
+            className="w-75 h-51 rounded-4xl object-cover"
           />
         </div>
-        <h3 className="font-bold text-center py-2">{title}</h3>
       </div>
     </Link>
   );
 }
-export function ReportCard({ title, icon, number, color }: ReportCardProps) {
-  return (
-    <div
-      className={`p-4 rounded-4xl shadow-md hover:shadow-lg transition`}
+
+/* =======================
+   ProductCard
       style={{ backgroundColor: color || "#000" }}
     >
       <div className="flex items-center gap-10">
         <div className="text-2xl text-white">{icon}</div>
         <h3 className="font-bold text-white">{title}</h3>
-        <p className="text-white font-bold text-2xl ml-auto">{number}</p>
+        <p className="ml-auto text-2xl font-bold text-white">{number}</p>
       </div>
     </div>
   );
