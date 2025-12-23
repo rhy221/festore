@@ -33,7 +33,7 @@ export default function BiddingHistory({
       "bg-yellow-500",
     ];
     const index = name.charCodeAt(0) % colors.length;
-    return colors[index];
+    return colors[index] ||       "bg-yellow-500";
   };
 
   const getInitials = (name: string): string => {

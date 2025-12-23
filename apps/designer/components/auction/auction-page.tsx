@@ -97,18 +97,18 @@ export function AuctionDetailClient({ mockAuctionData }: AuctionDetailClientProp
     return () => clearInterval(timer);
   }, [auction]);
 
-  const handlePlaceBid = async () => {
-    if (!auction) return;
-    setBidding(true);
+  // const handlePlaceBid = async () => {
+  //   if (!auction) return;
+  //   setBidding(true);
 
-    try {
-      await placeBidMutation.mutateAsync({ auctionId, body: {amount: bidAmount} });
-    } catch (error: any) {
-      alert(error?.message || 'Failed to place bid');
-    } finally {
-      setBidding(false);
-    }
-  };
+  //   try {
+  //     await placeBidMutation.mutateAsync({ auctionId, body: {amount: bidAmount} });
+  //   } catch (error: any) {
+  //     alert(error?.message || 'Failed to place bid');
+  //   } finally {
+  //     setBidding(false);
+  //   }
+  // };
 
   const formatCurrency = (amount: number) =>
     new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
@@ -136,13 +136,11 @@ export function AuctionDetailClient({ mockAuctionData }: AuctionDetailClientProp
         </>)
     return (
       <div className="min-h-screen bg-white">
-        {/* <AuctionHeader /> */}
 
         <main className="container mx-auto px-4 py-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <AuctionGallery images={mockAuctionData.images} title={mockAuctionData.title} />
 
-            {/* <AuctionDetails auction={auction}/> */}
           </div>
         </main>
       </div>

@@ -1,199 +1,223 @@
+// 'use client';
+
+// import { useEffect, useState } from 'react';
+// import { GalleryHeader } from '@/components/gallery/header';
+// import { StoreHeader } from './store-header';
+// import { StoreFilters } from './store-filters';
+// import { StoreGrid, StoreItem } from './store-grid';
+// import { useGetStoreItems } from '@/queries/useProduct';
+// import { QueryProps } from '@/app/(user)/store/[[...categorySlug]]/page';
+// import { useParams, useSearchParams } from 'next/navigation';
+
+// export function StorePage() {
+  
+//   const params = useParams();
+//   const searchParams = useSearchParams();
+
+//   const apiParams = {
+//     categorySlug: params.categorySlug ? params.categorySlug[0] : '', 
+//     gender: searchParams.get("gender"),
+//     style: searchParams.get("style"),
+//     sortPrice: searchParams.get("sortPrice"),
+//     search: searchParams.get("search"),
+//     page: searchParams.get("page") || '1',
+//   };
+
+//   const {data: store, isLoading: storeLoading} = useGetStoreItems(apiParams);
+
+// if(storeLoading) 
+//     return (<>
+//     Loading ...</>)
+
+//   if(!store) 
+//     return (<>
+//     Check your connection</>)
+
+//   return (
+//     <div className="min-h-screen bg-black px-8">
+      
+//             <StoreHeader />
+//       <StoreFilters
+        
+//       />
+
+//       <main className="container mx-auto py-12">
+//         <StoreGrid  store={store}/>
+
+//         <div className="mt-16 flex justify-center">
+//           <button className="px-8 py-3 rounded-lg border border-white/20 text-white hover:bg-white/10 transition-colors">
+//             Load More Items
+//           </button>
+//         </div>
+//       </main>
+//     </div>
+//   );
+// }
+
+
 'use client';
 
-import { useState } from 'react';
-import { GalleryHeader } from '@/components/gallery/header';
+import { useEffect, useState } from 'react';
+import { useRouter, useParams, useSearchParams } from 'next/navigation'; // Thêm useRouter
+import { Loader2 } from 'lucide-react'; // Thêm icon loading
 import { StoreHeader } from './store-header';
 import { StoreFilters } from './store-filters';
 import { StoreGrid, StoreItem } from './store-grid';
-// import { useToast } from '@/hooks/use-toast';
+import { useGetStoreItems } from '@/queries/useProduct';
 
-const mockStoreItems: StoreItem[] = [
-  {
-    id: '1',
-    title: 'S9 Bomber Jacket',
-    image: 'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg',
-    creator: 'TNNSMNN',
-    creatorBadge: 'TNNSMNN',
-    price: 20.0,
-    views: 292,
-    likes: 44,
-    isFree: false,
-    category: 'garment',
-  },
-  {
-    id: '2',
-    title: 'FV2 Princess-Line Single-Breasted Jacket',
-    image: 'https://images.pexels.com/photos/1055691/pexels-photo-1055691.jpeg',
-    creator: 'CONNECT Official',
-    creatorBadge: '한국섬유산업연합회',
-    price: null,
-    views: 206,
-    likes: 9,
-    isFree: true,
-    category: 'garment',
-  },
-  {
-    id: '3',
-    title: 'KV Kids Down Vest (130CM)',
-    image: 'https://images.pexels.com/photos/1820560/pexels-photo-1820560.jpeg',
-    creator: 'CONNECT Official',
-    creatorBadge: '한국섬유산업연합회',
-    price: null,
-    views: 184,
-    likes: 21,
-    isFree: true,
-    category: 'garment',
-  },
-  {
-    id: '4',
-    title: 'MV2 Zip-Up Trucker Jacket',
-    image: 'https://images.pexels.com/photos/1539638/pexels-photo-1539638.jpeg',
-    creator: 'CONNECT Official',
-    creatorBadge: '한국섬유산업연합회',
-    price: null,
-    views: 165,
-    likes: 13,
-    isFree: true,
-    category: 'garment',
-  },
-  {
-    id: '5',
-    title: 'FV2 Layered Mini Skirt',
-    image: 'https://images.pexels.com/photos/2739667/pexels-photo-2739667.jpeg',
-    creator: 'CONNECT Official',
-    creatorBadge: '한국섬유산업연합회',
-    price: null,
-    views: 160,
-    likes: 16,
-    isFree: true,
-    category: 'garment',
-  },
-  {
-    id: '6',
-    title: 'MV2 Baker Pants',
-    image: 'https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg',
-    creator: 'CONNECT Official',
-    creatorBadge: '한국섬유산업연합회',
-    price: null,
-    views: 136,
-    likes: 11,
-    isFree: true,
-    category: 'garment',
-  },
-  {
-    id: '7',
-    title: 'Premium Fabric Pack',
-    image: 'https://images.pexels.com/photos/3962286/pexels-photo-3962286.jpeg',
-    creator: 'CONNECT Official',
-    creatorBadge: '한국섬유산업연합회',
-    price: 15.0,
-    views: 245,
-    likes: 32,
-    isFree: false,
-    category: 'fabric',
-  },
-  {
-    id: '8',
-    title: 'Luxury Trim Collection',
-    image: 'https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg',
-    creator: 'CONNECT Official',
-    creatorBadge: '한국섬유산업연합회',
-    price: 8.0,
-    views: 178,
-    likes: 14,
-    isFree: false,
-    category: 'trim',
-  },
-  {
-    id: '9',
-    title: 'Avatar Bundle Set',
-    image: 'https://images.pexels.com/photos/1181690/pexels-photo-1181690.jpeg',
-    creator: 'Avatar Studio',
-    creatorBadge: '한국섬유산업연합회',
-    price: 25.0,
-    views: 412,
-    likes: 58,
-    isFree: false,
-    category: 'avatar',
-  },
-  {
-    id: '10',
-    title: 'Modern Scene Pack',
-    image: 'https://images.pexels.com/photos/3962260/pexels-photo-3962260.jpeg',
-    creator: 'Scene Creator',
-    creatorBadge: '한국섬유산업연합회',
-    price: 12.0,
-    views: 189,
-    likes: 22,
-    isFree: false,
-    category: 'scene',
-  },
-  {
-    id: '11',
-    title: 'Classic Blazer Template',
-    image: 'https://images.pexels.com/photos/1055691/pexels-photo-1055691.jpeg',
-    creator: 'Design Team',
-    creatorBadge: '한국섬유산업연합회',
-    price: null,
-    views: 267,
-    likes: 35,
-    isFree: true,
-    category: 'garment',
-  },
-  {
-    id: '12',
-    title: 'Satin Texture Bundle',
-    image: 'https://images.pexels.com/photos/1820560/pexels-photo-1820560.jpeg',
-    creator: 'Texture Lab',
-    creatorBadge: '한국섬유산업연합회',
-    price: 18.0,
-    views: 203,
-    likes: 28,
-    isFree: false,
-    category: 'fabric',
-  },
-];
+// Import Shadcn Pagination
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@workspace/ui/components/pagination';
+import { cn } from '@workspace/ui/lib/utils';
 
 export function StorePage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilters, setActiveFilters] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState('featured');
-//   const { toast } = useToast();
+  const router = useRouter();
+  const params = useParams();
+  const searchParams = useSearchParams();
 
-  const filteredItems = mockStoreItems.filter((item) =>
-    item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.creator.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // 1. Lấy page từ URL
+  const currentPage = Number(searchParams.get("page")) || 1;
 
-  const handleAddToCart = (item: StoreItem) => {
-    // toast({
-    //   title: 'Added to Cart',
-    //   description: `${item.title} has been added to your cart.`,
-    // });
+  const apiParams = {
+    categorySlug: params.categorySlug ? params.categorySlug[0] : '', 
+    gender: searchParams.get("gender"),
+    style: searchParams.get("style"),
+    sortPrice: searchParams.get("sortPrice"),
+    search: searchParams.get("search"),
+    page: currentPage,
   };
 
+  // 2. Hàm cập nhật URL (Dùng chung cho Filter và Pagination)
+  const updateQuery = (key: string, value: string | null) => {
+    const newParams = new URLSearchParams(searchParams.toString());
+    
+    if (value) {
+      newParams.set(key, value);
+    } else {
+      newParams.delete(key);
+    }
+
+    // Nếu thay đổi filter (không phải page), reset về trang 1
+    if (key !== 'page') {
+        newParams.set('page', '1');
+    }
+
+    router.push(`?${newParams.toString()}`, { scroll: true });
+  };
+
+  // 3. Fetch Data
+  const { data: store, isLoading: storeLoading } = useGetStoreItems(apiParams);
+
+  if (storeLoading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <Loader2 className="animate-spin text-white w-8 h-8" />
+      </div>
+    );
+  }
+
+  if (!store) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center text-white">
+        Check your connection
+      </div>
+    );
+  }
+
+  // 4. Lấy Metadata từ Response Backend
+  const { meta } = store;
+
   return (
-    <div className="min-h-screen bg-black">
-      <GalleryHeader />
-
-      {/* <StoreHeader searchQuery={searchQuery} onSearchChange={setSearchQuery} /> */}
-
-      <StoreFilters
-        activeFilters={activeFilters}
-        onFilterChange={setActiveFilters}
-        sortBy={sortBy}
-        onSortChange={setSortBy}
-        itemCount={filteredItems.length}
+    <div className="min-h-screen bg-black px-8 pb-20">
+      
+      <StoreHeader />
+      
+      {/* Bạn có thể truyền hàm updateQuery vào StoreFilters nếu muốn filter hoạt động */}
+      <StoreFilters 
+         // onFilterChange={updateQuery} 
       />
 
-      <main className="container mx-auto px-4 py-12">
-        <StoreGrid items={filteredItems} onAddToCart={handleAddToCart} />
-
-        <div className="mt-16 flex justify-center">
-          <button className="px-8 py-3 rounded-lg border border-white/20 text-white hover:bg-white/10 transition-colors">
-            Load More Items
-          </button>
+      <main className="container mx-auto py-12">
+        {/* Grid Content */}
+        <div className="min-h-[400px]">
+            {store.data.length > 0 ? (
+                <StoreGrid store={store} />
+            ) : (
+                <div className="text-center text-gray-500 py-20 text-lg">No items found in Store.</div>
+            )}
         </div>
+
+        {/* --- Pagination Controls --- */}
+        {meta && meta.lastPage > 0 && (
+          <div className="mt-16">
+            <Pagination>
+              <PaginationContent>
+                
+                {/* Previous Button */}
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => meta.hasPrevPage && updateQuery('page', (currentPage - 1).toString())}
+                    className={cn(
+                        "cursor-pointer text-white hover:text-white hover:bg-white/10 select-none", 
+                        !meta.hasPrevPage && "pointer-events-none opacity-50 text-gray-600"
+                    )} 
+                  />
+                </PaginationItem>
+
+                {/* Page Numbers Logic */}
+                {Array.from({ length: meta.lastPage }, (_, i) => i + 1).map((page) => {
+                  // Logic hiển thị thu gọn (Ellipsis)
+                  if (
+                    page === 1 || 
+                    page === meta.lastPage || 
+                    (page >= currentPage - 1 && page <= currentPage + 1)
+                  ) {
+                    return (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          isActive={page === currentPage}
+                          onClick={() => updateQuery('page', page.toString())}
+                          className={cn(
+                              "cursor-pointer select-none text-white hover:bg-white/10 hover:text-white border-none",
+                              page === currentPage && "bg-white text-black hover:bg-white hover:text-black font-bold"
+                          )}
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  }
+                  
+                  // Render dấu ...
+                  if (page === currentPage - 2 || page === currentPage + 2) {
+                     return <PaginationItem key={page}><PaginationEllipsis className="text-gray-500" /></PaginationItem>
+                  }
+                  
+                  return null;
+                })}
+
+                {/* Next Button */}
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => meta.hasNextPage && updateQuery('page', (currentPage + 1).toString())}
+                    className={cn(
+                        "cursor-pointer text-white hover:text-white hover:bg-white/10 select-none", 
+                        !meta.hasNextPage && "pointer-events-none opacity-50 text-gray-600"
+                    )}
+                  />
+                </PaginationItem>
+
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </main>
     </div>
   );

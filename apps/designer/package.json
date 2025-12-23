@@ -15,8 +15,10 @@
     "react-is": "^19.0.0-rc-69d4b800-20241021"
   },
   "dependencies": {
+    "@google/model-viewer": "^4.1.0",
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-tabs": "^1.1.13",
+    "@tanstack/react-virtual": "^3.13.12",
     "@workspace/ui": "workspace:*",
     "lucide-react": "^0.475.0",
     "motion": "^12.23.24",
@@ -25,6 +27,7 @@
     "postprocessing": "^6.37.8",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-hot-toast": "^2.6.0",
     "recharts": "2.15.4",
     "three": "^0.181.0"
   },

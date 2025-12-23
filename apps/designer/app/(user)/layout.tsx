@@ -1,6 +1,9 @@
 
+import Footer from "@/components/Footer";
 import NavBar from "@/components/NavBar";
+import ScrollToTop from "@/components/ScrollToTop";
 import Link from "next/link";
+import { Toaster } from "react-hot-toast";
 
 export default function RootLayout({
   children, modal
@@ -9,10 +12,13 @@ export default function RootLayout({
   modal: React.ReactNode
 }) {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col relative">
         <NavBar />
         {children}
         {modal}
+        <Toaster position="top-center"/>
+        <ScrollToTop />
+        <Footer />
     </div>
   );
 }

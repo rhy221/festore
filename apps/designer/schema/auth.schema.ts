@@ -88,15 +88,15 @@ export const LogoutResSchema = z.object({
 export type RegisterType = z.TypeOf<typeof RegisterSchema>;
 export type LoginBodyType = z.TypeOf<typeof LoginBodySchema>;
 export type LoginResType = {
-  // user: {
-  //   userId: string,
-  //   name: string,
-  //   email: string,
+  user: {
+    id: string,
+    name: string,
+    email: string,
     avatarUrl: string,
   //   bio: string,
   //   status: "active" | "banned"
   //   createdAt: string,
-  // },
+  },
   accessToken: string,
   refreshToken?: string,
 }

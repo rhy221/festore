@@ -7,17 +7,6 @@ import { useState, useRef } from "react";
 
 /* =======================
    Helpers
-======================= */
-const resolveImage = (url?: string) =>
-  url && url.trim() !== "" ? url : "/placeholder.png";
-
-/* =======================
-   Types
-======================= */
-interface CategoryCardProps {
-  title: string;
-  imageUrl?: string;
-  href: string;
   onMenuClick?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
@@ -32,7 +21,6 @@ interface ReportCardProps {
 
 /* =======================
    CategoryCard
-======================= */
 export function CategoryCard({
   title,
   imageUrl,
@@ -129,40 +117,6 @@ export function CategoryCard({
 
 /* =======================
    ProductCard
-======================= */
-export function ProductCard({
-  title,
-  imageUrl,
-}: {
-  title: string;
-  imageUrl?: string;
-}) {
-  return (
-    <div className="relative w-70 h-70 rounded-4xl bg-[#FAF0E6] p-3 cursor-default transition hover:shadow-lg">
-      <div className="mt-3">
-        <img
-          src={resolveImage(imageUrl)}
-          alt={title}
-          className="h-48 w-full rounded-4xl object-cover"
-        />
-      </div>
-      <h3 className="py-2 text-center font-bold">{title}</h3>
-    </div>
-  );
-}
-
-/* =======================
-   ReportCard
-======================= */
-export function ReportCard({
-  title,
-  icon,
-  number,
-  color,
-}: ReportCardProps) {
-  return (
-    <div
-      className="rounded-4xl p-4 shadow-md transition hover:shadow-lg"
       style={{ backgroundColor: color || "#000" }}
     >
       <div className="flex items-center gap-10">

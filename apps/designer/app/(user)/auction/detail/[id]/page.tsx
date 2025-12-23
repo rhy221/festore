@@ -8,6 +8,7 @@ import { useParams } from 'next/navigation';
 import { AuctionGallery } from '@/components/auction/auction-gallery';
 import { AuctionDetails } from '@/components/auction/auction-details';
 import { useQueryClient } from '@tanstack/react-query';
+import envConfig from '@/config';
 
 
 interface AuctionDetailClientProps {
@@ -38,14 +39,14 @@ export default function AuctionDetailClient({ mockAuctionData }: AuctionDetailCl
   // WebSocket connection
   useEffect(() => {
     if (!auction) return;
-    const newSocket = io('http://localhost:3003');
+    const newSocket = io(`${envConfig.NEXT_PUBLIC_API_ENDPOINT}/auctions`);
     setSocket(newSocket);
 
     newSocket.emit('joinAuction', auctionId);
 
     newSocket.on('newBid', (bid: AuctionBidType) => {
-      if(auction){
-         queryClient.setQueryData(["auctionBids"], (oldData: AuctionBidType[]) => {
+      if(bid){
+         queryClient.setQueryData(["auctionBids", auctionId], (oldData: AuctionBidType[]) => {
           if(!oldData)
             return oldData;
           return oldData = [ bid, ...oldData];
@@ -60,7 +61,7 @@ export default function AuctionDetailClient({ mockAuctionData }: AuctionDetailCl
 
     newSocket.on('auctionEnded', (winner: any) => {
       if(auction) {
-        queryClient.setQueryData(["auction"], (oldData: AuctionType) => {
+        queryClient.setQueryData(["auction", auctionId], (oldData: AuctionType) => {
           if(!oldData)
             return oldData;
 
@@ -73,7 +74,8 @@ export default function AuctionDetailClient({ mockAuctionData }: AuctionDetailCl
     newSocket.on('priceUpdate', ({ price }: { price: number }) => {
       // Cập nhật currentPrice
       if (auction) {
-       queryClient.setQueryData(["auction"], (oldData: AuctionType) => {
+        console.log("Price update received:", price);
+       queryClient.setQueryData(["auction", auctionId], (oldData: AuctionType) => {
           if(!oldData)
             return oldData;
           
@@ -109,7 +111,7 @@ export default function AuctionDetailClient({ mockAuctionData }: AuctionDetailCl
         return(<> Loading...
         </>)
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen ">
         {/* <AuctionHeader /> */}
 
         <main className="container mx-auto px-20 py-12">
