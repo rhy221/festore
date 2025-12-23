@@ -1,5 +1,11 @@
 
 export type AuctionStatus  = 'upcoming' | 'active' |'ended' |'cancelled'
+type DesignerProfile = {
+  _id: string,
+  name: string,
+  email: string,
+  avatarUrl: string,
+}
 export type AuctionType = {
    _id: string;
   title: string;
@@ -14,9 +20,14 @@ export type AuctionType = {
   status: AuctionStatus;
   totalBids: number;
   designerId: string;
+  designerProfile: DesignerProfile,
   viewCount: number;
+  likeCount: number;
   currentViewerCount?: number;
+  currentWinnerProfile?: DesignerProfile,
   currentWinnerId?: string;
+  isLiked: boolean;
+  isDesignerFollowed: boolean;
 }
 
 export type AuctionBidType = {
@@ -24,6 +35,7 @@ export type AuctionBidType = {
   bidderProfile: {
     userId: string;
     name: string;
+    avatarUrl: string;
   };
   amount: number;
   createdAt: string;
@@ -35,7 +47,10 @@ export type PlaceBidType = {
 
 export type GetAuctionResType = AuctionType; 
 
-export type GetAuctionsResType = AuctionType[];
+export type GetAuctionsResType ={
+  data: AuctionType[],
+  meta: any,
+}
 
 export type GetAuctionBidsResType = AuctionBidType[];
 

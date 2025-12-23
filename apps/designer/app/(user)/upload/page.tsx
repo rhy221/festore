@@ -15,17 +15,25 @@ import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@workspace/ui/components/select';
 import { Spinner } from '@workspace/ui/components/spinner';
-import { useUploadProduct } from '@/queries/useProduct';
+import { useCategories, useUploadProduct } from '@/queries/useProduct';
 
 
 export default function CreateAuctionPage() {
   const priceStep =  1000;
   const router = useRouter();
+
+  const {data: categories, isLoading: categoriesLoading} = useCategories();
+  const [styles, setStyles] = useState<string[]>([]);
+  
+ 
   const form = useForm<UploadProductType>({
     resolver: zodResolver(uploadProductSchema),
     defaultValues: {
     title: "",
     description: "",
+    categoryId: "",
+    style: "",
+    gender:"",
     images: [],
     models: [],
     type: "gallery",
@@ -37,6 +45,16 @@ export default function CreateAuctionPage() {
     
   }
   })
+
+   useEffect(() => {
+      const category = form.watch("categoryId"); 
+      if(category) {
+        const currentCategory = categories?.find((ca) => ca._id === category)
+        if(currentCategory) {
+          setStyles(currentCategory.styles);
+        }
+      }
+  }, [form.watch("categoryId")])
   const uploadMutation = useUploadProduct();
 
   const now = new Date().toISOString().slice(0, 16);
@@ -81,6 +99,10 @@ export default function CreateAuctionPage() {
     const formData = new FormData();
     formData.append("title", data.title);
     formData.append("description", data.description ?? "");
+    formData.append("categoryId", data.categoryId);
+    formData.append("style", data.style);
+    formData.append("gender", data.gender);
+
     formData.append("type", data.type);
     
     data.images.map((file) => {
@@ -212,7 +234,6 @@ export default function CreateAuctionPage() {
                 {...field}
                 id={field.name}
                 rows={6}
-                required
                 placeholder="Describe your item in detail..."
               >
               </Textarea>
@@ -223,6 +244,105 @@ export default function CreateAuctionPage() {
           )}>
 
           </Controller>
+
+           <Controller
+                  name="categoryId"
+                  control={form.control}
+                  render={({field, fieldState}) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name} className="block text-sm font-medium text-gray-700">
+                        Category
+                      </FieldLabel>
+                      <Select
+                      name={field.name}
+                      value={field.value}
+                      onValueChange={field.onChange} required>
+                  <SelectTrigger 
+                  id={field.name}
+                  name={field.name} 
+                  className="w-full">
+                    <SelectValue placeholder="Choose category" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                      {categories && categories.map((ca => (
+                        <SelectItem key={ca._id} value={ca._id}>{ca.name}</SelectItem>
+                      )))}
+                  </SelectContent>
+                </Select>
+                {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                    </Field>
+                  )}>
+
+                  </Controller>
+
+                   <Controller
+                  name="style"
+                  control={form.control}
+                  render={({field, fieldState}) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name} className="block text-sm font-medium text-gray-700">
+                        Styles
+                      </FieldLabel>
+                      <Select
+                      name={field.name}
+                      value={field.value}
+                      onValueChange={field.onChange} required>
+                  <SelectTrigger 
+                  id={field.name}
+                  name={field.name} 
+                  className="w-full">
+                    <SelectValue placeholder="Choose style" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                      {styles && styles.map((st => (
+                        <SelectItem key={st} value={st}>{st}</SelectItem>
+                      )))}
+                  </SelectContent>
+                </Select>
+                {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                    </Field>
+                  )}>
+
+                  </Controller>
+
+                   <Controller
+                  name="gender"
+                  control={form.control}
+                  render={({field, fieldState}) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name} className="block text-sm font-medium text-gray-700">
+                        Gender
+                      </FieldLabel>
+                      <Select
+                      name={field.name}
+                      value={field.value}
+                      onValueChange={field.onChange} required>
+                  <SelectTrigger 
+                  id={field.name}
+                  name={field.name} 
+                  className="w-full">
+                    <SelectValue placeholder="Choose gender" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                      <SelectItem value={"Male"}>Male</SelectItem>
+                      <SelectItem value={"Female"}>Female</SelectItem>
+                      <SelectItem value={"Unisex"}>Unisex</SelectItem>
+                  </SelectContent>
+                </Select>
+                {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                    </Field>
+                  )}>
+
+                  </Controller>
         </FieldGroup>
 
           <UploadFiles />

@@ -9,7 +9,7 @@ export const useAuctionQuery = (auctionId: string) => {
     });
 }
 
-export const useAuctionsQuery = (filter: string) => {
+export const useAuctionsQuery = (filter: any) => {
     return useQuery<GetAuctionsResType>({
         queryKey: ["auctions", filter],
         queryFn: () => auctionAction.getAuctions(filter),
@@ -19,7 +19,7 @@ export const useAuctionsQuery = (filter: string) => {
 
 export const useAuctionBidsQuery = (auctionId: string) => {
     return useQuery<GetAuctionBidsResType>({
-        queryKey: ["auctionBids"],
+        queryKey: ["auctionBids", auctionId],
         queryFn: () => auctionAction.getAuctionBids(auctionId),
     });
 }

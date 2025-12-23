@@ -65,13 +65,14 @@ const productsAction = {
     const response = await http.post<DesignResType>(`/products/update/${body.id}`, body.data, {timeout: 90000});
     return response.data;
   },
-  getGalleryItems: async () => {
-    const response = await http.get<GetGalleryItemsResType>('/products/gallery');
+  getGalleryItems: async (params?: any) => {
+    const response = await http.get<GetGalleryItemsResType>('/products/gallery', {params});
     console.log(response.data);
     return response.data;
   },
-  getStoreItems: async () => {
-    const response = await http.get<GetStoreItemsResType>('/products/store');
+  getStoreItems: async (params?: any) => {
+    const response = await http.get<GetStoreItemsResType>('/products/store', {params});
+    console.log(response.data);
     return response.data;
   },
   getOneComments: async (id: string) => {
@@ -79,7 +80,7 @@ const productsAction = {
     return response.data;
   },
   getCategories: async () => {
-    const response = await http.get<CategoryType[]>("/products/list/categories");
+    const response = await http.get<CategoryType[]>("/products/categories");
     return response.data;
   },
   likeDesign: async (designId: string) => {
@@ -95,7 +96,12 @@ const productsAction = {
   //   apiClient.get('/products', { params }).then(res => res.data),
   
   getMyProducts: async (params?: any) => {
-    const response = await http.get(`/products/my-products?page=${params.page}&limit=${params.limit}`);
+    const response = await http.get(`/products/my-products`, { params });
+    return response.data;
+  },
+
+  getUserProducts: async (userId: string, params?: any) => {
+    const response = await http.get(`/products/user/${userId}`, { params });
     return response.data;
   },
   // getMyProducts: (params?: any) => 

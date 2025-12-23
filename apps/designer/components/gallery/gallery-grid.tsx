@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Heart, Bookmark, Eye } from 'lucide-react';
-import { useGetGalleryItems } from '@/queries/useProduct';
-import { useRouter } from 'next/navigation';
-import { DesignResType } from '@/schema/product.schema';
+import { useGetGalleryItems, useLikeDesignMutation } from '@/queries/useProduct';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { DesignResType, GetGalleryItemsResType } from '@/schema/product.schema';
+import { useAuth } from '@/hooks/useAuth';
 
 interface GalleryItem {
   id: string;
@@ -22,47 +23,58 @@ interface GalleryGridProps {
   onItemClick: (item: GalleryItem) => void;
 }
 
-export function GalleryGrid({gallery}: {gallery: DesignResType[]}) {
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [likedItems, setLikedItems] = useState<Set<string>>(new Set());
+export function GalleryGrid({gallery}: {gallery: GetGalleryItemsResType}) {
 
-  // const {data: gallery, isLoading: galleryLoading} = useGetGalleryItems();
+    const searchParams = useSearchParams();
+    
+    const updateFilter = (key: string, value: string | null) => {
+          
+    
+        const params = new URLSearchParams(searchParams.toString());
+        if (value) {
+          params.set(key, value);
+        } else {
+          params.delete(key);
+        }
+        router.push(`?${params.toString()}`, { scroll: false });
+      };
+
   
   const router = useRouter();
-  const toggleLike = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setLikedItems((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
+
+    const likeMutation = useLikeDesignMutation();
+   const {execute} = useAuth();
+  
+    // 3. Handlers
+    const handleLike = async (id: string) => {
+      execute( async () => {
+        if (likeMutation.isPending) return;
+      try {
+        const result = await likeMutation.mutateAsync(id);
+        console.log('Like result:', result);
+      } catch (err) {
+        console.error('Like error:', err);
       }
-      return newSet;
-    });
-  };
+      })
+      
+    };
 
   const onItemClick = (id: string) => {
     router.push(`/detail/${id}`)
   }
 
-  // if(galleryLoading) 
-  //   return (<>
-  //   Loading...
-  //   </>)
-  // if(!gallery)
-  //   return(<>
-  //   Check your connection.
-  //   </>)
+  if(!gallery)
+    return(<>
+    Check your connection
+    </>)
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 auto-rows-[300px]">
-      {gallery.map((item) => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2 auto-rows-[300px]">
+      {gallery.data.map((item) => (
         <div
           key={item._id}
           className="relative group cursor-pointer rounded-lg overflow-hidden bg-zinc-900"
-          onMouseEnter={() => setHoveredId(item._id)}
-          onMouseLeave={() => setHoveredId(null)}
+          
           onClick={() => onItemClick(item._id)}
         >
           <img
@@ -92,12 +104,15 @@ export function GalleryGrid({gallery}: {gallery: DesignResType[]}) {
 
           <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
-              onClick={(e) => toggleLike(item._id, e)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleLike(item._id);
+              }}
               className="p-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur transition-colors"
             >
               <Heart
                 className={`w-4 h-4 ${
-                  likedItems.has(item._id)
+                  item.isLiked
                     ? 'fill-red-500 text-red-500'
                     : 'text-white'
                 }`}

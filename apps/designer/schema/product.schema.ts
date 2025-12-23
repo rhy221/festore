@@ -80,6 +80,9 @@ export const editProductSchema = z
   .object({
     title: z.string().min(1, "Title is required"),
     description: z.string().min(1, "Description is required"),
+    categoryId: z.string().min(1, "Category is required"),
+    style: z.string().min(1, "Style is required"),
+    gender: z.string().min(1, "Gender is required"),
     type: z.enum(["fixed", "auction", "gallery"]),
     
     images: z
@@ -180,6 +183,9 @@ export const uploadProductSchema = z
   .object({
     title: z.string().min(1, "Title is required"),
     description: z.string().min(1, "Description is required"),
+    categoryId: z.string().min(1, "Category is required"),
+    style: z.string().min(1, "Style is required"),
+    gender: z.string().min(1, "Gender is required"),
     type: z.enum(["fixed", "auction", "gallery"]),
     
       images: z
@@ -297,6 +303,7 @@ export type DesignResType =  {
 
     description: string;
 
+
     imageUrls: string[];
 
     modelFiles: ModelFile[];
@@ -305,7 +312,11 @@ export type DesignResType =  {
 
     totalEarning: number;
 
-    categoryId: string;
+  categoryId: string;
+
+  style: string;
+
+  gender: string;
 
     tags: string[];
 
@@ -324,6 +335,12 @@ export type DesignResType =  {
     viewCount: number;
 
     likeCount: number;
+
+  averageRating: number;
+
+  ratingCount: number;
+
+    commentCount: number;
 
     isDesignerFollowed: boolean
 
@@ -345,9 +362,11 @@ export type CommentType = {
 
 export type CategoryType = {
     _id: string,
-   name: string,
-   description: string,
-   parentCategoryId: string
+  name: string; 
+  slug: string; 
+
+
+  styles: string[];
 }
 
 
@@ -373,5 +392,11 @@ export const uploadDesignSchema = z.object({
 export type UploadDesignType = z.infer<typeof uploadDesignSchema>;
 export type UploadProductType = z.infer<typeof uploadProductSchema>;
 export type EditProductType = z.infer<typeof editProductSchema>;
-export type GetGalleryItemsResType = DesignResType[];
-export type GetStoreItemsResType = DesignResType[];
+export type GetGalleryItemsResType = {
+  data: DesignResType[],
+  meta: any
+};
+export type GetStoreItemsResType = {
+  data: DesignResType[],
+  meta: any
+}
