@@ -2,6 +2,7 @@
 
 import { useRegisterMutation } from "@/queries/useAuth";
 import { RegisterSchema, RegisterType } from "@/schema/auth.schema";
+import { useAuthStore } from "@/stores/authStore";
 import { useRegisterStore } from "@/stores/useRegisterStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
@@ -9,8 +10,10 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@workspace/ui/compone
 import { Input } from "@workspace/ui/components/input";
 import { Spinner } from "@workspace/ui/components/spinner";
 import { cn } from "@workspace/ui/lib/utils";
+import { Axios, AxiosError } from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 
@@ -21,6 +24,7 @@ type RegisterFormProps  = {
 export default function RegisterForm({ onChangeRegisted }: RegisterFormProps) {
   const registerMutation = useRegisterMutation();
   const router = useRouter();
+  const authStore = useAuthStore()
 
   const form = useForm<RegisterType>({
     resolver: zodResolver(RegisterSchema),
@@ -30,6 +34,11 @@ export default function RegisterForm({ onChangeRegisted }: RegisterFormProps) {
     },
     mode: "onChange",
   });
+
+  useEffect(() => {
+    if(authStore.isAuthenticated)
+      router.replace("/")
+  },[authStore]);
 
   const onSubmit = async (data: RegisterType) => {
     if (registerMutation.isPending) return; 
@@ -102,7 +111,7 @@ export default function RegisterForm({ onChangeRegisted }: RegisterFormProps) {
                     <FieldError errors={[fieldState.error]} />
                   )}
                   {registerMutation.isError && (
-                    <FieldError errors={[{message: registerMutation.isError ? "Tài khoản đã tồn tại" : ""}]} />
+                    <FieldError errors={[{message: (registerMutation.error as AxiosError).message}]} />
                   )}
               </Field>
             )}>
@@ -125,7 +134,7 @@ export default function RegisterForm({ onChangeRegisted }: RegisterFormProps) {
               Login
             </Link>
           </p>
-          <p className="text-muted-foreground text-sm text-balance">
+          {/* <p className="text-muted-foreground text-sm text-balance">
             By registering, you agree to our{" "}
             <Link href="#" className="underline underline-offset-4">
               Terms of Service
@@ -134,7 +143,7 @@ export default function RegisterForm({ onChangeRegisted }: RegisterFormProps) {
             <Link href="#" className="underline underline-offset-4">
               Privacy Policy
             </Link>
-          </p>
+          </p> */}
         </div>
       </form>
   );

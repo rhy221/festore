@@ -9,7 +9,7 @@ import { ItemCard } from '@/components/portfolio/item-card';
 import { Share2, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { Label } from '@workspace/ui/components/label';
 import { Textarea } from '@workspace/ui/components/textarea';
-import Statics from '@/app/(user)/profile/statics';
+import Statics from '@/components/portfolio/statics';
 import { Controller, useForm } from 'react-hook-form';
 import { Field, FieldError, FieldLabel } from '@workspace/ui/components/field';
 import { fi } from 'zod/v4/locales';

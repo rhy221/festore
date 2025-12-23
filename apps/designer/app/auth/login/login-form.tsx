@@ -10,8 +10,10 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@workspace/ui/compone
 import { Input } from "@workspace/ui/components/input";
 import { Spinner } from "@workspace/ui/components/spinner";
 import { cn } from "@workspace/ui/lib/utils";
+import { AxiosError } from "axios";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 export default function LoginForm() {
@@ -29,11 +31,17 @@ export default function LoginForm() {
     },
   });
 
+  useEffect(() => {
+    if(authStore.isAuthenticated) {
+      router.replace("/")
+    }
+      
+  },[authStore]);
+
   const handleSubmit = async (data: LoginBodyType) => {
     if (loginMutation.isPending) return;
     try {
       const result = await loginMutation.mutateAsync(data);
-      console.log("Login result:", result);
       // toast("Success", {
       //   description: "Login successful!",
       // });
@@ -111,7 +119,7 @@ export default function LoginForm() {
                   required>
                 </Input>
                 {loginMutation.isError && (
-                    <FieldError errors={[{message: "Tài khoản hoặc mật khẩu sai"}]} />
+                    <FieldError errors={[{message: (loginMutation.error as AxiosError).message}]} />
                   )}
               </Field>
             )}>

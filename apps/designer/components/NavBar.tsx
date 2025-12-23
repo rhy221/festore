@@ -12,6 +12,8 @@ import {
   Box, 
   ChartArea, 
   CircleUser, 
+  Key, 
+  KeyRound, 
   LogOut, 
   Menu, 
   ShoppingCart, 
@@ -33,6 +35,8 @@ import { useAuthStore } from '@/stores/authStore'
 import NotificationBell from './Notification'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@workspace/ui/components/sheet' // Import Sheet cho mobile menu
 import { cn } from '@workspace/ui/lib/utils' // Utility for merging classes
+import { useForgotPasswordMutation } from '@/queries/useAuth'
+import toast from 'react-hot-toast'
 
 const NavBar = () => {
     const router = useRouter();
@@ -45,6 +49,20 @@ const NavBar = () => {
         authStore.logout();
         router.replace("/");
     };
+
+    const mutation = useForgotPasswordMutation();
+    
+    
+        const onChangePassword = async () => {
+            if(mutation.isPending) return;
+            try {
+                
+                const result = await mutation.mutateAsync({email: authStore.user?.email || ''});
+                toast.success(`Change password email has been sent to your ${authStore.user?.email}`)
+            } catch(error) {
+                console.error(error);
+            }
+        }
 
     // Helper function để check active link
     const isActive = (path: string) => pathname === path;
@@ -110,6 +128,7 @@ const NavBar = () => {
             { authStore.isAuthenticated && <NotificationBell/>}
 
             {/* Cart */}
+            {authStore.isAuthenticated && 
             <Button variant="ghost" size="icon" asChild className="relative hover:bg-accent/50 rounded-full">
                 <Link href={"/cart"}>
                     <ShoppingCart className="w-5 h-5 text-foreground" />
@@ -118,6 +137,8 @@ const NavBar = () => {
                     </span>
                 </Link>
             </Button>
+            }
+            
 
             {/* Auth Dropdown (User Menu) */}
             <div className='hidden md:block'>
@@ -170,6 +191,9 @@ const NavBar = () => {
                             </Link> 
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={onChangePassword} className='cursor-pointer w-full flex items-center gap-2'>
+                            <KeyRound className="w-4 h-4 mr-2" /> Change password
+                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={logOut} className="cursor-pointer text-destructive focus:text-destructive">
                             <LogOut className="w-4 h-4 mr-2" /> Log out
                         </DropdownMenuItem>
@@ -239,7 +263,8 @@ const NavBar = () => {
                                             <p className="text-xs text-muted-foreground">{authStore.user?.email}</p>
                                         </div>
                                     </div>
-                                    
+                                                                <DropdownMenuSeparator />
+
                                     <div className="flex flex-col space-y-2 pl-2">
                                         <Link href={`/portfolio/${authStore.user?.id}/infor`} onClick={() => setIsSheetOpen(false)} className="flex items-center gap-2 py-2 text-sm text-muted-foreground hover:text-foreground">
                                             <CircleUser className="w-4 h-4" /> Portfolio
@@ -253,6 +278,11 @@ const NavBar = () => {
                                         <Link href="/orders" onClick={() => setIsSheetOpen(false)} className="flex items-center gap-2 py-2 text-sm text-muted-foreground hover:text-foreground">
                                             <Banknote className="w-4 h-4" /> Orders
                                         </Link>
+                                                                    <DropdownMenuSeparator />
+
+                                        <button onClick={() => {onChangePassword(); setIsSheetOpen(false)}} className="flex items-center gap-2 py-2 text-sm text-muted-foreground hover:text-foreground">
+                                            <KeyRound className="w-4 h-4" /> Change password
+                                        </button>
                                         <button onClick={() => {logOut(); setIsSheetOpen(false)}} className="flex items-center gap-2 py-2 text-sm text-destructive hover:underline text-left">
                                             <LogOut className="w-4 h-4" /> Log out
                                         </button>

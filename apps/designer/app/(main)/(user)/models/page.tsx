@@ -1167,6 +1167,7 @@ import { useDeleteProduct, useMyProducts } from '@/queries/useProduct';
 import { useCancelAuction } from '@/queries/useAuction';
 import { cn } from '@workspace/ui/lib/utils';
 import { formatCurrency } from '@/lib/utils';
+import Link from 'next/link';
 
 // Interface (Giữ nguyên)
 interface DesignData {
@@ -1294,7 +1295,17 @@ export default function ManageModelsPage() {
               Title <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div className="font-medium truncate max-w-[200px]" title={row.getValue('title')}>{row.getValue('title')}</div>,
+        cell: ({ row }) => {
+          const design = row.original;
+          const detailLink = design.type === 'auction' ? `auction/detail/${design._id}` : `detail/${design._id}`
+
+          return(
+            <Link href={detailLink}
+            className="font-medium truncate max-w-[200px]" title={row.getValue('title')}
+            >{row.getValue('title')}
+            </Link>
+          );
+        }
       },
       {
         accessorKey: 'type',
@@ -1321,6 +1332,7 @@ export default function ManageModelsPage() {
             )}>
               {typeLabels[type as keyof typeof typeLabels]}
             </span>
+            
           );
         },
       },
@@ -1443,14 +1455,25 @@ export default function ManageModelsPage() {
                     className="text-orange-400 hover:text-orange-300"
                     title="Cancel Auction"
                   />
-                  <ActionButton 
-                    onClick={() => { if (confirm('Delete this design?')) onDeleteProduct(design._id); }}
-                    icon={Trash2}
-                    className="text-destructive hover:text-red-400"
-                  />
+                  
                 </div>
               );
             }
+            if (design.status === 'active') {
+              return (
+                <div className="flex gap-1">
+                 
+                  <ActionButton 
+                    onClick={() => { if (confirm('Cancel auction?')) onCancelAuction(design._id); }}
+                    icon={Ban}
+                    className="text-orange-400 hover:text-orange-300"
+                    title="Cancel Auction"
+                  />
+                 
+                </div>
+              );
+            }
+
             if (design.status === 'cancelled') {
               return (
                 <ActionButton 
@@ -1460,6 +1483,17 @@ export default function ManageModelsPage() {
                 />
               );
             }
+
+            if (design.status === 'ended') {
+              return (
+                <ActionButton 
+                    onClick={() => { if (confirm('Delete this design?')) onDeleteProduct(design._id); }}
+                    icon={Trash2}
+                    className="text-destructive hover:text-red-400"
+                />
+              );
+            }
+
             return <span className="text-xs text-muted-foreground italic">Locked</span>;
           }
           return null;

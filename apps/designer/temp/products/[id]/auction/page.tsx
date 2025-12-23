@@ -1,9 +1,9 @@
 "use client";
 import React from "react";
-import AuctionTimer from "../../../../../components/AuctionTimer";
-import BiddingHistory from "../../../../../components/BiddingHistory";
-import AuctionInfo from "../../../../../components/AuctionInfo";
-import { useAuctionTimer } from "../../../../../hooks/useAuctionTimer";
+import AuctionTimer from "../../../../components/AuctionTimer";
+import BiddingHistory from "../../../../components/BiddingHistory";
+import AuctionInfo from "../../../../components/AuctionInfo";
+import { useAuctionTimer } from "../../../../hooks/useAuctionTimer";
 
 // API Data Interfaces
 interface Bidder {
