@@ -702,7 +702,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@workspace/
 import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui/components/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@workspace/ui/components/tabs';
 import { AuctionCountdown } from './auction-countdown';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { BidsHistory } from './auction-bids-history';
 import { copyToClipboard, formatCurrency } from '@/lib/utils';
 import { useAuctionQuery, usePlaceAuctionBidMutation } from '@/queries/useAuction';
@@ -712,10 +712,12 @@ import { Spinner } from '@workspace/ui/components/spinner';
 import { useAuthStore } from '@/stores/authStore';
 import { cn } from '@workspace/ui/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
-import { useFollowDesignerMutation, useLikeDesignMutation } from '@/queries/useProduct';
+import { useCategories, useFollowDesignerMutation, useLikeDesignMutation } from '@/queries/useProduct';
 import Link from 'next/link';
 import { LikeListModal } from '../LikeModal';
 import { Skeleton } from '@workspace/ui/components/skeleton';
+import { VirtualTryOnModal } from '../VirtualTryOn';
+import { useQueryClient } from '@tanstack/react-query';
 
 export function AuctionDetails({ auctionId, viewerCount }: { auctionId: string, viewerCount: number }) {
   // ... (Giữ nguyên logic state và hooks bên trên)
@@ -723,16 +725,26 @@ export function AuctionDetails({ auctionId, viewerCount }: { auctionId: string, 
   const [isFolllowed, setIsFollowed] = useState(false);
   const [isOpen, setIsOpen] = useState(false)
   const [bidAmount, setBidAmount] = useState(0);
-  const { data: auction, isLoading: auctionLoading } = useAuctionQuery(auctionId);
+  const { data: auction, isLoading: auctionLoading, refetch: refetchAuction } = useAuctionQuery(auctionId);
   const previousPrice = useRef(0);
   const [isFirstLoad, setFirstLoad] = useState(true);
   const [isSeller, setIsSeller] = useState(false);
   const [isLikeListOpen, setIsLikeListOpen] = useState(false);
-
+    const { data: categories } = useCategories();
   const authStore = useAuthStore();
   const { execute } = useAuth();
   const likeMutation = useLikeDesignMutation();
   const followMutation = useFollowDesignerMutation();
+  const categorySlug = useMemo(() => {
+    if (!auction || !categories) return "";
+    
+    const foundCategory = categories.find((cat: any) => {
+        if (cat._id === auction.categoryId) return true;
+        return false;
+    });
+
+    return foundCategory ? foundCategory.slug : "";
+  }, [auction, categories]);
 
   const handleLike = async (id: string) => {
     execute(async () => {
@@ -775,6 +787,7 @@ export function AuctionDetails({ auctionId, viewerCount }: { auctionId: string, 
     if (!auction) return;
     try {
       await placeBidMutation.mutateAsync({ auctionId: auction._id, body: { amount: bidAmount } });
+      refetchAuction();
     } catch (error: any) {
       alert(error?.message || 'Failed to place bid');
     }
@@ -848,7 +861,12 @@ export function AuctionDetails({ auctionId, viewerCount }: { auctionId: string, 
               >
                 {isFolllowed ? 'Following' : 'Follow'}
               </Button>}
-              
+              <VirtualTryOnModal 
+                                    productImages={auction.imageUrls} 
+                                    productTitle={auction.title}
+                                    categorySlug={categorySlug}
+                                    size='icon'
+              />
             </div>
           </div>
 
@@ -938,7 +956,7 @@ export function AuctionDetails({ auctionId, viewerCount }: { auctionId: string, 
                         <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-bold text-sm">VND</span>
                       </div>
                       <p className="text-xs text-muted-foreground font-medium ml-1">
-                        Min. bid: <span className="text-primary font-bold">{formatCurrency(auction.currentPrice + (auction.bidIncrement || 1))}</span>
+                        Min bid: <span className="text-primary font-bold">{formatCurrency(auction.currentPrice + (auction.bidIncrement || 1))}</span>
                       </p>
                     </div>
 

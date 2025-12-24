@@ -10,8 +10,10 @@ import Link from 'next/link'
 import { 
   Banknote, 
   Box, 
+  Boxes, 
   ChartArea, 
   CircleUser, 
+  Codesandbox, 
   Key, 
   KeyRound, 
   LogOut, 
@@ -119,10 +121,13 @@ const NavBar = () => {
         {/* --- RIGHT SECTION --- */}
         <div className='flex gap-3 md:gap-6 items-center'>
             
+
             {/* Upload Button (Desktop only) */}
-            <Button asChild className="hidden md:inline-flex rounded-full px-6 font-bold" size="default">
+             { authStore.isAuthenticated &&
+             <Button asChild className="hidden md:inline-flex rounded-full px-6 font-bold" size="default">
                 <Link href="/upload">UPLOAD</Link>
-            </Button>
+            </Button>}
+            
             
             {/* Notification */}
             { authStore.isAuthenticated && <NotificationBell/>}
@@ -186,6 +191,11 @@ const NavBar = () => {
                             </Link> 
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
+                            <Link href="/purchase" className='cursor-pointer w-full flex items-center gap-2'>
+                                <Boxes className="w-4 h-4" /> <span>Purchases</span>
+                            </Link> 
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
                             <Link href="/orders" className='cursor-pointer w-full flex items-center gap-2'>
                                 <Banknote className="w-4 h-4" /> <span>Orders</span>
                             </Link> 
@@ -230,13 +240,15 @@ const NavBar = () => {
                                         {item.label}
                                     </Link>
                                 ))}
-                                <Link 
+                                 { authStore.isAuthenticated && 
+                                 <Link 
                                     href="/upload" 
                                     onClick={() => setIsSheetOpen(false)}
                                     className="text-lg font-medium text-primary hover:underline"
                                 >
                                     Upload Design
-                                </Link>
+                                </Link>}
+                                
                             </div>
 
                             <DropdownMenuSeparator />
@@ -274,6 +286,9 @@ const NavBar = () => {
                                         </Link>
                                         <Link href="/models" onClick={() => setIsSheetOpen(false)} className="flex items-center gap-2 py-2 text-sm text-muted-foreground hover:text-foreground">
                                             <Box className="w-4 h-4" /> Models
+                                        </Link>
+                                        <Link href="/purchase" onClick={() => setIsSheetOpen(false)} className="flex items-center gap-2 py-2 text-sm text-muted-foreground hover:text-foreground">
+                                            <Boxes className="w-4 h-4" /> Purchases
                                         </Link>
                                         <Link href="/orders" onClick={() => setIsSheetOpen(false)} className="flex items-center gap-2 py-2 text-sm text-muted-foreground hover:text-foreground">
                                             <Banknote className="w-4 h-4" /> Orders

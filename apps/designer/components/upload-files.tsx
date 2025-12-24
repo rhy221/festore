@@ -11,9 +11,9 @@ export function UploadFiles() {
     
     return (
         <div className="flex flex-col gap-4">
-            <h2>Images</h2>
+            <h2>Images </h2>
             <UploadImages />
-            <h2>Model</h2>
+            <h2>Model <span className="text-gray-500">{"(.glb,.gltf,.fbx)"}</span></h2>
             <UploadModel />
         </div>
     )
@@ -25,7 +25,7 @@ export function EditFiles() {
         <div className="flex flex-col gap-4">
             <h2>Images</h2>
             <EditImages />
-            <h2>Model</h2>
+            <h2>Model <span className="text-gray-500">{"(.glb,.gltf,.fbx)"}</span></h2>
             <EditModel />
         </div>
     )
@@ -147,10 +147,11 @@ export function UploadModel() {
       <Input
         ref={fileRef}
         type="file"
-        accept=".glb,.gltf" // Giới hạn đuôi file 3D
+        accept=".glb,.gltf,.fbx"
         onChange={handleSelect}
         className="hidden"
       />
+      
 
       {currentFile ? (
         /* UI khi ĐÃ có file */
@@ -523,7 +524,7 @@ export function EditModel() {
       <Input
         ref={fileRef}
         type="file"
-        accept=".glb,.gltf"
+        accept=".glb,.gltf,.fbx"
         onChange={handleSelect}
         className="hidden"
       />

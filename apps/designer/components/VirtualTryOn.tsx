@@ -620,7 +620,8 @@ import toast from 'react-hot-toast';
 interface VirtualTryOnModalProps {
   productImages: string[];
   productTitle: string;
-  categorySlug: string; 
+  categorySlug: string;
+  size?: string; 
 }
 
 const supportedCategories = ['tops', 'bottoms', 'full-body'];
@@ -628,7 +629,8 @@ const supportedCategories = ['tops', 'bottoms', 'full-body'];
 export function VirtualTryOnModal({ 
   productImages, 
   productTitle, 
-  categorySlug 
+  categorySlug ,
+  size
 }: VirtualTryOnModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const isSupported = supportedCategories.includes(categorySlug);
@@ -713,13 +715,25 @@ export function VirtualTryOnModal({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
+        {size === "icon" ? (
         <Button 
+          variant="outline"
+          size={"icon"}
+          className="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 rounded-full h-10 w-10 md:h-12 md:w-12 border border-border shadow-lg transition-all hover:scale-[1.02] group"
+        >
+          <Sparkles className="w-5 h-5 group-hover:animate-spin" />
+        </Button>
+        ):
+        (
+           <Button 
           variant="outline"
           className="w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white border-0 font-bold py-6 rounded-full shadow-lg transition-all hover:scale-[1.02] group"
         >
           <Sparkles className="w-5 h-5 mr-2 group-hover:animate-spin" />
           VIRTUAL TRY-ON 
         </Button>
+        )}
+       
       </DialogTrigger>
       
       {/* UPDATE: Dialog chính */}

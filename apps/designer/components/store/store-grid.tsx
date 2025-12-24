@@ -7,6 +7,7 @@ import { useGetStoreItems } from '@/queries/useProduct';
 import { useRouter } from 'next/navigation';
 import { DesignResType, GetStoreItemsResType } from '@/schema/product.schema';
 import { useAddToCart } from '@/queries/useCart';
+import { formatCurrency } from '@/lib/utils';
 
 export interface StoreItem {
   id: string;
@@ -110,7 +111,7 @@ export function StoreGrid({store} : {store: GetStoreItemsResType}) {
 
              {item.price !== null && (
               <p className="text-white font-semibold">
-                ${item.price.toFixed(2)}
+                {formatCurrency(item.price)}
               </p>
             )}
 
