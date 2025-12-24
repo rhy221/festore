@@ -1265,7 +1265,7 @@ export default function ManageModelsPage() {
   }), [pagination, searchParam, typeParam, statusParam, sorting]);
 
   // --- 6. FETCH DATA ---
-  const { data: apiResponse, isLoading, isFetching } = useMyProducts(apiQueryParams);
+  const { data: apiResponse, isLoading, isFetching, refetch } = useMyProducts(apiQueryParams);
   
   const tableData = apiResponse?.data || [];
   const pageCount = apiResponse?.meta?.totalPages || 0;
@@ -1277,12 +1277,16 @@ export default function ManageModelsPage() {
   // Handlers actions (giữ nguyên)
   const onCancelAuction = async (id: string) => {
     if(cancelAuctionMutation.isPending) return;
-    try { await cancelAuctionMutation.mutateAsync(id); } catch(err) { console.error(err); }
+    try { await cancelAuctionMutation.mutateAsync(id);
+      refetch();
+     } catch(err) { console.error(err); }
   }
 
   const onDeleteProduct = async (id: string) => {
     if(deleteMutation.isPending) return;
-    try { await deleteMutation.mutateAsync(id); } catch(err) { console.error(err); }
+    try { await deleteMutation.mutateAsync(id); 
+      refetch();
+    } catch(err) { console.error(err); }
   }
 
   // --- COLUMNS DEFINITION ---

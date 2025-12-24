@@ -37,9 +37,9 @@ export default function CreateAuctionPage() {
     images: [],
     models: [],
     type: "gallery",
-    price: 0,
-    startingPrice: 0,
-    bidIncrement: 0,
+    price: 1,
+    startingPrice: 1,
+    bidIncrement: 1,
     startTime: "",
     endTime: ""
     
@@ -134,12 +134,12 @@ export default function CreateAuctionPage() {
 
     try {
       const result = await uploadMutation.mutateAsync(formData)
+      form.reset();
       if(result.type === "auction")
-        alert('Auction created successfully!');
-      else if (result.type === "fixed") 
-        alert('Store item created successfully!')
-      else
-      alert('Gallery item created successfully!')
+        router.push(`/auction/detail/${result._id}`)
+      else 
+        router.push(`/detail/${result._id}`)
+
 
     } catch(error) {
       console.log(error)
@@ -210,7 +210,7 @@ export default function CreateAuctionPage() {
                 id={field.name}
                 type='text'
                 required
-                placeholder="e.g., Vintage Rolex Watch"
+                placeholder=""
               >
               </Input>
                {fieldState.invalid && (
@@ -426,8 +426,8 @@ export default function CreateAuctionPage() {
                 {...field}
                 id={field.name}
                 type='number'
-                min="0"
-                step={priceStep}
+                min="1"
+                // step={priceStep}
                 required={form.watch("type") === "fixed"}
                 placeholder="1000000"
               >
@@ -455,8 +455,8 @@ export default function CreateAuctionPage() {
                 {...field}
                 id={field.name}
                 type='number'
-                min="0"
-                step={priceStep}
+                min="1"
+                // step={priceStep}
                 required={form.watch("type") === "auction"}
                 placeholder="1000000"
               >

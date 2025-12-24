@@ -40,9 +40,9 @@ export default function EditForm({ id }: { id: string  })
     models: [],
     oldModels: [],
     type: "gallery",
-    price: 0,
-    startingPrice: 0,
-    bidIncrement: 0,
+    price: 1,
+    startingPrice: 1,
+    bidIncrement: 1,
     startTime: "",
     endTime: ""
     
@@ -220,7 +220,7 @@ export default function EditForm({ id }: { id: string  })
                 id={field.name}
                 type='text'
                 required
-                placeholder="e.g., Vintage Rolex Watch"
+                placeholder=""
               >
               </Input>
                {fieldState.invalid && (
@@ -375,8 +375,8 @@ export default function EditForm({ id }: { id: string  })
                 {...field}
                 id={field.name}
                 type='number'
-                min="0"
-                step={priceStep}
+                min="1"
+                // step={priceStep}
                 required={form.watch("type") === "fixed"}
                 placeholder="1000000"
               >
@@ -404,8 +404,8 @@ export default function EditForm({ id }: { id: string  })
                 {...field}
                 id={field.name}
                 type='number'
-                min="0"
-                step={priceStep}
+                min="1"
+                // step={priceStep}
                 required={form.watch("type") === "auction"}
                 placeholder="1000000"
               >

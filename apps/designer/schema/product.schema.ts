@@ -291,6 +291,7 @@ export type ModelFile ={
 
   size: number;
 }
+export type AuctionStatus  = 'upcoming' | 'active' |'ended' |'cancelled'
 
 export type DesignResType =  {
     _id: string;
@@ -323,6 +324,7 @@ export type DesignResType =  {
     price: number;
 
     type: "auction" | "fixed" | "gallery";
+    currentPrice: number;
 
     startingPrice: number;
     
@@ -331,6 +333,10 @@ export type DesignResType =  {
     startTime: string;
 
     endTime: string;
+
+    currentWinnerId: string;
+    currentWinnerProfile?: DesignerProfile,
+    status: AuctionStatus,
 
     viewCount: number;
 

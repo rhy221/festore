@@ -1,3 +1,4 @@
+import { DesignResType } from "./product.schema";
 
 export type AuctionStatus  = 'upcoming' | 'active' |'ended' |'cancelled'
 type DesignerProfile = {
@@ -6,29 +7,7 @@ type DesignerProfile = {
   email: string,
   avatarUrl: string,
 }
-export type AuctionType = {
-   _id: string;
-  title: string;
-  description: string;
-  imageUrls: string[];
-  modelUrls?: string[];
-  displayModelUrl?: string;
-  currentPrice: number;
-  startingPrice: number;
-  bidIncrement: number;
-  endTime: string;
-  status: AuctionStatus;
-  totalBids: number;
-  designerId: string;
-  designerProfile: DesignerProfile,
-  viewCount: number;
-  likeCount: number;
-  currentViewerCount?: number;
-  currentWinnerProfile?: DesignerProfile,
-  currentWinnerId?: string;
-  isLiked: boolean;
-  isDesignerFollowed: boolean;
-}
+export type AuctionType = DesignResType;
 
 export type AuctionBidType = {
   _id: string;

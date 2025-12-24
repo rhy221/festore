@@ -1,6 +1,6 @@
 import { auctionAction } from "@/api/auction.api";
 import { GetAuctionBidsResType, GetAuctionResType, GetAuctionsResType } from "@/schema/auction.schema";
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export const useAuctionQuery = (auctionId: string) => {
     return useQuery<GetAuctionResType>({
@@ -21,13 +21,18 @@ export const useAuctionBidsQuery = (auctionId: string) => {
     return useQuery<GetAuctionBidsResType>({
         queryKey: ["auctionBids", auctionId],
         queryFn: () => auctionAction.getAuctionBids(auctionId),
-    });
+    })
+    
 }
 
 export const usePlaceAuctionBidMutation = () => {
+        const queryClient = useQueryClient();
+
     return useMutation({
-        mutationFn: auctionAction.placeAuctionBid
+        mutationFn: auctionAction.placeAuctionBid,
+    
     });
+
 }
 
 export const useUploadAuction = () => {
