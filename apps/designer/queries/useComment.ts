@@ -18,10 +18,10 @@ export const useCreateComment = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['comments', variables.productId] });
       queryClient.invalidateQueries({ queryKey: ['product', variables.productId] });
-      toast.success('Bình luận thành công!');
+      toast.success('Comment posted successfully!');
     },
     onError: () => {
-      toast.error('Không thể bình luận');
+      toast.error('Failed to post comment');
     },
   });
 };
@@ -34,10 +34,10 @@ export const useUpdateComment = () => {
       commentAction.updateComment(commentId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comments'] });
-      toast.success('Cập nhật bình luận thành công!');
+      toast.success('Comment updated successfully!');
     },
     onError: () => {
-      toast.error('Không thể cập nhật bình luận');
+      toast.error('Failed to update comment');
     },
   });
 };
@@ -49,10 +49,10 @@ export const useDeleteComment = () => {
     mutationFn: commentAction.deleteComment,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comments'] });
-      toast.success('Xóa bình luận thành công!');
+      toast.success('Comment deleted successfully!');
     },
     onError: () => {
-      toast.error('Không thể xóa bình luận');
+      toast.error('Failed to delete comment');
     },
   });
 };

@@ -27,10 +27,10 @@ export const useCreateRating = () => {
       queryClient.invalidateQueries({ queryKey: ['ratings', variables.productId] });
       queryClient.invalidateQueries({ queryKey: ['myRating', variables.productId] });
       queryClient.invalidateQueries({ queryKey: ['product', variables.productId] });
-      toast.success('Đánh giá thành công!');
+      toast.success('Rating submitted successfully!');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Không thể đánh giá');
+      toast.error(error.response?.data?.message || 'Failed to submit rating');
     },
   });
 };
@@ -45,10 +45,10 @@ export const useUpdateRating = () => {
       queryClient.invalidateQueries({ queryKey: ['ratings', variables.productId] });
       queryClient.invalidateQueries({ queryKey: ['myRating', variables.productId] });
       queryClient.invalidateQueries({ queryKey: ['product', variables.productId] });
-      toast.success('Cập nhật đánh giá thành công!');
+      toast.success('Rating updated successfully!');
     },
     onError: () => {
-      toast.error('Không thể cập nhật đánh giá');
+      toast.error('Failed to update rating');
     },
   });
 };
@@ -62,10 +62,10 @@ export const useDeleteRating = () => {
       queryClient.invalidateQueries({ queryKey: ['ratings', productId] });
       queryClient.invalidateQueries({ queryKey: ['myRating', productId] });
       queryClient.invalidateQueries({ queryKey: ['product', productId] });
-      toast.success('Xóa đánh giá thành công!');
+      toast.success('Rating deleted successfully!');
     },
     onError: () => {
-      toast.error('Không thể xóa đánh giá');
+      toast.error('Failed to delete rating');
     },
   });
 };

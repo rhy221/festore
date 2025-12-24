@@ -9,6 +9,7 @@ import { AuctionGallery } from '@/components/auction/auction-gallery';
 import { AuctionDetails } from '@/components/auction/auction-details';
 import { useQueryClient } from '@tanstack/react-query';
 import envConfig from '@/config';
+import { Skeleton } from '@workspace/ui/components/skeleton';
 
 
 interface AuctionDetailClientProps {
@@ -90,26 +91,8 @@ export default function AuctionDetailClient({ mockAuctionData }: AuctionDetailCl
     };
   }, [auctionId, auction]);
 
-  if (auctionLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-xl">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!auction) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-xl">Auction not found</div>
-      </div>
-    );
-  }
-
- 
-    if(auctionLoading)
-        return(<> Loading...
-        </>)
+  if(auctionLoading || !auction)
+    return (<AuctionSkeleton />)
     return (
       <div className="min-h-screen ">
         {/* <AuctionHeader /> */}
@@ -118,6 +101,82 @@ export default function AuctionDetailClient({ mockAuctionData }: AuctionDetailCl
             <AuctionDetails auctionId={auction._id} viewerCount={viewerCount} />
         </main>
       </div>
+  );
+}
+
+function AuctionSkeleton() {
+  return (
+    <div className="bg-background min-h-screen p-4 md:p-8 lg:p-12">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+        
+        {/* Left Column: Gallery Skeleton */}
+        <div className="space-y-4">
+          {/* Main Image */}
+          <Skeleton className="aspect-square w-full rounded-2xl" />
+          {/* Thumbnails */}
+          <div className="flex gap-4 overflow-hidden">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl" />
+            ))}
+          </div>
+        </div>
+
+        {/* Right Column: Details Skeleton */}
+        <div className="flex flex-col space-y-6 md:space-y-8">
+          
+          {/* Header Section */}
+          <div className="space-y-4">
+            <div className="flex gap-4">
+              <Skeleton className="h-4 w-24 md:w-32" />
+              <Skeleton className="h-4 w-24 md:w-32" />
+            </div>
+            <Skeleton className="h-10 md:h-12 w-3/4 rounded-lg" />
+            
+            <div className="flex gap-2">
+              <Skeleton className="h-10 w-10 md:h-12 md:w-12 rounded-full" />
+              <Skeleton className="h-10 w-10 md:h-12 md:w-12 rounded-full" />
+              <Skeleton className="h-10 w-24 md:w-32 rounded-full" />
+            </div>
+          </div>
+
+          {/* Price Section */}
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-12 md:h-14 w-40 md:w-56" />
+            <Skeleton className="h-7 w-12 rounded-md" />
+          </div>
+
+          {/* Highest Bidder Card */}
+          <Skeleton className="h-24 w-full rounded-2xl" />
+
+          {/* Timer Section */}
+          <div className="p-6 bg-secondary/10 rounded-2xl border border-border/50 space-y-3">
+            <Skeleton className="h-3 w-32 mx-auto sm:mx-0" />
+            <div className="flex justify-center sm:justify-start gap-4">
+               <Skeleton className="h-12 w-12 rounded-lg" />
+               <Skeleton className="h-12 w-12 rounded-lg" />
+               <Skeleton className="h-12 w-12 rounded-lg" />
+               <Skeleton className="h-12 w-12 rounded-lg" />
+            </div>
+          </div>
+
+          {/* Bidding Button */}
+          <Skeleton className="h-14 md:h-16 w-full rounded-2xl" />
+
+          {/* Tabs Section */}
+          <div className="space-y-6">
+            <Skeleton className="h-12 md:h-14 w-full rounded-xl" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-2/3" />
+            </div>
+            {/* Creator Card */}
+            <Skeleton className="h-20 w-full rounded-2xl" />
+          </div>
+          
+        </div>
+      </div>
+    </div>
   );
 }
 

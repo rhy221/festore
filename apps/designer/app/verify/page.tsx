@@ -1,6 +1,7 @@
 "use client"
 
 import http from '@/lib/http';
+import { useAuthStore } from '@/stores/authStore';
 import { useMutation } from '@tanstack/react-query';
 import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent, CardFooter } from '@workspace/ui/components/card';
@@ -9,7 +10,17 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import React from 'react'
 
 type VerifyEmailResType = {
-  token: string;
+  user: {
+    id: string,
+    name: string,
+    email: string,
+    avatarUrl: string,
+  //   bio: string,
+  //   status: "active" | "banned"
+  //   createdAt: string,
+  },
+  accessToken: string,
+  refreshToken?: string,
 }
 
 const page = () => {
@@ -17,6 +28,7 @@ const page = () => {
     const params = useSearchParams();
     const token = params.get("token");
     const router = useRouter();
+    const authStore = useAuthStore();
 
     if(!token)
       router.push("/auth/register");
@@ -33,8 +45,12 @@ const page = () => {
       if(verifyMutation.isPending) return;
       try {
         const result = await verifyMutation.mutateAsync();
-        localStorage.setItem("accessToken", result.token);
+        if(result.accessToken) {
+
+        authStore.login(result.user ,result.accessToken);
         router.push("/");
+
+      }
       } catch(error) {
         console.log(error); 
       }

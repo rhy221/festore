@@ -723,7 +723,7 @@ export function VirtualTryOnModal({
       </DialogTrigger>
       
       {/* UPDATE: Dialog chính */}
-      <DialogContent className="w-[95vw] max-w-[90rem] h-[90vh] p-0 gap-0 bg-zinc-950 border-zinc-800 text-white overflow-hidden flex flex-col">
+      <DialogContent className="min-w-[50vw] max-w-[90rem] h-[90vh] p-0 gap-0 bg-zinc-950 border-zinc-800 text-white overflow-hidden flex flex-col">
         
         {/* Header */}
         <div className="p-4 pr-12 border-b border-zinc-800 flex justify-between items-center bg-zinc-900/50 relative flex-shrink-0">

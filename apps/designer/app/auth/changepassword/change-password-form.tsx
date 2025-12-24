@@ -10,6 +10,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { changePasswordSchema, ChangePasswordType } from "@/schema/auth.schema";
 import { useChangePasswordMutation } from "@/queries/useAuth";
 import { Spinner } from "@workspace/ui/components/spinner";
+import { useEffect } from "react";
+import { useAuthStore } from "@/stores/authStore";
 
 
 export default function ChangePasswordForm()
@@ -18,9 +20,14 @@ export default function ChangePasswordForm()
     const params = useSearchParams();
     const token = params.get("token");
     const router = useRouter();
+    const authStore = useAuthStore();
 
-    if(!token) 
+      useEffect(() => {
+         if(!token) 
         router.push("/auth/login");
+      },[])
+
+   
 
     const form = useForm<ChangePasswordType>({
       resolver: zodResolver(changePasswordSchema),
@@ -37,10 +44,12 @@ export default function ChangePasswordForm()
       if(mutation.isPending) return;
       try {
         const result = await mutation.mutateAsync({ token: token!, password: data.password});
-        console.log(result);
-        router.push("/auth/login");
+        if(!authStore.isAuthenticated)
+          router.push("/auth/login");
+        else 
+          router.push("/");
       } catch(error) {
-        console.log(error);
+        console.error(error);
       }
     }
     return (

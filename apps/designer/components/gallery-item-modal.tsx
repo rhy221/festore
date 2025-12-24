@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { X, Heart, Bookmark, Share2, Download, Info, ShoppingCart, Link } from 'lucide-react';
 import { Button } from '@workspace/ui/components/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui/components/avatar';
@@ -12,8 +12,11 @@ import { ProductCommentTabs } from './Comment';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@workspace/ui/lib/utils';
 import { VirtualTryOnModal } from './VirtualTryOn';
-import { copyToClipboard } from '@/lib/utils';
+import { copyToClipboard, formatCurrency } from '@/lib/utils';
 import { LikeListModal } from './LikeModal';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/stores/authStore';
+import { Skeleton } from '@workspace/ui/components/skeleton';
 
 export function GalleryItemModal({ id }: { id: string }) {
   const [mainActionElement, setMainActionElement] = useState<HTMLButtonElement | null>(null);
@@ -21,6 +24,8 @@ export function GalleryItemModal({ id }: { id: string }) {
 const [isLikeListOpen, setIsLikeListOpen] = useState(false);
   const { data: design, isLoading: designLoading } = useProduct(id);
   const { data: categories } = useCategories();
+  const authStore = useAuthStore();
+  const router = useRouter();
 
   // 2. Tính toán slug dựa trên design.categoryId
   const categorySlug = useMemo(() => {
@@ -72,15 +77,24 @@ const [isLikeListOpen, setIsLikeListOpen] = useState(false);
     });
   };
 
-  if (designLoading) return <div className="text-white p-10">Loading ...</div>;
-  if (!design) return <div className="text-white p-10">Check your connection</div>;
+  useEffect(()=>{
+    if(design?.type && design.type === "auction")
+      router.replace(`/auction/detail/${id}`)
+  },[design])
+
+  if (designLoading || !design) return (
+    <div className="text-white p-10">
+    <GalleryItemSkeleton />
+  </div>
+  );
+  
 
   return (
     // CHANGE 1: Sử dụng container và mx-auto để căn giữa, px-4 cho mobile
-    <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-6 grid grid-cols-1 lg:grid-cols-10 gap-8">
+    <div className="w-full mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
       
       {/* --- LEFT & CENTER CONTENT (Chiếm 8/10 trên Desktop, 100% trên Mobile) --- */}
-      <div className='grid grid-cols-1 lg:grid-cols-8 lg:col-span-8 gap-1'>
+      <div className='grid grid-cols-1 lg:grid-cols-8 lg:col-span-10 gap-1'>
         
         {/* --- COL 1: Main Image --- */}
         <div className="lg:col-span-5 relative flex flex-col">
@@ -94,9 +108,9 @@ const [isLikeListOpen, setIsLikeListOpen] = useState(false);
         {/* --- COL 2: Product Info --- */}
         <div className="lg:col-span-3 h-full ">
           {/* CHANGE 2: Bỏ min-h-full, điều chỉnh padding và background */}
-          <div className="flex flex-col  gap-6 justify-between p-6 bg-zinc-900 rounded-xl">
+          <div className="flex flex-col min-h-full  gap-6 justify-between p-6 bg-zinc-900 rounded-xl">
             
-            <div className="space-y-8">
+            <div className="space-y-16">
               {/* Stats Badge */}
               <div className="flex justify-start gap-3 items-center">
                 <Badge  
@@ -135,6 +149,8 @@ const [isLikeListOpen, setIsLikeListOpen] = useState(false);
                       {design.designerProfile.name}
                     </p>
                   </div>
+                  {authStore.user?.id !== design.designerId &&
+
                   <Button
                     onClick={handleFollow}
                     size="sm"
@@ -143,24 +159,28 @@ const [isLikeListOpen, setIsLikeListOpen] = useState(false);
                   >
                     {design.isDesignerFollowed ? "Following" : "Follow"}
                   </Button>
+                  }
                 </div>
               </div>
             </div>
 
             {/* Main Action Section (Mobile & Desktop Inline) */}
             <div className="space-y-4 pt-4">
-              {design.type === "fixed" && (
                 <div className="flex flex-col gap-4">
-                  <p className="text-white text-2xl font-bold">
-                    $ {design.price.toFixed(2)}
-                  </p>
-                  <Button
-                    ref={setMainActionElement}
-                    onClick={() => onAddToCart(id)}
-                    className="w-full bg-white text-black hover:bg-white/90 font-bold py-6 rounded-full text-base transition-transform active:scale-95"
-                  >
+                  {design.type === "fixed" && authStore.user?.id !== design.designerId && (
+                  <div className='flex flex-col gap-4'>
+                     <p className="text-white text-2xl font-bold">
+                      {formatCurrency(design.price)}
+                    </p>
+                    <Button
+                      ref={setMainActionElement}
+                      onClick={() => onAddToCart(id)}
+                      className="w-full bg-white text-black hover:bg-white/90 font-bold py-6 rounded-full text-base transition-transform active:scale-95"
+                    >
                     ADD TO CART
-                  </Button>
+                    </Button>
+                  </div>
+                 )}
 
                    <div className="pt-2">
                     <VirtualTryOnModal 
@@ -170,7 +190,7 @@ const [isLikeListOpen, setIsLikeListOpen] = useState(false);
                     />
                   </div>
                 </div>
-              )}
+              
             </div>
 
           </div>
@@ -217,7 +237,7 @@ const [isLikeListOpen, setIsLikeListOpen] = useState(false);
         <div className="sticky top-24 z-10 flex flex-col items-center ml-4">
           
           {/* Sticky Cart Box */}
-          {design.type === "fixed" && (
+          {design.type === "fixed" && authStore.user?.id !== design.designerId && (
             <div
               className={cn(
                 "overflow-hidden transition-all duration-500 ease-in-out w-full flex justify-end",
@@ -280,6 +300,97 @@ const [isLikeListOpen, setIsLikeListOpen] = useState(false);
         onClose={() => setIsLikeListOpen(false)} 
         designId={id} 
       />
+    </div>
+  );
+}
+
+export function GalleryItemSkeleton() {
+  return (
+    <div className="w-full mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      {/* --- LEFT & CENTER CONTENT --- */}
+      <div className="grid grid-cols-1 lg:grid-cols-8 lg:col-span-10 gap-1">
+        
+        {/* COL 1: Main Image Skeleton */}
+        <div className="lg:col-span-5 relative flex flex-col">
+          <Skeleton className="w-full aspect-[4/5] rounded-lg" />
+        </div>
+
+        {/* COL 2: Product Info Skeleton */}
+        <div className="lg:col-span-3 h-full">
+          <div className="flex flex-col min-h-full gap-6 p-6 bg-zinc-900/50 rounded-xl">
+            <div className="space-y-16">
+              {/* Stats Badge */}
+              <div className="flex justify-start gap-3 items-center">
+                <Skeleton className="h-8 w-24 rounded-full" />
+                <Skeleton className="h-5 w-16" />
+              </div>
+
+              {/* Title & Designer Info */}
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <Skeleton className="h-8 w-full" />
+                  <Skeleton className="h-8 w-2/3" />
+                </div>
+
+                <div className="flex items-center gap-3 pt-4 border-t border-zinc-800">
+                  <Skeleton className="w-10 h-10 md:w-12 md:h-12 rounded-full" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                  <Skeleton className="h-8 w-20 rounded-md" />
+                </div>
+              </div>
+            </div>
+
+            {/* Action Section */}
+            <div className="space-y-4 pt-4">
+              <div className="space-y-4">
+                <Skeleton className="h-8 w-24" />
+                <Skeleton className="h-14 w-full rounded-full" />
+                <Skeleton className="h-10 w-full rounded-md" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Description & More Images Skeleton */}
+        <div className="lg:col-span-8 flex flex-col py-8 px-0 md:px-8 lg:px-20 gap-6">
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-3/4" />
+          </div>
+
+          <div className="space-y-6">
+            <Skeleton className="w-full aspect-video rounded-lg" />
+            <Skeleton className="w-full aspect-video rounded-lg" />
+          </div>
+        </div>
+
+        {/* Comments Skeleton */}
+        <div className="lg:col-span-8 bg-zinc-900/30 flex flex-col py-8 px-4 md:px-8 lg:px-20 rounded-xl gap-4">
+          <Skeleton className="h-10 w-full rounded-lg" />
+          <div className="space-y-4">
+             <div className="flex gap-3">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <Skeleton className="h-20 flex-1 rounded-lg" />
+             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* --- COL 3: Sticky Sidebar Skeleton (Desktop Only) --- */}
+      <div className="hidden lg:block lg:col-span-2">
+        <div className="sticky top-24 flex flex-col items-center ml-4 space-y-8">
+          {/* Icons stack */}
+          <div className="flex flex-col gap-6 items-center bg-zinc-900/50 p-4 rounded-full border border-white/5">
+            <Skeleton className="h-12 w-12 rounded-full" />
+            <Skeleton className="h-12 w-12 rounded-full" />
+            <Skeleton className="h-12 w-12 rounded-full" />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,16 +1,17 @@
 'use client';
 
 import { isTokenExpired } from '@/lib/http';
+import { useAuthStore } from '@/stores/authStore';
 import { useRouter } from 'next/navigation';
 
 export const useAuth = () => {
   const router = useRouter();
-
+  const authStore = useAuthStore();
   // Hàm này nhận vào một function (action) mà bạn muốn thực hiện nếu đã login
   const execute = (action: () => void) => {
-    const token = localStorage.getItem('accessToken');
+    
 
-    if (!token || isTokenExpired(token)) {
+    if (!authStore.isAuthenticated) {
       // Chưa login -> Redirect
       const currentPath = window.location.pathname;
       router.push(`/auth/login?callbackUrl=${encodeURIComponent(currentPath)}`);

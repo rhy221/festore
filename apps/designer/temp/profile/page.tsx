@@ -1,6 +1,6 @@
 import Products from "./products";
 import Profile from "./profile";
-import Statics from "./statics";
+import Statics from "../../components/portfolio/statics";
 
 
 export default function Home() {

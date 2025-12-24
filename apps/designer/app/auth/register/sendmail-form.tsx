@@ -1,14 +1,18 @@
 "use client";
 import { useSendVerifyEmailMutation } from '@/queries/useAuth';
+import { useAuthStore } from '@/stores/authStore';
 import { useRegisterStore } from '@/stores/useRegisterStore';
 import { Button } from '@workspace/ui/components/button';
 import { Spinner } from '@workspace/ui/components/spinner';
-import React from 'react'
+import { useRouter } from 'next/navigation';
+import React, { useEffect } from 'react'
 
 export default function SendVerifyEmailForm() {
     const { email } = useRegisterStore();
     const mutation =  useSendVerifyEmailMutation();
-    
+    const router = useRouter();
+      const authStore = useAuthStore()
+
     const onClick = async () => {
         if(mutation.isPending) return;
         try{
@@ -18,6 +22,12 @@ export default function SendVerifyEmailForm() {
       console.log(error);
     }
     }
+
+    useEffect(() => {
+    if(authStore.isAuthenticated)
+      router.replace("/")
+  },[authStore]);
+
     return (
     <div className="flex flex-col gap-5">
       <h2 className="text-xl font-bold">Verify email has been sent to your <strong>{email}</strong></h2>

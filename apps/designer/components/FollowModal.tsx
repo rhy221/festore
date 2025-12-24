@@ -12,6 +12,7 @@ import Link from "next/link";
 import { useAuthStore } from "@/stores/authStore";
 import { cn } from "@workspace/ui/lib/utils";
 import { useFollowDesignerMutation } from "@/queries/useProduct";
+import { useAuth } from "@/hooks/useAuth";
 
 interface FollowModalProps {
   isOpen: boolean;
@@ -23,6 +24,8 @@ interface FollowModalProps {
 export function FollowModal({ isOpen, onClose, userId, defaultType }: FollowModalProps) {
   const queryClient = useQueryClient();
   const currentUser = useAuthStore((state) => state.user);
+  const {execute} = useAuth()
+
   
   // State quản lý tab đang active bên trong modal
   const [activeTab, setActiveTab] = useState<"followers" | "following">(defaultType);
@@ -51,7 +54,8 @@ export function FollowModal({ isOpen, onClose, userId, defaultType }: FollowModa
   const followMutation = useFollowDesignerMutation();
 
   const handleFollow = async (id: string) => {
-    if(followMutation.isPending) return;
+    execute(async () => {
+      if(followMutation.isPending) return;
     try {
         await followMutation.mutateAsync(id);
         queryClient.invalidateQueries({queryKey: ["follow-list", userId, activeTab]});
@@ -59,6 +63,7 @@ export function FollowModal({ isOpen, onClose, userId, defaultType }: FollowModa
     catch(err){
         console.error(err);
     }
+    })
   }
 
   return (

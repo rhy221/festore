@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import * as z from 'zod';
 import { Controller, useForm } from "react-hook-form";
@@ -15,10 +15,13 @@ import { forgotPasswordBodySchema, ForgotPasswordBodyType } from '@/schema/auth.
 import { useForgotPasswordMutation } from '@/queries/useAuth';
 import { Spinner } from '@workspace/ui/components/spinner';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
+import { useAuthStore } from '@/stores/authStore';
 
 
 export default function ForgotPasswordForm() {
     const router = useRouter();
+    const authStore = useAuthStore();
     
     const form = useForm<ForgotPasswordBodyType>({
         resolver: zodResolver(forgotPasswordBodySchema),
@@ -34,11 +37,17 @@ export default function ForgotPasswordForm() {
         if(mutation.isPending) return;
         try {
             const result = await mutation.mutateAsync(data);
-            console.log(result);
+            toast.success(`Change password email has been sent to your ${form.watch("email", "email")}`)
         } catch(error) {
-            console.log(error);
+            console.error(error);
         }
     }
+
+    useEffect(() => {
+        if(authStore.isAuthenticated)
+          router.replace("/")
+      },[authStore]);
+
     return (
         <form
                 id="register-form"
@@ -71,7 +80,6 @@ export default function ForgotPasswordForm() {
                         {fieldState.invalid && (
                             <FieldError errors={[fieldState.error]} />
                           )}
-                          {mutation.isSuccess && <span>{"Đã gửi email đổi mật khẩu"}</span>}
                       </Field>
                     )}>
                   </Controller>
