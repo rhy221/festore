@@ -15,6 +15,7 @@ import { set } from 'date-fns';
 import { copyToClipboard } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 import { FollowModal } from '@/components/FollowModal';
+import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui/components/avatar';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -136,12 +137,12 @@ export default function PortfolioLayout({ children, params }: LayoutProps) {
               
               {/* Avatar Section */}
               <div className="relative group">
-                <div className="w-28 h-28 lg:w-36 lg:h-36 rounded-full overflow-hidden bg-[#1a1a1a] ring-4 ring-[#0f0f10] relative">
-                  <img 
-                    src={userPortfolio?.avatarUrl || '/default-avatar.png'} 
-                    alt={userPortfolio?.name || 'User Avatar'} 
+                <Avatar className="w-28 h-28 lg:w-36 lg:h-36 rounded-full overflow-hidden bg-[#1a1a1a] ring-4 ring-[#0f0f10] relative">
+                  <AvatarImage 
+                    src={userPortfolio?.avatarUrl} 
                     className="w-full h-full object-cover"
                   />
+                  <AvatarFallback>{userPortfolio?.name || 'U'}</AvatarFallback>
                   
                   {/* Loading Spinner Overlay cho Avatar */}
                   {isAvatarUploading && (
@@ -149,7 +150,7 @@ export default function PortfolioLayout({ children, params }: LayoutProps) {
                        <Loader2 className="animate-spin text-white" size={32} />
                     </div>
                   )}
-                </div>
+                </Avatar>
                 
                 {/* Chỉ hiện overlay Edit nếu là Owner và KHÔNG đang upload */}
                 {isOwner && !isAvatarUploading && (
