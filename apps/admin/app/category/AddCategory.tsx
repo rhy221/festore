@@ -64,26 +64,27 @@ export default function AdminCategoryAddPopup({
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
-      <div className="bg-white p-8 rounded-2xl shadow-2xl text-gray-900 max-w-xl w-full">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 backdrop-blur-sm">
+      <div className="w-full max-w-xl rounded-lg bg-card text-card-foreground shadow-xl border border-border p-6">
         
         {/* HEADER */}
-        <div className="flex justify-between items-start pb-4 border-b border-gray-100 mb-6">
-          <h2 className="text-3xl font-light tracking-wide">
+        <div className="mb-6 flex items-center justify-between border-b border-border pb-4">
+          <h2 className="text-lg font-semibold">
             Create new category
           </h2>
+
           <button
             onClick={onClose}
-            className="p-1 text-gray-500 hover:text-black rounded-full hover:bg-gray-100"
+            className="rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground transition"
           >
-            <X className="w-6 h-6" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* FORM */}
-        <div className="space-y-6">
+        <div className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="mb-1 block text-sm font-medium text-foreground">
               Category name
             </label>
             <Input
@@ -92,14 +93,14 @@ export default function AdminCategoryAddPopup({
               placeholder="e.g. Tops"
             />
             {name && (
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="mt-1 text-xs text-muted-foreground">
                 Slug: <span className="italic">{generateSlug(name)}</span>
               </p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="mb-1 block text-sm font-medium text-foreground">
               Styles (comma separated)
             </label>
             <Input
@@ -111,11 +112,11 @@ export default function AdminCategoryAddPopup({
         </div>
 
         {/* ACTIONS */}
-        <div className="pt-6 flex justify-end">
+        <div className="mt-6 flex justify-end">
           <Button
-            className="bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 px-6 py-2 rounded-lg disabled:opacity-50"
             onClick={handleSubmit}
             disabled={loading}
+            className="rounded-md bg-primary text-primary-foreground px-5 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-50"
           >
             {loading ? "Processing..." : "Create category"}
           </Button>

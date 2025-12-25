@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { BarChart, Bar, CartesianGrid, XAxis, YAxis } from "recharts";
+import { BarChart, Bar, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from "recharts";
 import {
   ChartContainer,
   ChartTooltip,
@@ -15,7 +15,7 @@ import { getProductStats, type ProductData } from "@/api/home.api";
 const chartConfig = {
   products: {
     label: "Số lượng",
-    color: "#111827",
+    color: "var(--color-chart-1)",
   },
 } satisfies ChartConfig;
 
@@ -50,7 +50,7 @@ export default function ProductChart({ data }: ProductChartProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-[220px] text-sm text-gray-400">
+      <div className="flex h-[180px] md:h-[260px] items-center justify-center text-sm text-muted-foreground">
         Loading chart...
       </div>
     );
@@ -61,49 +61,60 @@ export default function ProductChart({ data }: ProductChartProps) {
     : 0;
 
   return (
-    <div className="w-full rounded-2xl border border-gray-200 bg-white px-5 pt-5 pb-4 shadow-sm">
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm font-semibold tracking-wide text-gray-900">
+    <div className="w-full rounded-xl border border-border bg-card px-4 md:px-6 pt-4 md:pt-6 pb-4 shadow-sm">
+      {/* HEADER */}
+      <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+        <h2 className="text-sm md:text-base font-semibold text-foreground">
           Category Product Statistics
         </h2>
-        <span className="text-xs text-gray-400">All Categories</span>
+        <span className="text-xs text-muted-foreground">
+          All Categories
+        </span>
       </div>
 
+      {/* ERROR */}
       {error && (
-        <div className="mb-3 rounded-lg border border-yellow-200 bg-yellow-50 px-3 py-2 text-xs text-yellow-800">
+        <div className="mb-3 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
           {error}
         </div>
       )}
 
-      <div className="w-full h-[220px]">
-        <ChartContainer config={chartConfig} className="w-full h-full">
-          <BarChart data={chartData} barCategoryGap="35%">
-            <CartesianGrid strokeDasharray="2 6" stroke="#eee" vertical={false} />
-            <XAxis
-              dataKey="categoryName"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={10}
-              tick={{ fill: "#9ca3af", fontSize: 10 }}
-            />
-            <YAxis
-              tickLine={false}
-              axisLine={false}
-              tick={{ fill: "#9ca3af", fontSize: 10 }}
-              tickCount={6}
-              domain={[0, maxQuantity + 5]}
-              allowDecimals={false}
-            />
-            <ChartTooltip content={<ChartTooltipContent />} />
-            <ChartLegend content={<ChartLegendContent />} />
-            <Bar
-              dataKey="quantity"
-              fill="var(--color-products)"
-              barSize={22}
-              radius={[6, 6, 0, 0]}
-              background={{ fill: "#f3f4f6" }}
-            />
-          </BarChart>
+      {/* CHART */}
+      <div className="h-[180px] sm:h-[220px] md:h-[280px] w-full">
+        <ChartContainer config={chartConfig} className="h-full w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData} barCategoryGap="30%">
+              <CartesianGrid
+                strokeDasharray="2 6"
+                stroke="var(--border)"
+                vertical={false}
+              />
+              <XAxis
+                dataKey="categoryName"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                tick={{ fill: "var(--muted-foreground)", fontSize: 10 }}
+              />
+              <YAxis
+                tickLine={false}
+                axisLine={false}
+                tick={{ fill: "var(--muted-foreground)", fontSize: 10 }}
+                tickCount={6}
+                domain={[0, maxQuantity + 5]}
+                allowDecimals={false}
+              />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <ChartLegend content={<ChartLegendContent />} />
+              <Bar
+                dataKey="quantity"
+                fill="var(--color-chart-1)"
+                barSize={14}
+                radius={[6, 6, 0, 0]}
+                className="md:!barSize-[22]"
+              />
+            </BarChart>
+          </ResponsiveContainer>
         </ChartContainer>
       </div>
     </div>

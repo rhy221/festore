@@ -9,7 +9,6 @@ import { UsersAPI, type Design } from "@/api/users.api";
 import { ArrowUpDown } from "lucide-react";
 import { toast } from "sonner";
 
-
 const SIDEBAR_WIDTH = 240;
 const HEADER_HEIGHT = 80;
 
@@ -46,7 +45,6 @@ const resolveDesignImage = (design?: Design) => {
   return `${baseUrl}/${raw.replace(/^\/+/, "")}`;
 };
 
-
 export default function AdminUserDetailPage() {
   const params = useParams();
   const userId = params?.id as string | undefined;
@@ -80,10 +78,11 @@ export default function AdminUserDetailPage() {
 
         setUser({
           id: userBase._id,
-          type: Array.isArray(userBase.role) &&
+          type:
+            Array.isArray(userBase.role) &&
             userBase.role.includes("designer")
-            ? "designer"
-            : "customer",
+              ? "designer"
+              : "customer",
           email: userBase.email,
           createdAt: userBase.createdAt,
           status: userBase.state,
@@ -124,7 +123,7 @@ export default function AdminUserDetailPage() {
   }, [userId, user?.type]);
 
   const filteredDesigns = useMemo(() => {
-    const keyword = (searchTerm ?? "").toLowerCase();
+    const keyword = searchTerm.toLowerCase();
 
     return designs
       .filter((d) =>
@@ -138,72 +137,69 @@ export default function AdminUserDetailPage() {
   }, [designs, searchTerm, sortAsc]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex text-black">
-      {/* HEADER */}
+    <div className="min-h-screen bg-background text-foreground flex">
       <div
-        className="fixed top-0 right-0 z-20 bg-white shadow-md"
+        className="fixed top-0 right-0 z-20 bg-card border-b border-border"
         style={{ height: HEADER_HEIGHT, left: SIDEBAR_WIDTH }}
       >
         <Header role="admin" name="Admin" />
       </div>
 
       <div className="flex-1" style={{ marginLeft: SIDEBAR_WIDTH }}>
-        {/* SIDEBAR */}
         <div
-          className="fixed top-0 left-0 h-full bg-white shadow-lg"
+          className="fixed top-0 left-0 h-full bg-sidebar border-r border-sidebar-border"
           style={{ width: SIDEBAR_WIDTH }}
         >
           <Sidebar />
         </div>
 
-        {/* CONTENT */}
         <main
-          className="p-6 bg-white overflow-y-auto"
+          className="p-4 sm:p-6 overflow-y-auto"
           style={{ marginTop: HEADER_HEIGHT }}
         >
           {loading ? (
-            <div className="text-center text-xl py-20">Loading...</div>
+            <div className="text-center py-20 text-muted-foreground">
+              Loading...
+            </div>
           ) : !user ? (
-            <div className="text-center text-xl text-red-500 py-20">
+            <div className="text-center py-20 text-destructive">
               User not found
             </div>
           ) : (
             <>
-              {/* USER INFO */}
-              <div className="flex gap-6 mb-8">
+              <div className="flex flex-col md:flex-row gap-6 mb-8">
                 <img
                   src={
                     user.avatar ||
                     "https://via.placeholder.com/200x200/6B7280/FFFFFF?text=User"
                   }
                   alt="User avatar"
-                  className="w-48 h-48 rounded-full border object-cover"
+                  className="w-40 h-40 md:w-48 md:h-48 rounded-full border border-border object-cover"
                 />
 
-                <div className="grid grid-cols-2 gap-x-10 gap-y-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-2">
                   <InfoRow label="Name" value={user.name ?? "-"} />
                   <InfoRow label="Email" value={user.email ?? "-"} />
                   <InfoRow label="Status" value={user.status ?? "-"} />
                   <InfoRow label="Created At" value={user.createdAt ?? "-"} />
-                  <div className="col-span-2">
+                  <div className="sm:col-span-2">
                     <InfoRow label="Bio" value={user.bio ?? "-"} />
                   </div>
                 </div>
               </div>
 
-              {/* DESIGNS */}
               {user.type === "designer" && (
                 <>
-                  <div className="flex gap-4 mb-4">
+                  <div className="flex gap-3 mb-4">
                     <input
                       value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value ?? "")}
+                      onChange={(e) => setSearchTerm(e.target.value)}
                       placeholder="Search designs"
-                      className="flex-1 px-4 py-2 border rounded-lg"
+                      className="flex-1 px-4 py-2 rounded-lg bg-input border border-border focus:outline-none"
                     />
                     <button
                       onClick={() => setSortAsc((v) => !v)}
-                      className="w-11 h-11 border rounded-lg flex items-center justify-center"
+                      className="w-11 h-11 rounded-lg border border-border flex items-center justify-center bg-secondary hover:bg-accent transition"
                     >
                       <ArrowUpDown
                         className={`transition-transform ${
@@ -214,13 +210,13 @@ export default function AdminUserDetailPage() {
                   </div>
 
                   {designLoading ? (
-                    <div className="py-10 text-center text-gray-500">
+                    <div className="py-10 text-center text-muted-foreground">
                       Loading designs...
                     </div>
                   ) : filteredDesigns.length > 0 ? (
-                    <div className="grid grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                       {filteredDesigns.map((design, index) => {
-                        const key = design._id ? design._id : `design-${index}`;
+                        const key = design._id ?? `design-${index}`;
                         return (
                           <DesignCard
                             key={key}
@@ -233,9 +229,8 @@ export default function AdminUserDetailPage() {
                         );
                       })}
                     </div>
-
                   ) : (
-                    <div className="py-10 text-center text-gray-500">
+                    <div className="py-10 text-center text-muted-foreground">
                       No designs found
                     </div>
                   )}
@@ -246,7 +241,6 @@ export default function AdminUserDetailPage() {
         </main>
       </div>
 
-      {/* DIALOG */}
       {user?.type === "designer" && (
         <DesignDetailDialog
           design={selectedDesign}
@@ -261,8 +255,8 @@ export default function AdminUserDetailPage() {
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <p>
-      <span className="font-semibold">{label}: </span>
-      {value}
+      <span className="text-muted-foreground">{label}:</span>{" "}
+      <span className="font-medium">{value}</span>
     </p>
   );
 }
@@ -280,22 +274,33 @@ function DesignCard({
   return (
     <div
       onClick={onClick}
-      className="cursor-pointer border rounded-lg p-4 text-center bg-[#faf0e6] hover:shadow-md"
+      className="
+        cursor-pointer
+        rounded-lg
+        border border-border
+        bg-card
+        p-4
+        text-center
+        hover:shadow-md
+        transition
+      "
     >
       {image ? (
         <img
           src={image}
           alt={title}
-          className="w-40 h-40 mx-auto object-cover rounded mb-3"
+          className="w-40 h-40 mx-auto object-cover rounded-md mb-3"
         />
       ) : (
-        <div className="w-40 h-40 mx-auto flex items-center justify-center bg-gray-200 rounded mb-3 text-sm text-gray-500">
+        <div className="w-40 h-40 mx-auto flex items-center justify-center bg-muted rounded-md mb-3 text-sm text-muted-foreground">
           No image
         </div>
       )}
 
       <p className="font-semibold truncate">{title}</p>
-      <p className="text-sm">{design.status ?? "-"}</p>
+      <p className="text-sm text-muted-foreground">
+        {design.status ?? "-"}
+      </p>
     </div>
   );
 }

@@ -70,54 +70,58 @@ export default function AdminCategoryEditPopup({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="w-full max-w-2xl rounded-2xl bg-white p-8 shadow-2xl animate-in fade-in zoom-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 backdrop-blur-sm">
+      <div className="w-full max-w-2xl rounded-lg bg-card text-card-foreground border border-border p-6 shadow-xl">
         
         {/* HEADER */}
-        <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-2xl font-bold tracking-wide text-gray-900">
+        <div className="mb-6 flex items-center justify-between border-b border-border pb-4">
+          <h2 className="text-lg font-semibold">
             Edit category
           </h2>
-          <X
-            className="h-6 w-6 cursor-pointer text-gray-500 hover:text-black"
+
+          <button
             onClick={onClose}
-          />
+            className="rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground transition"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
 
         {/* FORM */}
-        <div className="space-y-6">
+        <div className="space-y-5">
           <div>
-            <label className="text-sm font-semibold text-gray-700">
+            <label className="mb-1 block text-sm font-medium text-foreground">
               Category name
             </label>
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
+              className="text-black placeholder:text-muted-foreground"
             />
-            <p className="mt-1 text-xs text-gray-400">
-              Slug:{" "}
-              <span className="italic">{generateSlug(name)}</span>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Slug: <span className="italic">{generateSlug(name)}</span>
             </p>
           </div>
 
           <div>
-            <label className="text-sm font-semibold text-gray-700">
+            <label className="mb-1 block text-sm font-medium text-foreground">
               Styles (comma separated)
             </label>
             <Input
               value={stylesInput}
               onChange={(e) => setStylesInput(e.target.value)}
               placeholder="T-shirt, Hoodie, Jacket"
+              className="text-black placeholder:text-muted-foreground"
             />
           </div>
         </div>
 
         {/* ACTIONS */}
-        <div className="mt-10 flex justify-end gap-4">
+        <div className="mt-8 flex justify-end gap-3">
           <Button
             variant="outline"
-            className="rounded-xl px-6"
             onClick={onClose}
+            className="rounded-md px-5 py-2 text-sm"
           >
             Cancel
           </Button>
@@ -125,7 +129,7 @@ export default function AdminCategoryEditPopup({
           <Button
             onClick={handleSubmit}
             disabled={loading}
-            className="rounded-xl bg-black px-8 text-white hover:bg-gray-900 disabled:opacity-50"
+            className="rounded-md bg-primary text-primary-foreground px-6 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-50"
           >
             {loading ? "Saving..." : "Save changes"}
           </Button>
