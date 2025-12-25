@@ -27,7 +27,7 @@ export default function UserTable({
 
   if (isLoading) {
     return (
-      <div className="py-12 text-center text-gray-400">
+      <div className="py-12 text-center text-[var(--muted-foreground)]">
         Loading users...
       </div>
     );
@@ -35,7 +35,7 @@ export default function UserTable({
 
   if (validUsers.length === 0) {
     return (
-      <div className="py-12 text-center text-gray-400">
+      <div className="py-12 text-center text-[var(--muted-foreground)]">
         No users found
       </div>
     );
@@ -43,30 +43,29 @@ export default function UserTable({
 
   return (
     <div className="overflow-x-auto shadow-lg rounded-xl">
-      <table className="min-w-full bg-white rounded-xl border-collapse">
+      <table className="min-w-full bg-[var(--card)] rounded-xl border-collapse">
         <thead>
-          <tr className="bg-gray-100 text-left">
-            <th className="p-3 font-semibold text-gray-700">No.</th>
-            <th className="p-3 font-semibold text-gray-700">Email</th>
-            <th className="p-3 font-semibold text-gray-700">State</th>
-            <th className="p-3 font-semibold text-gray-700 text-center">
-              Actions
-            </th>
+          <tr className="bg-[var(--popover)] text-left text-[var(--card-foreground)]">
+            <th className="p-3 font-semibold">No.</th>
+            <th className="p-3 font-semibold">Email</th>
+            <th className="p-3 font-semibold">State</th>
+            <th className="p-3 font-semibold text-center">Actions</th>
           </tr>
         </thead>
 
         <tbody>
           {validUsers.map((user, index) => {
             const isBlocked = user.state === "blocked";
+            const isActive = user.state === "active";
 
             return (
               <tr
                 key={user._id}
-                className="border-b border-gray-200 hover:bg-blue-50 transition-colors"
+                className="border-b border-[var(--border)] hover:bg-[var(--accent)] transition-colors duration-200"
               >
-                <td className="p-3">{index + 1}</td>
+                <td className="p-3 text-[var(--card-foreground)]">{index + 1}</td>
 
-                <td className="p-3 font-medium text-gray-800">
+                <td className="p-3 font-medium text-[var(--card-foreground)]">
                   {user.email}
                 </td>
 
@@ -74,8 +73,10 @@ export default function UserTable({
                   <span
                     className={`px-3 py-1 rounded-full text-sm font-medium ${
                       isBlocked
-                        ? "bg-red-100 text-red-700"
-                        : "bg-green-100 text-green-700"
+                        ? "bg-[var(--destructive)] text-[var(--destructive-foreground)]"
+                        : isActive
+                        ? "bg-[#3e7c65] text-white"
+                        : "bg-[var(--muted)] text-[var(--muted-foreground)]"
                     }`}
                   >
                     {(user.state ?? "unknown").toUpperCase()}
@@ -83,26 +84,20 @@ export default function UserTable({
                 </td>
 
                 <td className="p-3 flex justify-center items-center gap-4">
-                  {/* View detail */}
                   <button
-                    className="p-2 rounded-full hover:bg-gray-200"
+                    className="p-2 rounded-full hover:bg-[var(--secondary)] transition-colors"
                     onClick={() => onViewDetail(user._id)}
                     title="View details"
                   >
-                    <EyeIcon size={22} />
+                    <EyeIcon size={22} className="text-[var(--card-foreground)]" />
                   </button>
 
-                  {/* Lock / Unlock */}
                   {isBlocked ? (
                     <button
                       className={`p-2 rounded-full hover:bg-green-100 ${
-                        actionLoading
-                          ? "opacity-50 pointer-events-none"
-                          : ""
+                        actionLoading ? "opacity-50 pointer-events-none" : ""
                       }`}
-                      onClick={() =>
-                        onToggleLock(user._id, false)
-                      }
+                      onClick={() => onToggleLock(user._id, false)}
                       title="Unlock account"
                     >
                       <LockKeyholeOpen
@@ -113,13 +108,9 @@ export default function UserTable({
                   ) : (
                     <button
                       className={`p-2 rounded-full hover:bg-red-100 ${
-                        actionLoading
-                          ? "opacity-50 pointer-events-none"
-                          : ""
+                        actionLoading ? "opacity-50 pointer-events-none" : ""
                       }`}
-                      onClick={() =>
-                        onToggleLock(user._id, true)
-                      }
+                      onClick={() => onToggleLock(user._id, true)}
                       title="Lock account"
                     >
                       <LockKeyhole

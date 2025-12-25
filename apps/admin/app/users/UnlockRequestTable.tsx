@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import type { UnlockRequest } from "./UnlockRequest";
 import { displayUnlockStatus } from "./types";
@@ -13,18 +15,16 @@ export default function UnlockRequestTable({
   onViewRequest,
 }: UnlockRequestTableProps) {
   return (
-    <div className="overflow-x-auto shadow-lg rounded-xl">
-      <table className="min-w-full bg-white rounded-xl border-collapse">
+    <div className="overflow-x-auto rounded-xl shadow-lg">
+      <table className="min-w-full border-collapse">
         <thead>
-          <tr className="bg-gray-100 text-left">
-            <th className="p-3 font-semibold text-gray-700">No.</th>
-            <th className="p-3 font-semibold text-gray-700">Email</th>
-            <th className="p-3 font-semibold text-gray-700">Appeal Content</th>
-            <th className="p-3 font-semibold text-gray-700">Submitted Date</th>
-            <th className="p-3 font-semibold text-gray-700">Status</th>
-            <th className="p-3 font-semibold text-gray-700 text-center">
-              Actions
-            </th>
+          <tr className="bg-[var(--popover)] text-[var(--popover-foreground)]">
+            <th className="p-3 font-semibold">No.</th>
+            <th className="p-3 font-semibold">Email</th>
+            <th className="p-3 font-semibold">Appeal Content</th>
+            <th className="p-3 font-semibold">Submitted Date</th>
+            <th className="p-3 font-semibold">Status</th>
+            <th className="p-3 font-semibold text-center">Actions</th>
           </tr>
         </thead>
 
@@ -32,17 +32,17 @@ export default function UnlockRequestTable({
           {requests.map((r, i) => (
             <tr
               key={r._id}
-              className="border-b border-gray-200 hover:bg-blue-50 transition-colors"
+              className="border-b border-[var(--border)] hover:bg-[var(--accent)] transition-colors"
             >
-              <td className="p-3">{i + 1}</td>
+              <td className="p-3 text-[var(--card-foreground)]">{i + 1}</td>
 
-              <td className="p-3 text-gray-600">
+              <td className="p-3 text-[var(--card-foreground)]">
                 {r.userId?.email ?? "—"}
               </td>
 
-              <td className="p-3">{r.reason}</td>
+              <td className="p-3 text-[var(--card-foreground)]">{r.reason}</td>
 
-              <td className="p-3">
+              <td className="p-3 text-[var(--card-foreground)]">
                 {r.createdAt
                   ? new Date(r.createdAt).toLocaleDateString()
                   : "—"}
@@ -52,10 +52,10 @@ export default function UnlockRequestTable({
                 <span
                   className={`px-3 py-1 rounded-full text-sm font-medium ${
                     r.status === "pending"
-                      ? "bg-yellow-100 text-yellow-700"
+                      ? "bg-[var(--accent)] text-[var(--foreground)]"
                       : r.status === "approved"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-red-100 text-red-700"
+                      ? "bg-[var(--primary)] text-[var(--primary-foreground)]"
+                      : "bg-[var(--destructive)] text-[var(--destructive-foreground)]"
                   }`}
                 >
                   {displayUnlockStatus(r.status)}
@@ -65,11 +65,11 @@ export default function UnlockRequestTable({
               <td className="p-3 flex justify-center">
                 <button
                   type="button"
-                  className="p-2 rounded-full hover:bg-gray-200 transition-colors"
+                  className="p-2 rounded-full hover:bg-[var(--muted)] transition-colors"
                   onClick={() => onViewRequest(r)}
                   title="View request details"
                 >
-                  <EyeIcon size={22} className="text-gray-700" />
+                  <EyeIcon size={22} className="text-[var(--card-foreground)]" />
                 </button>
               </td>
             </tr>
@@ -78,8 +78,8 @@ export default function UnlockRequestTable({
           {requests.length === 0 && (
             <tr>
               <td
-                colSpan={7}
-                className="px-4 py-12 text-center text-gray-400 text-lg font-medium"
+                colSpan={6}
+                className="px-4 py-12 text-center text-[var(--muted-foreground)] text-lg font-medium"
               >
                 No unlock requests found
               </td>

@@ -5,28 +5,23 @@ import Sidebar from "@/components/Sidebar/Sidebar";
 import UserListSection from "./UserListSection";
 import UnlockRequestSection from "./UnlockRequestSection";
 
-const SIDEBAR_WIDTH = 240;
-const HEADER_HEIGHT = 80;
-
 export default function AdminUsersPage() {
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      <div
-        className="fixed top-0 left-0 h-full bg-white shadow-lg"
-        style={{ width: SIDEBAR_WIDTH }}
-      >
-        <Sidebar />
-      </div>
+    <div className="min-h-screen bg-background">
+      {/* HEADER */}
+      <header className="fixed top-0 left-0 right-0 z-20 h-16 md:h-20 bg-card border-b border-border">
+        <Header role="admin" name="ABC" />
+      </header>
 
-      <div className="flex-1" style={{ marginLeft: SIDEBAR_WIDTH }}>
-        <div
-          className="fixed top-0 right-0 z-20 bg-white shadow-md"
-          style={{ height: HEADER_HEIGHT, left: SIDEBAR_WIDTH }}
-        >
-          <Header role="admin" name="ABC" />
-        </div>
+      {/* LAYOUT */}
+      <div className="flex pt-16 md:pt-20">
+        {/* SIDEBAR */}
+        <aside className="hidden md:block fixed left-0 top-16 md:top-20 h-[calc(100vh-5rem)] w-60">
+          <Sidebar />
+        </aside>
 
-        <main className="p-6" style={{ marginTop: HEADER_HEIGHT }}>
+        {/* MAIN */}
+        <main className="flex-1 px-4 md:px-6 lg:px-8 md:ml-60 space-y-6">
           <UserListSection />
           <UnlockRequestSection />
         </main>

@@ -23,27 +23,42 @@ export default function UnlockHistoryDialog({
   return (
     <>
       {/* Overlay */}
-      <div className="fixed inset-0 bg-black/50 z-40" />
+      <div className="fixed inset-0 z-40 bg-black/50" />
 
-      {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto">
-        <div className="mt-10 mb-8 w-full max-w-4xl rounded-2xl bg-white shadow-xl ring-1 ring-black/5 p-8">
+      {/* Modal wrapper */}
+      <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-2 sm:px-4">
+        <div
+          className="
+            mt-4 mb-6
+            w-full max-w-4xl
+            rounded-2xl
+            bg-card text-card-foreground
+            shadow-xl ring-1 ring-border
+            p-4 sm:p-6 md:p-8
+          "
+        >
           {/* Header */}
-          <div className="relative">
-            <h2 className="text-2xl font-bold text-slate-900">
+          <div className="relative flex items-start justify-between gap-4">
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold">
               Processing Details
             </h2>
+
             <button
               onClick={() => onOpenChange(false)}
               aria-label="Close"
-              className="absolute right-0 top-0 inline-flex items-center justify-center w-8 h-8 hover:bg-gray-100 rounded"
+              className="
+                inline-flex h-8 w-8 items-center justify-center
+                rounded-md
+                hover:bg-muted
+                transition
+              "
             >
-              <img src="/xButtonIcon.png" alt="Close" className="w-5 h-5" />
+              <img src="/xButtonIcon.png" alt="Close" className="h-4 w-4" />
             </button>
           </div>
 
           {/* User info */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-12 mt-6 text-slate-900">
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-x-12">
             <InfoRow label="Full Name" value={user.fullName ?? "—"} />
             <InfoRow label="Role" value={roles} />
             <InfoRow label="Email Address" value={user.email ?? "—"} />
@@ -53,7 +68,7 @@ export default function UnlockHistoryDialog({
           </div>
 
           {/* Reasons */}
-          <div className="mt-6 text-slate-900">
+          <div className="mt-6 space-y-4">
             <ReasonSection
               label="Account Lock Reason"
               value={user.lockReason ?? "—"}
@@ -61,59 +76,44 @@ export default function UnlockHistoryDialog({
             <ReasonSection
               label="Appeal Reason"
               value={user.appealReason ?? "—"}
-              className="mt-4"
             />
           </div>
 
           {/* History */}
           <div className="mt-6">
-            <p className="font-semibold mb-3">Processing History</p>
+            <p className="mb-3 font-semibold">Processing History</p>
 
-            <div className="overflow-x-auto">
-              <table className="w-full border border-slate-400 border-collapse text-sm">
-                <thead>
-                  <tr className="bg-white text-slate-700">
-                    <th className="border border-slate-400 py-2 px-3">No.</th>
-                    <th className="border border-slate-400 py-2 px-3">
-                      Processed By
-                    </th>
-                    <th className="border border-slate-400 py-2 px-3">
-                      Process Date
-                    </th>
-                    <th className="border border-slate-400 py-2 px-3">
-                      Action
-                    </th>
-                    <th className="border border-slate-400 py-2 px-3">
-                      Notes
-                    </th>
+            <div className="overflow-x-auto rounded-lg border border-border">
+              <table className="w-full border-collapse text-xs sm:text-sm">
+                <thead className="bg-muted">
+                  <tr>
+                    <Th>No.</Th>
+                    <Th>Processed By</Th>
+                    <Th>Process Date</Th>
+                    <Th>Action</Th>
+                    <Th>Notes</Th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {user.processingHistory?.length ? (
                     user.processingHistory.map((record, idx) => (
-                      <tr key={record.id ?? idx}>
-                        <td className="border border-slate-400 py-2 px-3 text-center">
-                          {idx + 1}
-                        </td>
-                        <td className="border border-slate-400 py-2 px-3">
-                          {record.processor}
-                        </td>
-                        <td className="border border-slate-400 py-2 px-3 text-center">
-                          {record.processDate}
-                        </td>
-                        <td className="border border-slate-400 py-2 px-3 text-center">
-                          {record.action}
-                        </td>
-                        <td className="border border-slate-400 py-2 px-3">
-                          {record.note}
-                        </td>
+                      <tr
+                        key={record.id ?? idx}
+                        className="hover:bg-muted/50 transition"
+                      >
+                        <Td center>{idx + 1}</Td>
+                        <Td>{record.processor}</Td>
+                        <Td center>{record.processDate}</Td>
+                        <Td center>{record.action}</Td>
+                        <Td>{record.note}</Td>
                       </tr>
                     ))
                   ) : (
                     <tr>
                       <td
                         colSpan={5}
-                        className="border border-slate-400 py-4 px-3 text-center text-gray-400"
+                        className="py-4 text-center text-muted-foreground"
                       >
                         No processing history
                       </td>
@@ -132,8 +132,8 @@ export default function UnlockHistoryDialog({
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="font-semibold">{label}</p>
-      <p className="mt-1">{value}</p>
+      <p className="text-sm font-semibold text-muted-foreground">{label}</p>
+      <p className="mt-1 text-sm sm:text-base">{value}</p>
     </div>
   );
 }
@@ -141,16 +141,40 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 function ReasonSection({
   label,
   value,
-  className,
 }: {
   label: string;
   value: string;
-  className?: string;
 }) {
   return (
-    <div className={className}>
-      <p className="font-semibold">{label}</p>
-      <p className="mt-2">{value}</p>
+    <div>
+      <p className="text-sm font-semibold text-muted-foreground">{label}</p>
+      <p className="mt-2 text-sm sm:text-base">{value}</p>
     </div>
+  );
+}
+
+function Th({ children }: { children: React.ReactNode }) {
+  return (
+    <th className="border border-border px-3 py-2 text-left font-medium">
+      {children}
+    </th>
+  );
+}
+
+function Td({
+  children,
+  center,
+}: {
+  children: React.ReactNode;
+  center?: boolean;
+}) {
+  return (
+    <td
+      className={`border border-border px-3 py-2 ${
+        center ? "text-center" : ""
+      }`}
+    >
+      {children}
+    </td>
   );
 }

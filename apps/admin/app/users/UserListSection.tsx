@@ -76,13 +76,10 @@ export default function UserListSection() {
   });
 
   const handleViewDetail = (userId: string) => {
-    window.location.href = `/admin/users/${userId}`;
+    window.location.href = `/users/${userId}`;
   };
 
-  const handleToggleLock = async (
-    userId: string,
-    willLock: boolean
-  ) => {
+  const handleToggleLock = async (userId: string, willLock: boolean) => {
     setActionLoading(true);
     try {
       await UsersAPI.updateUserState(
@@ -97,7 +94,6 @@ export default function UserListSection() {
       setActionLoading(false);
     }
   };
-
 
   const handleDeleteUser = async (userId: string) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
@@ -115,14 +111,14 @@ export default function UserListSection() {
 
   return (
     <section className="mb-10 font-sans">
-      <h3 className="text-2xl font-bold mb-6 text-gray-900">
+      <h3 className="text-2xl font-bold mb-6 text-[var(--foreground)]">
         User List
       </h3>
 
       {/* Search */}
       <div className="flex flex-1 max-w-lg mb-6">
         <Input
-          className="flex-1 px-4 py-3 rounded-full border border-gray-200"
+          className="flex-1 px-4 py-3 rounded-full border border-[var(--border)] bg-[var(--card)] text-[var(--card-foreground)]"
           placeholder="Search by email"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -133,22 +129,22 @@ export default function UserListSection() {
       <div className="flex flex-wrap gap-4 mb-6">
         <div className="relative" ref={userStateRef}>
           <div
-            className="flex items-center gap-2 cursor-pointer px-4 py-2 bg-white border rounded-full"
+            className="flex items-center gap-2 cursor-pointer px-4 py-2 bg-[var(--card)] border border-[var(--border)] rounded-full text-[var(--card-foreground)]"
             onClick={() => setShowUserStateDropdown((s) => !s)}
           >
-            <span className="text-gray-700 font-medium">State</span>
-            <Filter className="h-5 w-5 text-gray-500" />
+            <span className="font-medium">State</span>
+            <Filter className="h-5 w-5 text-[var(--muted-foreground)]" />
           </div>
 
           {showUserStateDropdown && (
-            <div className="absolute mt-2 w-44 bg-white border rounded-xl shadow-lg z-50">
+            <div className="absolute mt-2 w-44 bg-[var(--card)] border border-[var(--border)] rounded-xl shadow-lg z-50">
               {(["all", "active", "blocked"] as UserStateFilterType[]).map(
                 (state) => (
                   <button
                     key={state}
-                    className={`w-full text-left px-4 py-2 hover:bg-blue-50 ${
+                    className={`w-full text-left px-4 py-2 hover:bg-[var(--accent)] ${
                       userStateFilter === state
-                        ? "bg-blue-100 font-semibold"
+                        ? "bg-[var(--accent)] font-semibold"
                         : ""
                     }`}
                     onClick={() => {

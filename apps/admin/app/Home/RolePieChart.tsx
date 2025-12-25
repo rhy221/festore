@@ -1,10 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recharts";
-import { getRoleStats, RoleStatsData } from "@/api/home.api";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { getRoleStats, type RoleStatsData } from "@/api/home.api";
 
-const COLORS = ["#f472b6", "#60a5fa"];
+const COLORS = [
+  "var(--color-chart-4)",
+  "var(--color-chart-2)",
+];
 
 interface RoleStats {
   name: string;
@@ -38,7 +48,7 @@ export default function RolePieChart() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-[220px] text-sm text-gray-400">
+      <div className="flex h-[180px] md:h-[260px] items-center justify-center text-sm text-muted-foreground">
         Loading chart...
       </div>
     );
@@ -46,22 +56,24 @@ export default function RolePieChart() {
 
   if (error) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white px-5 py-4 shadow-sm text-xs text-red-500">
+      <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
         {error}
       </div>
     );
   }
 
   return (
-    <div className="w-full rounded-2xl border border-gray-200 bg-white px-5 pt-5 pb-4 shadow-sm">
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm font-semibold tracking-wide text-gray-900">
+    <div className="w-full rounded-xl border border-border bg-card px-4 md:px-6 pt-4 md:pt-6 pb-4 shadow-sm">
+      <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+        <h2 className="text-sm md:text-base font-semibold text-foreground">
           User Role Distribution
         </h2>
-        <span className="text-xs text-gray-400">Designers vs Customers</span>
+        <span className="text-xs text-muted-foreground">
+          Designers vs Customers
+        </span>
       </div>
 
-      <div className="w-full h-[220px]">
+      <div className="h-[180px] sm:h-[220px] md:h-[280px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -70,11 +82,13 @@ export default function RolePieChart() {
               nameKey="name"
               cx="50%"
               cy="50%"
-              outerRadius={70}
-              innerRadius={35}
-              label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+              outerRadius="80%"
+              innerRadius="45%"
+              label={({ name, percent }) =>
+                `${name}: ${(percent * 100).toFixed(0)}%`
+              }
             >
-              {data.map((entry, index) => (
+              {data.map((_, index) => (
                 <Cell key={index} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>

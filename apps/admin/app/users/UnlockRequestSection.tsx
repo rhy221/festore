@@ -27,15 +27,9 @@ export default function UnlockRequestSection() {
   const fetchUnlockRequests = async () => {
     try {
       const res = await api.get("/api/admin/unlock-requests");
-
       const rawData: any = res.data;
       const data = Array.isArray(rawData) ? rawData : rawData?.data;
-
-      if (Array.isArray(data)) {
-        setRequests(data);
-      } else {
-        setRequests([]);
-      }
+      setRequests(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error fetching unlock requests:", error);
       toast.error("Failed to load unlock requests.");
@@ -56,10 +50,8 @@ export default function UnlockRequestSection() {
         setShowStatusDropdown(false);
       }
     }
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   useEffect(() => {
@@ -70,12 +62,10 @@ export default function UnlockRequestSection() {
   const filteredRequests = requests.filter((request) => {
     const matchesStatus =
       statusFilter === "all" ? true : request.status === statusFilter;
-
     const keyword = debouncedSearch.toLowerCase();
     const matchesSearch =
-      request.name.toLowerCase().includes(keyword) ||
+      request.userId?.email.toLowerCase().includes(keyword) ||
       request.reason.toLowerCase().includes(keyword);
-
     return matchesStatus && matchesSearch;
   });
 
@@ -86,14 +76,14 @@ export default function UnlockRequestSection() {
 
   return (
     <section className="mb-10 font-sans">
-      <h3 className="text-2xl font-bold mb-6 text-gray-900">
+      <h3 className="text-2xl font-bold mb-6 text-[var(--foreground)]">
         Account Unlock Requests
       </h3>
 
       {/* Search */}
       <div className="flex flex-1 max-w-lg mb-4">
         <Input
-          className="flex-1 px-4 py-3 rounded-full border border-gray-200 shadow-sm focus:border-blue-400 focus:ring focus:ring-blue-100 transition-all duration-300"
+          className="flex-1 px-4 py-3 rounded-full border border-[var(--input)] shadow-sm focus:border-[var(--primary)] focus:ring focus:ring-[var(--ring)] transition-all duration-300 bg-[var(--card)] text-[var(--card-foreground)]"
           placeholder="Search by name or request content"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -104,32 +94,30 @@ export default function UnlockRequestSection() {
       <div className="flex flex-wrap gap-4 mb-6">
         <div className="relative" ref={statusDropdownRef}>
           <div
-            className="flex items-center gap-2 cursor-pointer select-none px-4 py-2 bg-white border border-gray-200 rounded-full shadow-sm hover:shadow-md transition-shadow duration-300"
+            className="flex items-center gap-2 cursor-pointer select-none px-4 py-2 bg-[var(--card)] border border-[var(--border)] rounded-full shadow-sm hover:shadow-md transition-shadow duration-300 text-[var(--card-foreground)]"
             onClick={() => setShowStatusDropdown((prev) => !prev)}
           >
-            <span className="text-gray-700 font-medium">Status</span>
-            <Filter className="h-5 w-5 text-gray-500" />
+            <span className="font-medium">Status</span>
+            <Filter className="h-5 w-5 text-[var(--card-foreground)]" />
           </div>
 
           {showStatusDropdown && (
-            <div className="absolute mt-2 w-44 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
+            <div className="absolute mt-2 w-44 bg-[var(--card)] border border-[var(--border)] rounded-xl shadow-lg z-50 overflow-hidden">
               {(["all", "pending", "processed"] as UnlockStatusFilterType[]).map(
                 (status) => (
                   <button
                     key={status}
-                    className={`w-full text-left px-4 py-2 text-gray-700 hover:bg-blue-50 transition-colors ${
+                    className={`w-full text-left px-4 py-2 hover:bg-[var(--accent)] transition-colors ${
                       statusFilter === status
-                        ? "bg-blue-100 font-semibold"
-                        : ""
+                        ? "bg-[var(--accent)] font-semibold"
+                        : "text-[var(--card-foreground)]"
                     }`}
                     onClick={() => {
                       setStatusFilter(status);
                       setShowStatusDropdown(false);
                     }}
                   >
-                    {status === "all"
-                      ? "All"
-                      : displayUnlockStatus(status)}
+                    {status === "all" ? "All" : displayUnlockStatus(status)}
                   </button>
                 )
               )}
