@@ -11,7 +11,7 @@ export interface User {
   verified: boolean;
   createdAt: string;
   updatedAt: string;
-  state: "active" | "blocked" | "pending" | string;
+  state: "active" | "banned";
   fullName?: string;
   phone?: string;
   lockDate?: string;
@@ -101,14 +101,26 @@ export const UsersAPI = {
       : [];
   },
 
-  updateUserState: async (
-    id: string,
-    state: "active" | "blocked"
-  ) => {
-    const res = await api.patch(
-      `${BASE_URL}/users/${id}/state`,
-      { state }
-    );
+  // updateUserState: async (
+  //   id: string,
+  //   state: "active" | "banned"
+  // ) => {
+  //   const res = await api.patch(
+  //     `${BASE_URL}/users/${id}/state`,
+  //     { state }
+  //   );
+  //   return res.data;
+  // },
+
+  updateUserState: async (data :{
+    userId: string,
+    state: "banned" | "active",
+    reason: string
+  }) => {
+    const res = await api.patch(`${BASE_URL}/users/${data.userId}/state`, {
+        state: data.state,
+        reason: data.reason,
+      });
     return res.data;
   },
 

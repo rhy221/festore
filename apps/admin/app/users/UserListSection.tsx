@@ -6,8 +6,9 @@ import { Filter } from "lucide-react";
 import { User, UsersAPI } from "@/api/users.api";
 import UserTable from "./UserTable";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 
-type UserStateFilterType = "all" | "active" | "blocked";
+type UserStateFilterType = "all" | "active" | "banned";
 
 export default function UserListSection() {
   const [search, setSearch] = useState("");
@@ -19,31 +20,19 @@ export default function UserListSection() {
 
   const userStateRef = useRef<HTMLDivElement | null>(null);
 
-  const [loading, setLoading] = useState(false);
-  const [actionLoading, setActionLoading] = useState(false);
-  const [users, setUsers] = useState<User[]>([]);
+  const {data, refetch, isLoading, isError, error} = useQuery<User[]>({
+      queryKey: ["users"],
+      queryFn: () => UsersAPI.getUsers(),
+      
+    })
 
-  const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const res = await UsersAPI.getUsers();
-      const list = Array.isArray(res)
-        ? res
-        : Array.isArray(res?.data)
-        ? res.data
-        : [];
-      setUsers(list);
-    } catch {
-      toast.error("Failed to load user list.");
-      setUsers([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    if (isError && error) {
+      const errorMessage = (error as any)?.response?.data?.message || "Failed to fetch users";
+      toast.error(errorMessage);
+    }
+  }, [isError, error]);
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(search), 300);
@@ -64,7 +53,7 @@ export default function UserListSection() {
       document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const filteredUsers = users.filter((u) => {
+  const filteredUsers = data?.filter((u) => {
     const matchState =
       userStateFilter === "all" ? true : u.state === userStateFilter;
 
@@ -79,33 +68,17 @@ export default function UserListSection() {
     window.location.href = `/users/${userId}`;
   };
 
-  const handleToggleLock = async (userId: string, willLock: boolean) => {
-    setActionLoading(true);
-    try {
-      await UsersAPI.updateUserState(
-        userId,
-        willLock ? "blocked" : "active"
-      );
-      await fetchUsers();
-      toast.success("User state updated successfully.");
-    } catch {
-      toast.error("Failed to update user state.");
-    } finally {
-      setActionLoading(false);
-    }
-  };
+;
 
   const handleDeleteUser = async (userId: string) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
-    setActionLoading(true);
     try {
       await UsersAPI.deleteUser(userId);
-      await fetchUsers();
+      await refetch();
       toast.success("User deleted successfully.");
     } catch {
       toast.error("Failed to delete user.");
     } finally {
-      setActionLoading(false);
     }
   };
 
@@ -138,7 +111,7 @@ export default function UserListSection() {
 
           {showUserStateDropdown && (
             <div className="absolute mt-2 w-44 bg-[var(--card)] border border-[var(--border)] rounded-xl shadow-lg z-50">
-              {(["all", "active", "blocked"] as UserStateFilterType[]).map(
+              {(["all", "active", "banned"] as UserStateFilterType[]).map(
                 (state) => (
                   <button
                     key={state}
@@ -156,7 +129,7 @@ export default function UserListSection() {
                       ? "All"
                       : state === "active"
                       ? "Active"
-                      : "Blocked"}
+                      : "Banned"}
                   </button>
                 )
               )}
@@ -166,11 +139,11 @@ export default function UserListSection() {
       </div>
 
       <UserTable
-        users={filteredUsers}
+        users={filteredUsers || []}
         onViewDetail={handleViewDetail}
-        onToggleLock={handleToggleLock}
-        isLoading={loading}      
-        actionLoading={actionLoading}
+        // onToggleLock={handleToggleLock}
+        isLoading={isLoading}
+        onRefresh={refetch}      
       />
     </section>
   );

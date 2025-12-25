@@ -4,6 +4,10 @@ import { Toaster } from "sonner";
 
 import "@workspace/ui/globals.css"
 import { Providers } from "@/components/providers";
+import { SidebarProvider, SidebarTrigger } from "@workspace/ui/components/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
+import Header from "@/components/Header/Header";
+import TanstackProvider from "@/providers/tanstack-provider";
 
 const fontSans = Geist({
   subsets: ["latin"],
@@ -25,7 +29,28 @@ export default function RootLayout({
       <body
         className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
       >
-        <Providers>{children}</Providers>
+        <TanstackProvider>
+
+           <Providers>
+          <SidebarProvider>
+             <AppSidebar />
+             <div className="w-full">
+              
+            <main className="relative">
+              <div className="sticky top-0 left-0 z-50">
+                <Header role="admin" name="ABC" />
+             <SidebarTrigger />
+
+              </div>
+              {children}
+            </main>
+             </div>
+              
+          </SidebarProvider>
+          
+          </Providers>
+        </TanstackProvider>
+       
         <Toaster />
       </body>
     </html>

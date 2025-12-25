@@ -29,9 +29,9 @@ export const CategoriesAPI = {
     return response.data;
   },
 
-  getProducts: async (id: string, search?: string) => {
+  getProducts: async (id: string, params: any) => {
     const response = await api.get<Product[]>(`${BASE_URL}/${id}/products`, {
-      params: { search },
+      params
     });
     return response.data;
   },

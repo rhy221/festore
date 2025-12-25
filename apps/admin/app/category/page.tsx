@@ -111,19 +111,9 @@ export default function AdminCategoryPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* HEADER */}
-      <header className="fixed top-0 left-0 right-0 z-20 h-16 md:h-20 bg-card border-b border-border">
-        <Header />
-      </header>
-
-      <div className="flex pt-16 md:pt-20 flex-1">
-        {/* Sidebar */}
-        <aside className="hidden lg:block fixed left-0 top-16 md:top-20 h-[calc(100vh-5rem)] w-60 border-r border-border bg-sidebar">
-          <Sidebar />
-        </aside>
 
         {/* Main content */}
-        <main className="flex-1 px-4 md:px-6 lg:px-8 md:ml-60 py-6 font-sans text-foreground">
+        <main className="flex-1 px-6 md:px-10 lg:px-20 ">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3 border-b border-border pb-3">
             <h1 className="text-lg sm:text-xl font-bold">Category List</h1>
             <Button
@@ -221,7 +211,7 @@ export default function AdminCategoryPage() {
             />
           )}
         </main>
-      </div>
+ 
     </div>
   );
 }

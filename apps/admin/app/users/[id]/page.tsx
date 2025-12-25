@@ -138,25 +138,11 @@ export default function AdminUserDetailPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex">
-      <div
-        className="fixed top-0 right-0 z-20 bg-card border-b border-border"
-        style={{ height: HEADER_HEIGHT, left: SIDEBAR_WIDTH }}
-      >
-        <Header role="admin" name="Admin" />
-      </div>
+      
+      <div className="flex-1">
 
-      <div className="flex-1" style={{ marginLeft: SIDEBAR_WIDTH }}>
-        <div
-          className="fixed top-0 left-0 h-full bg-sidebar border-r border-sidebar-border"
-          style={{ width: SIDEBAR_WIDTH }}
-        >
-          <Sidebar />
-        </div>
+    <main className="flex-1 px-6 md:px-10 lg:px-20 ">
 
-        <main
-          className="p-4 sm:p-6 overflow-y-auto"
-          style={{ marginTop: HEADER_HEIGHT }}
-        >
           {loading ? (
             <div className="text-center py-20 text-muted-foreground">
               Loading...

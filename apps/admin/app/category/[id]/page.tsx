@@ -4,15 +4,16 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { Input } from "../../../../../packages/ui/src/components/input";
 import { ProductCard } from "components/card";
-import Sidebar from "components/Sidebar/Sidebar";
-import Header from "../../../components/Header/Header";
 import { CategoriesAPI, type Category, type Product } from "@/api/categories.api";
 import { toast } from "sonner";
+import { Spinner } from "@workspace/ui/components/spinner";
+import { cn } from "@/lib/utils";
 
 export default function AdminCategoryDetail() {
   const { id } = useParams<{ id: string }>();
 
   const [search, setSearch] = useState("");
+  const [selectedStyle, setSelectedStyle] = useState<string | null>(null);
   const [category, setCategory] = useState<Category | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,124 +23,150 @@ export default function AdminCategoryDetail() {
     setLoading(true);
 
     try {
-      const rawCategory: any = await CategoriesAPI.getById(id);
-      if (!rawCategory) {
-        toast.error("Category not found");
-        setCategory(null);
-        setProducts([]);
-        return;
+      // 1. Load Category Info
+      if (!category || category.id !== id) {
+        const rawCategory: any = await CategoriesAPI.getById(id);
+        if (rawCategory) {
+          setCategory({
+            id: String(rawCategory.id ?? rawCategory._id),
+            name: rawCategory.name,
+            slug: rawCategory.slug,
+            styles: Array.isArray(rawCategory.styles) ? rawCategory.styles : [],
+            isDeleted: Boolean(rawCategory.isDeleted),
+            productCount: rawCategory.productCount,
+          });
+        }
       }
 
-      const normalizedCategory: Category = {
-        id: String(rawCategory.id ?? rawCategory._id),
-        name: rawCategory.name,
-        slug: rawCategory.slug,
-        styles: Array.isArray(rawCategory.styles) ? rawCategory.styles : [],
-        isDeleted: Boolean(rawCategory.isDeleted),
-        productCount: rawCategory.productCount,
-      };
+      // 2. Load Products with filters
+      const rawProducts = await CategoriesAPI.getProducts(id, { 
+        search: search, 
+        style: selectedStyle 
+      });
 
-      setCategory(normalizedCategory);
-
-      const rawProducts = await CategoriesAPI.getProducts(id, search);
       const normalizedProducts: Product[] = (rawProducts || []).map((p: any) => ({
         id: String(p.id ?? p._id),
         name: p.title,
-        imageUrl: Array.isArray(p.imageUrls) && p.imageUrls.length ? p.imageUrls[0] : "", // đảm bảo có imageUrl
+        imageUrl: Array.isArray(p.imageUrls) && p.imageUrls.length ? p.imageUrls[0] : "",
         createdAt: p.createdAt,
       }));
 
       setProducts(normalizedProducts);
     } catch (error: any) {
-      toast.error(`Failed to load category. Error: ${error.response?.status || "Server error"}`);
-      setCategory(null);
-      setProducts([]);
+      toast.error(`Failed to load data: ${error.message}`);
     } finally {
       setLoading(false);
     }
-  }, [id, search]);
+  }, [id, search, selectedStyle]);
 
   useEffect(() => {
     loadCategoryData();
   }, [loadCategoryData]);
 
+  const toggleStyle = (style: string) => {
+    setSelectedStyle((prev) => (prev === style ? null : style));
+  };
+
   if (loading && !category) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-xl text-gray-500">Loading...</p>
-      </div>
-    );
-  }
-
-  if (!category && !loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-xl text-gray-500">Category not found</p>
+      <div className="flex h-[50vh] items-center justify-center">
+        <Spinner />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <Header role="admin" name="ABC" />
-      <div className="flex flex-1 pt-32">
-        <div className="w-[296px]">
-          <Sidebar />
-        </div>
-
-        <main className="flex-1 bg-card p-6 overflow-y-auto text-foreground">
-          <h1 className="font-bold text-3xl">
+    <div className="w-full p-4 md:p-20 space-y-8">
+      {/* Header Section */}
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
             {category?.name}
           </h1>
+          <p className="text-muted-foreground mt-2">
+            Manage product listings and style variations.
+          </p>
+        </div>
 
-          {category?.styles?.length && (
-            <div className="flex flex-wrap gap-2 mt-3">
-              {category.styles.map((style) => (
-                <span
-                  key={style}
-                  className="rounded-full bg-muted px-3 py-1 text-sm"
-                >
-                  {style}
-                </span>
-              ))}
-            </div>
-          )}
-
-          <div className="py-2">
-            <Input
-              className="text-sm bg-card border border-input rounded-md px-3 py-2 w-full"
-              placeholder="Enter search keyword"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && loadCategoryData()}
-            />
+        {/* Styles Filter Tags */}
+        {category?.styles?.length && (
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-sm font-medium mr-2 hidden sm:inline">Styles:</span>
+            <button
+              onClick={() => setSelectedStyle(null)}
+              className={cn(
+                "px-4 py-1.5 rounded-full text-sm font-medium transition-all border",
+                !selectedStyle 
+                  ? "bg-primary text-primary-foreground border-primary shadow-sm" 
+                  : "bg-background text-muted-foreground hover:border-foreground"
+              )}
+            >
+              All
+            </button>
+            {category.styles.map((style) => (
+              <button
+                key={style}
+                onClick={() => toggleStyle(style)}
+                className={cn(
+                  "px-4 py-1.5 rounded-full text-sm font-medium transition-all border",
+                  selectedStyle === style
+                    ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                    : "bg-background text-muted-foreground hover:border-foreground"
+                )}
+              >
+                {style}
+              </button>
+            ))}
           </div>
+        )}
 
-          {loading && (
-            <div className="text-center py-8 text-muted-foreground">
-              Loading products...
-            </div>
-          )}
-
-          {!loading && products.length > 0 && (
-            <div className="grid grid-cols-3 gap-4">
-              {products.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  title={product.name}
-                  imageUrl={product.imageUrl}
-                />
-              ))}
-            </div>
-          )}
-
-          {!loading && products.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground">
-              {search ? "No products match your search" : "No products in this category yet"}
-            </div>
-          )}
-        </main>
+        {/* Search Bar */}
+        <div className="max-w-md">
+          <Input
+            placeholder="Search products..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && loadCategoryData()}
+            className="w-full shadow-sm"
+          />
+        </div>
       </div>
+
+      <hr className="border-border" />
+
+      {/* Grid Section */}
+      {loading ? (
+        <div className="flex justify-center py-20">
+          <Spinner />
+        </div>
+      ) : products.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
+          {products.map((product) => (
+            <div key={product.id} className="w-full max-w-[280px] sm:max-w-none">
+               <ProductCard
+                title={product.name}
+                imageUrl={product.imageUrl}
+              />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-24 border-2 border-dashed rounded-2xl bg-muted/30">
+          <p className="text-muted-foreground text-lg italic text-center px-4">
+            {search || selectedStyle 
+              ? "No products found matching your filters" 
+              : "No products in this category yet"}
+          </p>
+          {(search || selectedStyle) && (
+            <button 
+              onClick={() => {setSearch(""); setSelectedStyle(null);}}
+              className="mt-4 text-primary font-semibold hover:underline"
+            >
+              Clear all filters
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

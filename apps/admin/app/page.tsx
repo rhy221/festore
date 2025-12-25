@@ -1,10 +1,5 @@
-"use client";
+import { redirect } from "next/navigation";
 
 export default function HomePage() {
-  return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold">Home Page</h1>
-      <p>Trang chủ đã chạy đúng.</p>
-    </div>
-  );
+  redirect("/home");
 }

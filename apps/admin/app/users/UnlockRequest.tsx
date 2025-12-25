@@ -82,7 +82,7 @@ export default function UnlockRequestDialog({
 
     const updatedUser: User = {
       ...currentUser,
-      state: action === "unlock" ? "active" : "blocked",
+      state: action === "unlock" ? "active" : "banned",
       processingHistory: [
         ...(currentUser.processingHistory ?? []),
         newRecord,
@@ -94,18 +94,18 @@ export default function UnlockRequestDialog({
     setShowHistoryDialog(true);
   };
 
-  if (showHistoryDialog) {
-    return (
-      <UnlockHistoryDialog
-        user={tempUser ?? currentUser}
-        open={showHistoryDialog}
-        onOpenChange={(open) => {
-          setShowHistoryDialog(open);
-          if (!open) closeModal();
-        }}
-      />
-    );
-  }
+  // if (showHistoryDialog) {
+  //   return (
+  //     <UnlockHistoryDialog
+  //       user={tempUser ?? currentUser}
+  //       open={showHistoryDialog}
+  //       onOpenChange={(open) => {
+  //         setShowHistoryDialog(open);
+  //         if (!open) closeModal();
+  //       }}
+  //     />
+  //   );
+  // }
 
   return (
     <>
@@ -146,10 +146,7 @@ export default function UnlockRequestDialog({
             {/* User info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               <InfoRow label="Email" value={currentUser.email ?? "—"} />
-              <InfoRow
-                label="Role"
-                value={currentUser.role?.join(", ") ?? "—"}
-              />
+              
               <InfoRow label="Status" value={currentUser.state ?? "—"} />
             </div>
 
@@ -174,7 +171,7 @@ export default function UnlockRequestDialog({
                       onChange={() => setAction("unlock")}
                     />
                   </label>
-
+{/* 
                   <label className="flex items-center gap-3 text-sm">
                     <input
                       type="checkbox"
@@ -191,7 +188,7 @@ export default function UnlockRequestDialog({
                       onChange={(e) => setSendCommitment(e.target.checked)}
                     />
                     Send commitment email
-                  </label>
+                  </label> */}
                 </div>
 
                 {/* Reject */}
