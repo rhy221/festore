@@ -16,7 +16,7 @@ export default function RootLayout({
         <NavBar />
         {children}
         {modal}
-        <Toaster position="top-center"/>
+        {/* <Toaster position="top-center"/> */}
         <ScrollToTop />
         <Footer />
     </div>

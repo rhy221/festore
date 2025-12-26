@@ -10,41 +10,27 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const path = usePathname()
-      const currentTab = path.slice(path.lastIndexOf("/"), path.length);
+    const path = usePathname()
+    const currentTab = path.slice(path.lastIndexOf("/"), path.length);
   return (
     <div className="min-h-screen bg-zinc-950">
         <main className="container mx-auto px-16 py-12">
              <Tabs defaultValue={currentTab} className="w-full">
           <TabsList className="border-b border-zinc-800 bg-transparent h-auto p-0 rounded-none ">
             <TabsTrigger
-              value="/cart"
+              value="/sales"
               className="text-white/50 font-bold text-[1.2rem] data-[state=active]:text-white data-[state=active]:bg-transparent bg-transparent  border-0 rounded-none px-0 mr-8"
             >
-                <Link href={"/cart"}>CART</Link>
+                <Link href={"/sales"}>Sales</Link>
             </TabsTrigger>
             <TabsTrigger
-              value="/purchase"
+              value="/analytics"
               className="text-white/50 font-bold text-[1.2rem] data-[state=active]:text-white data-[state=active]:bg-transparent bg-transparent  border-0 rounded-none px-0 mr-8"
             >
-            <Link href={"/purchase"}>PURCHASE</Link>
+            <Link href={"/sales/analytics"}>Analytics</Link>
 
               
             </TabsTrigger>
-            <TabsTrigger
-              value="/orders"
-              className="text-white/50 font-bold text-[1.2rem] data-[state=active]:text-white data-[state=active]:bg-transparent bg-transparent  border-0 rounded-none px-0 mr-8"
-            >
-            <Link href={"/orders"}>ORDERS</Link>
-
-              
-            </TabsTrigger>
-            {/* <TabsTrigger
-              value="invoice"
-              className="text-white/50 font-bold text-[1.2rem] data-[state=active]:text-white data-[state=active]:bg-transparent   border-0 rounded-none px-0"
-            >
-              INVOICE
-            </TabsTrigger> */}
           </TabsList>
           {children}
         </Tabs>

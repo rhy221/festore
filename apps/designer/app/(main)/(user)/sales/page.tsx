@@ -977,13 +977,7 @@ export default function SalesReportPage() {
 
 return (
     <div className="container mx-auto p-4 md:p-6 space-y-6 md:space-y-8 font-sans">
-      <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
-        
-        {/* --- HEADER --- */}
-        <div className="flex items-center gap-6 text-sm font-semibold text-muted-foreground uppercase tracking-wide border-b border-border pb-4">
-          <span className="text-foreground cursor-pointer border-b-2 border-primary -mb-[17px] pb-4">Item Sales</span>
-        </div>
-
+      <div className="space-y-6 md:space-y-8">
         {/* --- CONTROLS BAR (Responsive Updated) --- */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           

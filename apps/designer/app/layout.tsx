@@ -4,6 +4,7 @@ import { Bruno_Ace_SC, Geist, Geist_Mono, Montserrat, Press_Start_2P } from "nex
 
 import "@workspace/ui/globals.css"
 import TanstackProvider from "@/providers/tanstack-provider";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -64,6 +65,7 @@ export default function RootLayout(props: {
       style={{ width: "500px", height: "500px" }}>
               
             </model-viewer> */}
+            <Toaster />
           </div>
         </main>
       </body>
