@@ -1,8 +1,8 @@
 "use client"
 
-import RegisterForm from "@/app/auth/register/register-form";
+import RegisterForm from "@/components/auth/register-form";
 import { useState } from "react";
-import SendVerifyEmailForm from "./sendmail-form";
+import SendVerifyEmailForm from "../../../components/auth/sendmail-form";
 
 export default function RegisterPage() {
   const [isRegisted, setRegisted] = useState(false);

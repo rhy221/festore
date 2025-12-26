@@ -152,25 +152,32 @@ export function ProductCard({
   imageUrl?: string;
 }) {
   return (
-    <div
-      className="
-        relative w-70 h-70
-        rounded-2xl
-        bg-card border border-border
-        p-4 cursor-default
-        transition hover:bg-accent
-      "
-    >
-      <div className="mt-2">
-        <img
-          src={resolveImage(imageUrl)}
-          alt={title}
-          className="h-44 w-full rounded-xl object-cover bg-muted"
-        />
+    // Thêm class 'group' để nhận diện hover cho ảnh bên trong
+    <div className="group w-full">
+      <div className="
+        relative 
+        aspect-[3/4] 
+        rounded-xl sm:rounded-2xl 
+        bg-card border border-border 
+        p-2 sm:p-4 
+        cursor-pointer 
+        transition-all duration-300 
+        hover:bg-accent hover:shadow-md
+      ">
+        {/* Container bọc ảnh để tránh tràn khi scale */}
+        <div className="w-full h-full overflow-hidden rounded-lg sm:rounded-xl">
+          <img
+            src={resolveImage(imageUrl)}
+            alt={title}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          />
+        </div>
+
+        {/* Chữ: nhỏ hơn trên mobile (text-xs) và bình thường trên desktop (sm:text-sm) */}
+        <h3 className="mt-2 sm:mt-3 text-center text-xs sm:text-sm font-medium text-foreground line-clamp-1 px-1">
+          {title}
+        </h3>
       </div>
-      <h3 className="mt-3 text-center text-sm font-medium text-foreground line-clamp-2">
-        {title}
-      </h3>
     </div>
   );
 }

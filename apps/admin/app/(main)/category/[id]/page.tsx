@@ -140,9 +140,9 @@ export default function AdminCategoryDetail() {
           <Spinner />
         </div>
       ) : products.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 justify-items-center">
           {products.map((product) => (
-            <div key={product.id} className="w-full max-w-[280px] sm:max-w-none">
+            <div key={product.id} className="">
                <ProductCard
                 title={product.name}
                 imageUrl={product.imageUrl}

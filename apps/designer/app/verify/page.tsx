@@ -8,6 +8,7 @@ import { Card, CardContent, CardFooter } from '@workspace/ui/components/card';
 import { Spinner } from '@workspace/ui/components/spinner';
 import { useRouter, useSearchParams } from 'next/navigation'
 import React, { Suspense, useEffect } from 'react'
+export const dynamic = 'force-dynamic';
 
 const VerifyEmailContent = () => {
     const params = useSearchParams();
