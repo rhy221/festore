@@ -1,7 +1,10 @@
 import { redirect } from "next/navigation";
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
 
+export default async function ModelsPage({ params }: PageProps) {
+  const { id } = await params;
 
-export default function ModelsPage({ params }: { params: {id: string} }) 
-{
-    redirect(`./${params.id}/infor`);
+  redirect(`/portfolio/${id}/infor`);
 }
