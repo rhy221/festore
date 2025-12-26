@@ -69,7 +69,7 @@ export default function VerifyPage() {
     return (
         <Suspense fallback={
             <div className="flex justify-center mt-10">
-                <Spinner /> <p>Loading verification...</p>
+                <Spinner /> 
             </div>
         }>
             <VerifyEmailContent />

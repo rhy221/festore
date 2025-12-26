@@ -1,19 +1,11 @@
-import {
-  ChangePasswordBodyType,
-  ForgotPasswordBodyType,
-  LoginBodyType,
-  LoginResType,
-  LogoutResType,
-  RegisterType,
-  SendVerifyEmailBodyType,
-  
-} from "@/schema/auth.schema";
-import http from "@/lib/http";
+
+import api from "@/lib/http";
+import { ChangePasswordBodyType, ForgotPasswordBodyType, LoginBodyType, LoginResType } from "@/schema/auth.schema";
 
 const authAction = {
   login: async (body: LoginBodyType) => {
     try {
-       const response = await http.post<LoginResType>("api/admin/login", body);
+       const response = await api.post<LoginResType>("api/admin/login", body);
     return response.data;
     } catch(error) {
       throw error;
@@ -32,12 +24,12 @@ const authAction = {
 //   },
 
   forgotPassword: async (body: ForgotPasswordBodyType) => {
-    const response = await http.post("api/admin/forgot-password", {...body, origin: process.env.NEXT_PUBLIC_URL + "/changepassword"});
+    const response = await api.post("api/admin/forgot-password", {...body, origin: process.env.NEXT_PUBLIC_URL + "/changepassword"});
     return response.data;
   },
 
   changePassword: async (body: ChangePasswordBodyType) => {
-    const response = await http.post("api/admin/reset-password", body);
+    const response = await api.post("api/admin/reset-password", body);
     return response.data;
   },
 
