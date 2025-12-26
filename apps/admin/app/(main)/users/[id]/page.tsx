@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import Header from "@/components/Header/Header";
 import Sidebar from "@/components/Sidebar/Sidebar";
-import DesignDetailDialog from "../DesignDetail";
+import DesignDetailDialog from "../../../../components/user/DesignDetail";
 import { UsersAPI, type Design } from "@/api/users.api";
 import { ArrowUpDown } from "lucide-react";
 import { toast } from "sonner";

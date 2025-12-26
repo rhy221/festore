@@ -1,9 +1,9 @@
 "use client";
 
-import QuickStatsSection from "./StatCard";
-import TopRankingsSection from "./RankingCard";
-import ProductChart from "./ProductChart";
-import RolePieChart from "./RolePieChart";
+import QuickStatsSection from "../../../components/home/StatCard";
+import TopRankingsSection from "../../../components/home/RankingCard";
+import ProductChart from "../../../components/home/ProductChart";
+import RolePieChart from "../../../components/home/RolePieChart";
 
 export default function AdminDashboardPage() {
   return (

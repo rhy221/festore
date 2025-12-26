@@ -2,8 +2,8 @@
 
 import Header from "@/components/Header/Header";
 import Sidebar from "@/components/Sidebar/Sidebar";
-import UserListSection from "./UserListSection";
-import UnlockRequestSection from "./UnlockRequestSection";
+import UserListSection from "../../../components/user/UserListSection";
+import UnlockRequestSection from "../../../components/user/UnlockRequestSection";
 
 export default function AdminUsersPage() {
   return (

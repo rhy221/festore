@@ -1,6 +1,5 @@
 'use client';
 
-import { isTokenExpired } from '@/lib/http';
 import { useAuthStore } from '@/stores/authStore';
 import { useRouter } from 'next/navigation';
 
