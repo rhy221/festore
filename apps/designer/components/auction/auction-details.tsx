@@ -704,7 +704,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@workspace/ui/componen
 import { AuctionCountdown } from './auction-countdown';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { BidsHistory } from './auction-bids-history';
-import { copyToClipboard, formatCurrency } from '@/Lib/utils';
+import { copyToClipboard, formatCurrency } from '@/lib/utils';
 import { useAuctionQuery, usePlaceAuctionBidMutation } from '@/queries/useAuction';
 import { AuctionGallery } from './auction-gallery';
 import CountUp from '../CountUp';

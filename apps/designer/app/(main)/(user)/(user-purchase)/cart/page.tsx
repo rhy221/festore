@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useCart, useRemoveFromCart } from '@/queries/useCart';
 import { useCreateOrder } from '@/queries/useOrder';
 import { Spinner } from '@workspace/ui/components/spinner';
-import { formatCurrency } from '@/Lib/utils';
+import { formatCurrency } from '@/lib/utils';
 
 interface CartItem {
   id: string;

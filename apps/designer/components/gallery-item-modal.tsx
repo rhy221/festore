@@ -12,7 +12,7 @@ import { ProductCommentTabs } from './Comment';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@workspace/ui/lib/utils';
 import { VirtualTryOnModal } from './VirtualTryOn';
-import { copyToClipboard, formatCurrency } from '@/Lib/utils';
+import { copyToClipboard, formatCurrency } from '@/lib/utils';
 import { LikeListModal } from './LikeModal';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';

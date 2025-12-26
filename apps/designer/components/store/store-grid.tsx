@@ -7,7 +7,7 @@ import { useGetStoreItems } from '@/queries/useProduct';
 import { useRouter } from 'next/navigation';
 import { DesignResType, GetStoreItemsResType } from '@/schema/product.schema';
 import { useAddToCart } from '@/queries/useCart';
-import { formatCurrency } from '@/Lib/utils';
+import { formatCurrency } from '@/lib/utils';
 import Image from 'next/image';
 
 export interface StoreItem {

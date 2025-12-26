@@ -6,7 +6,7 @@ import * as z from 'zod';
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import http from '@/Lib/http';
+import http from '@/lib/Http';
 import { cn } from '@workspace/ui/lib/utils';
 import { Field, FieldError, FieldGroup, FieldLabel } from '@workspace/ui/components/field';
 import { Input } from '@workspace/ui/components/input';

@@ -1,5 +1,5 @@
 import userAction from "@/api/user.api"
-import http from "@/Lib/http"
+import http from "@/lib/Http"
 import { UserProfileResType, UserProfileStaticsResType } from "@/schema/user.schema"
 import { useMutation, useQuery } from "@tanstack/react-query"
 

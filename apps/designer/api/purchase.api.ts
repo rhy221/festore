@@ -1,4 +1,4 @@
-import http from "@/Lib/http";
+import http from "@/lib/Http";
 import { Purchase } from "@/schema/purchase.schema";
 
 export const purchaseAction = {

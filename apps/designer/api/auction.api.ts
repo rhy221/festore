@@ -1,6 +1,5 @@
-import http from "@/Lib/http";
+import http from "@/lib/Http";
 import { AuctionType, GetAuctionBidsResType, GetAuctionResType, GetAuctionsResType, PlaceAcutionBidResType, PlaceAuctionBidBodyType } from "@/schema/auction.schema";
-import { string } from "zod";
 
 
 export const auctionAction = {

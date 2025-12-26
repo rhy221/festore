@@ -16,7 +16,7 @@ import { Card, CardContent } from '@workspace/ui/components/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@workspace/ui/components/select';
 import { Spinner } from '@workspace/ui/components/spinner';
 import { useCategories, useEditProduct, useProduct, useUploadProduct } from '@/queries/useProduct';
-import { formatToLocalInput } from '@/Lib/utils';
+import { formatToLocalInput } from '@/lib/utils';
 
 
 export default function EditForm({ id }: { id: string  }) 
