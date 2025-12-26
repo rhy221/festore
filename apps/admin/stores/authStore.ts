@@ -1,4 +1,4 @@
-import { isTokenExpired } from '@/lib/http';
+import { isTokenExpired } from '@/lib/jwt';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
@@ -24,35 +24,33 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       token: null,
       isAuthenticated: false,
-      
       login: (user, token) => {
-        localStorage.setItem("accessToken", token);
+        // Chỉ chạy localStorage khi ở trình duyệt
+        if (typeof window !== 'undefined') localStorage.setItem("accessToken", token);
         set({ user, token, isAuthenticated: true });
       },
-      
       logout: () => {
-        localStorage.removeItem("accessToken");
+        if (typeof window !== 'undefined') localStorage.removeItem("accessToken");
         set({ user: null, token: null, isAuthenticated: false });
       },
-      
       updateUser: (user) => set({ user }),
     }),
     {
       name: 'auth-storage',
-      storage: createJSONStorage(() => localStorage),
-      
-      // --- PHẦN QUAN TRỌNG NHẤT ---
+      // Dùng storage an toàn
+      storage: createJSONStorage(() => (typeof window !== 'undefined' ? localStorage : dummyStorage)),
       onRehydrateStorage: () => (state) => {
-        // Hàm này chạy SAU KHI dữ liệu từ localStorage được nạp vào state
-        if (state && state.token) {
-          // Kiểm tra nếu token hết hạn
-          if (isTokenExpired(state.token)) {
-            console.log("Token expired during hydration. Logging out...");
-            // Gọi hàm logout của store để reset state
-            state.logout();
-          }
+        if (state?.token && isTokenExpired(state.token)) {
+          state.logout();
         }
       },
     }
   )
 );
+
+// Fallback storage cho môi trường Server lúc build
+const dummyStorage = {
+  getItem: () => null,
+  setItem: () => {},
+  removeItem: () => {},
+};

@@ -1,64 +1,45 @@
 import envConfig from "@/config";
-import axios, { AxiosError, AxiosInstance } from "axios";
-
-function decodeJwtPayload(token: string) {
-  try {
-    const payloadBase64 = token.split(".")[1];
-    if (!payloadBase64) return null;
-    return JSON.parse(atob(payloadBase64));
-  } catch {
-    return null;
-  }
-}
-
-export function isTokenExpired(token: string) {
-  const payload = decodeJwtPayload(token);
-  if (!payload?.exp) return true;
-  const now = Math.floor(Date.now() / 1000);
-  return payload.exp < now;
-}
+import { useAuthStore } from "@/stores/authStore";
+import { isTokenExpired } from "./jwt"; // Import từ file mới
+import axios, { AxiosInstance } from "axios";
 
 class Http {
   instance: AxiosInstance;
-
   constructor() {
     this.instance = axios.create({
       baseURL: envConfig.NEXT_PUBLIC_API_ENDPOINT,
       timeout: 10000,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
     });
 
-    this.instance.interceptors.request.use(
-      (config) => {
-        
-        if (config.data instanceof FormData) {
-            config.headers["Content-Type"] = "multipart/form-data";
-          }
-        const token = localStorage.getItem("accessToken");
-
+    this.instance.interceptors.request.use((config) => {
+      if (typeof window !== 'undefined') { // Kiểm tra môi trường browser
+        const token = useAuthStore.getState().token;
         if (token) {
           if (isTokenExpired(token)) {
-            localStorage.removeItem("accessToken");
+            useAuthStore.getState().logout();
           } else {
-            config.headers.set(
-              "Authorization",
-              `Bearer ${token}`
-            );
+            config.headers.set("Authorization", `Bearer ${token}`);
           }
         }
-
-        return config;
-      },
-      (error) => Promise.reject(error)
-    );
+      }
+      return config;
+    });
 
     this.instance.interceptors.response.use(
       (response) => response,
-      (error: AxiosError) => {
-        if (error.response) return Promise.reject(error.response.data);
-        return Promise.reject(error);
+      (error) => {
+        if (typeof window !== 'undefined') { // Rất quan trọng
+          const status = error.response?.status;
+          const data = error.response?.data as any;
+
+          if (status === 401 && (data?.message === "User has been bannned" || data?.message === "User is inactive")) {
+            alert("Your account has been banned. Please contact admin!");
+            useAuthStore.getState().logout();
+            window.location.href = "/auth/login";
+          }
+        }
+        return Promise.reject(error.response?.data || error);
       }
     );
   }

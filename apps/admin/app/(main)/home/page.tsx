@@ -1,7 +1,5 @@
 "use client";
 
-import Header from "../../components/Header/Header";
-import Sidebar from "../../components/Sidebar/Sidebar";
 import QuickStatsSection from "./StatCard";
 import TopRankingsSection from "./RankingCard";
 import ProductChart from "./ProductChart";
