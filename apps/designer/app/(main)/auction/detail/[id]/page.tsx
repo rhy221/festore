@@ -11,12 +11,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import envConfig from '@/config';
 import { Skeleton } from '@workspace/ui/components/skeleton';
 
-
-interface AuctionDetailClientProps {
-  mockAuctionData: any;
-}
-
-export default function AuctionDetailClient({ mockAuctionData }: AuctionDetailClientProps) {
+export default function AuctionDetailClient() {
       const params = useParams();
     const auctionId = params.id as string;
 
