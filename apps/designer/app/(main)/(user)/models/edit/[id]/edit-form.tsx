@@ -5,7 +5,7 @@ import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { editProductSchema, EditProductType, uploadDesignSchema, uploadProductSchema, UploadProductType } from '@/schema/product.schema';
+import { editProductSchema, EditProductType, uploadDesignSchema, uploadProductSchema, UploadProductType } from '@/schemas/product.schema';
 import { useUploadAuction } from '@/queries/useAuction';
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@workspace/ui/components/field';
 import { Input } from '@workspace/ui/components/input';

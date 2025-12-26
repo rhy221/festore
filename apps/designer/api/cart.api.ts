@@ -1,5 +1,5 @@
 import http from "@/lib/Http";
-import { Cart } from "@/schema/cart.schema";
+import { Cart } from "@/schemas/cart.schema";
 
 export const cartAction = {
   

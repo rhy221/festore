@@ -1,7 +1,7 @@
 "use client";
 
 import { useLoginMutation } from "@/queries/useAuth";
-import { LoginBodySchema, LoginBodyType } from "@/schema/auth.schema";
+import { LoginBodySchema, LoginBodyType } from "@/schemas/auth.schema";
 import { useAuthStore } from "@/stores/authStore";
 import { useRegisterStore } from "@/stores/useRegisterStore";
 import { zodResolver } from "@hookform/resolvers/zod";

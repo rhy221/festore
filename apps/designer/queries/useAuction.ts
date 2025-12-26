@@ -1,5 +1,5 @@
 import { auctionAction } from "@/api/auction.api";
-import { GetAuctionBidsResType, GetAuctionResType, GetAuctionsResType } from "@/schema/auction.schema";
+import { GetAuctionBidsResType, GetAuctionResType, GetAuctionsResType } from "@/schemas/auction.schema";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export const useAuctionQuery = (auctionId: string) => {

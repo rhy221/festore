@@ -14,7 +14,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { Field, FieldError, FieldLabel } from '@workspace/ui/components/field';
 import { fi } from 'zod/v4/locales';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { updateUserInforSchema, UpdateUserInforType } from '@/schema/user.schema';
+import { updateUserInforSchema, UpdateUserInforType } from '@/schemas/user.schema';
 import { useUserPortfolio, useUserPortfolioEditing } from '@/queries/useUser';
 import { Spinner } from '@workspace/ui/components/spinner';
 import { useAuthStore } from '@/stores/authStore';

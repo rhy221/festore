@@ -6,7 +6,7 @@ import { AuctionDetails } from './auction-details';
 import { useEffect, useState } from 'react';
 import { useAuctionBidsQuery, useAuctionQuery, usePlaceAuctionBidMutation } from '@/queries/useAuction';
 import { io, Socket } from 'socket.io-client';
-import { AuctionBidType } from '@/schema/auction.schema';
+import { AuctionBidType } from '@/schemas/auction.schema';
 import { useParams } from 'next/navigation';
 
 

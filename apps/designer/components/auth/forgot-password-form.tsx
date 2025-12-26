@@ -11,7 +11,7 @@ import { cn } from '@workspace/ui/lib/utils';
 import { Field, FieldError, FieldGroup, FieldLabel } from '@workspace/ui/components/field';
 import { Input } from '@workspace/ui/components/input';
 import { Button } from '@workspace/ui/components/button';
-import { forgotPasswordBodySchema, ForgotPasswordBodyType } from '@/schema/auth.schema';
+import { forgotPasswordBodySchema, ForgotPasswordBodyType } from '@/schemas/auth.schema';
 import { useForgotPasswordMutation } from '@/queries/useAuth';
 import { Spinner } from '@workspace/ui/components/spinner';
 import Link from 'next/link';

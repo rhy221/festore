@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuctionBidsQuery, useAuctionQuery, usePlaceAuctionBidMutation } from '@/queries/useAuction';
 import { io, Socket } from 'socket.io-client';
-import { AuctionBidType, AuctionType } from '@/schema/auction.schema';
+import { AuctionBidType, AuctionType } from '@/schemas/auction.schema';
 import { useParams } from 'next/navigation';
 import { AuctionGallery } from '@/components/auction/auction-gallery';
 import { AuctionDetails } from '@/components/auction/auction-details';

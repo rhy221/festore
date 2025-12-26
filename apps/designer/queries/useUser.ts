@@ -1,6 +1,6 @@
 import userAction from "@/api/user.api"
 import http from "@/lib/Http"
-import { UserProfileResType, UserProfileStaticsResType } from "@/schema/user.schema"
+import { UserProfileResType, UserProfileStaticsResType } from "@/schemas/user.schema"
 import { useMutation, useQuery } from "@tanstack/react-query"
 
 export const useUserProfile = () => {

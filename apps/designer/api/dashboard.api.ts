@@ -1,5 +1,5 @@
 import http from "@/lib/Http";
-import { MonthlyReportData, SalesHistoryData } from "@/schema/dashboard.schema";
+import { MonthlyReportData, SalesHistoryData } from "@/schemas/dashboard.schema";
 
 
 export interface CategoryData {

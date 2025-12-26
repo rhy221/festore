@@ -5,7 +5,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useGetStoreItems } from '@/queries/useProduct';
 import { useRouter } from 'next/navigation';
-import { DesignResType, GetStoreItemsResType } from '@/schema/product.schema';
+import { DesignResType, GetStoreItemsResType } from '@/schemas/product.schema';
 import { useAddToCart } from '@/queries/useCart';
 import { formatCurrency } from '@/lib/utils';
 import Image from 'next/image';

@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from '@workspace/ui/components/dropdown-menu';
 import { useQueryClient } from '@tanstack/react-query';
-import { CategoryType } from '@/schema/product.schema';
+import { CategoryType } from '@/schemas/product.schema';
 import { useCategories } from '@/queries/useProduct';
 
 interface StoreFiltersProps {

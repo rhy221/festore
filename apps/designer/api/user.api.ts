@@ -1,5 +1,5 @@
 import http from "@/lib/Http";
-import { UserProfileResType, UserProfileStaticsResType } from "@/schema/user.schema";
+import { UserProfileResType, UserProfileStaticsResType } from "@/schemas/user.schema";
 
 
 // const MOCK_KEY = "fe_mock_user_me";

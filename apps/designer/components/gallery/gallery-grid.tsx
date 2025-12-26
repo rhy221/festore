@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Heart, Bookmark, Eye } from 'lucide-react';
 import { useGetGalleryItems, useLikeDesignMutation } from '@/queries/useProduct';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { DesignResType, GetGalleryItemsResType } from '@/schema/product.schema';
+import { DesignResType, GetGalleryItemsResType } from '@/schemas/product.schema';
 import { useAuth } from '@/hooks/useAuth';
 
 interface GalleryItem {

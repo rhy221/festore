@@ -1,7 +1,7 @@
 "use client";
 
 import { useRegisterMutation } from "@/queries/useAuth";
-import { RegisterSchema, RegisterType } from "@/schema/auth.schema";
+import { RegisterSchema, RegisterType } from "@/schemas/auth.schema";
 import { useAuthStore } from "@/stores/authStore";
 import { useRegisterStore } from "@/stores/useRegisterStore";
 import { zodResolver } from "@hookform/resolvers/zod";

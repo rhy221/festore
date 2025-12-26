@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Button } from '@workspace/ui/components/button';
 import { Image as ImageIcon, Loader2 } from 'lucide-react';
-import { UserProfileResType } from '@/schema/user.schema';
+import { UserProfileResType } from '@/schemas/user.schema';
 
 interface ProfileBannerProps {
   user: UserProfileResType;

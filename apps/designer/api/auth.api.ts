@@ -8,7 +8,7 @@ import {
   RegisterType,
   SendVerifyEmailBodyType,
   
-} from "@/schema/auth.schema";
+} from "@/schemas/auth.schema";
 
 
 const authAction = {

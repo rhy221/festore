@@ -7,7 +7,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from '@workspace/ui/compone
 import { Input } from "@workspace/ui/components/input";
 import { Button } from "@workspace/ui/components/button";
 import { useRouter, useSearchParams } from "next/navigation";
-import { changePasswordSchema, ChangePasswordType } from "@/schema/auth.schema";
+import { changePasswordSchema, ChangePasswordType } from "@/schemas/auth.schema";
 import { useChangePasswordMutation } from "@/queries/useAuth";
 import { Spinner } from "@workspace/ui/components/spinner";
 import { useEffect } from "react";

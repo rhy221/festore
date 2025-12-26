@@ -1,6 +1,6 @@
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { useAuctionBidsQuery } from "@/queries/useAuction";
-import { AuctionBidType } from "@/schema/auction.schema";
+import { AuctionBidType } from "@/schemas/auction.schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@workspace/ui/components/avatar";
 import Link from "next/link";
 

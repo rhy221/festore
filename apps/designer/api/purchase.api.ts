@@ -1,5 +1,5 @@
 import http from "@/lib/Http";
-import { Purchase } from "@/schema/purchase.schema";
+import { Purchase } from "@/schemas/purchase.schema";
 
 export const purchaseAction = {
 
