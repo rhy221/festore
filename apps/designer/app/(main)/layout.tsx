@@ -9,7 +9,8 @@ export default function RootLayout({
   children, modal
 }: {
   children: React.ReactNode;
-  modal: React.ReactNode
+  modal: React.ReactNode;
+  params: Promise<any>;
 }) {
   return (
     <div className="flex flex-col relative">

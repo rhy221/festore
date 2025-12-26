@@ -40,8 +40,6 @@ export const metadata: Metadata = {
 
 export default function RootLayout(props: {
   children: React.ReactNode;
-  modal: React.ReactNode;
-  params: Promise<any>;
 }) {
   return (
     <html lang="en">
