@@ -99,13 +99,14 @@ const createTouchTexture = () => {
     clear();
     for (let i = trail.length - 1; i >= 0; i--) {
       const point = trail[i];
+      if (!point) continue;
       const f = point.force * speed * (1 - point.age / maxAge);
       point.x += point.vx * f;
       point.y += point.vy * f;
       point.age++;
       if (point.age > maxAge) trail.splice(i, 1);
     }
-    for (let i = 0; i < trail.length; i++) drawPoint(trail[i]);
+    for (let i = 0; i < trail.length; i++) drawPoint(trail[i]!);
     texture.needsUpdate = true;
   };
   return {
@@ -477,7 +478,7 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
         if (typeof window !== 'undefined' && (window as any).crypto?.getRandomValues) {
           const u32 = new Uint32Array(1);
           window.crypto.getRandomValues(u32);
-          return u32[0] / 0xffffffff;
+          return u32[0]! / 0xffffffff;
         }
         return Math.random();
       };
@@ -534,11 +535,21 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
         };
       };
       const onPointerDown = (e: PointerEvent) => {
+        if (!threeRef.current || !uniforms) return;
+
         const { fx, fy } = mapToPixels(e);
-        const ix = threeRef.current?.clickIx ?? 0;
-        uniforms.uClickPos.value[ix].set(fx, fy);
-        uniforms.uClickTimes.value[ix] = uniforms.uTime.value;
-        if (threeRef.current) threeRef.current.clickIx = (ix + 1) % MAX_CLICKS;
+
+        const ix = threeRef.current.clickIx ?? 0;
+
+        const clickPos = uniforms.uClickPos.value[ix];
+        const clickTime = uniforms.uClickTimes.value;
+
+        if (clickPos && clickTime !== undefined) {
+          clickPos.set(fx, fy);
+          uniforms.uClickTimes.value[ix] = uniforms.uTime.value;
+
+          threeRef.current.clickIx = (ix + 1) % MAX_CLICKS;
+        }
       };
       const onPointerMove = (e: PointerEvent) => {
         if (!touch) return;
