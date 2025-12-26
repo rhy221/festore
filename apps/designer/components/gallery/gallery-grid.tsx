@@ -77,8 +77,10 @@ export function GalleryGrid({gallery}: {gallery: GetGalleryItemsResType}) {
           
           onClick={() => onItemClick(item._id)}
         >
-          <img
-            src={item.imageUrls[0]}
+          <Image
+            src={item.imageUrls[0] || ""}
+            width={200}
+            height={250}
             alt={item.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />

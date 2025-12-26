@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { DesignResType, GetStoreItemsResType } from '@/schema/product.schema';
 import { useAddToCart } from '@/queries/useCart';
 import { formatCurrency } from '@/lib/utils';
+import Image from 'next/image';
 
 export interface StoreItem {
   id: string;
@@ -47,7 +48,7 @@ export function StoreGrid({store} : {store: GetStoreItemsResType}) {
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
       {store.data.map((item) => (
         <div
           key={item._id}
@@ -57,8 +58,10 @@ export function StoreGrid({store} : {store: GetStoreItemsResType}) {
           onClick={() => {onItemClick(item._id)}}
         >
           <div className="relative bg-zinc-900 rounded-lg overflow-hidden cursor-pointer aspect-[3/4]">
-            <img
-              src={item.imageUrls[0]}
+            <Image
+              src={item.imageUrls[0] || ""}
+              width={200}
+              height={250}
               alt={item.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
