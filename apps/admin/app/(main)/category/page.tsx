@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import { Button } from "../../../../../packages/ui/src/components/button";
 import { toast } from "sonner";
 import Sidebar from "components/Sidebar/Sidebar";
@@ -10,7 +10,8 @@ import AdminCategoryAddPopup from "./AddCategory";
 import AdminCategoryEditPopup from "./EditCategory";
 import AdminCategoryDeletePopup from "./DeleteCategory";
 import { useRouter } from "next/navigation";
-
+import { Spinner } from "@workspace/ui/components/spinner";
+export const dynamic = 'force-dynamic';
 type CategoryFixed = {
   id: string;
   name: string;
@@ -66,6 +67,17 @@ const AdminCategoryActionsDropdown: React.FC<{
 };
 
 export default function AdminCategoryPage() {
+  return (
+    // Bọc Suspense để bảo vệ các component con có thể dùng useSearchParams ngầm
+    <Suspense fallback={<div>
+      <Spinner/>
+    </div>}>
+       <CategoryPageContent />
+    </Suspense>
+  );
+}
+
+export  function CategoryPageContent() {
   const [categories, setCategories] = useState<CategoryFixed[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
