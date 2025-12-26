@@ -1,156 +1,156 @@
-"use client";
-import { useEffect, useState } from "react";
-import { Skeleton } from "@workspace/ui/components/skeleton";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@workspace/ui/components/tabs";
-import { Button } from "@workspace/ui/components/button";
-import { Card } from "@workspace/ui/components/card";
-import { Input } from "@workspace/ui/components/input";
-import {
-  Car,
-  Pencil,
-  PersonStanding,
-  Search,
-  Star,
-  ThumbsUp,
-  UserPlus,
-  UserRoundPlus,
-} from "lucide-react";
-import { useProducts } from "@/queries/useProduct";
-import { DesignResType } from "@/schema/product.schema";
-import Link from "next/link";
+// "use client";
+// import { useEffect, useState } from "react";
+// import { Skeleton } from "@workspace/ui/components/skeleton";
+// import {
+//   Tabs,
+//   TabsContent,
+//   TabsList,
+//   TabsTrigger,
+// } from "@workspace/ui/components/tabs";
+// import { Button } from "@workspace/ui/components/button";
+// import { Card } from "@workspace/ui/components/card";
+// import { Input } from "@workspace/ui/components/input";
+// import {
+//   Car,
+//   Pencil,
+//   PersonStanding,
+//   Search,
+//   Star,
+//   ThumbsUp,
+//   UserPlus,
+//   UserRoundPlus,
+// } from "lucide-react";
+// import { useProducts } from "@/queries/useProduct";
+// import { DesignResType } from "@/schema/product.schema";
+// import Link from "next/link";
 
-export default function Products() {
+// export default function Products() {
 
-  const qquery = useProducts();
-  const [loading, setLoading] = useState(true);
-  const [query, setQuery] = useState("");
-  const [tab, setTab] = useState("All");
-  // useEffect(() => {
-  //   let mounted = true;
-  //   const fetchProducts = async () => {
-  //     try {
-  //       const data = await productsAction.get();
-  //       if (!mounted) return;
-  //       // setModals(data);
-  //     } catch (e) {
-  //       // giữ nguyên danh sách rỗng khi lỗi
-  //     } finally {
-  //       if (mounted) setLoading(false);
-  //     }
-  //   };
-  //   fetchProducts();
-  //   return () => {
-  //     mounted = false;
-  //   };
-  // }, []);
-  return (
-    <>
-      <Tabs value={tab} onValueChange={setTab} className="w-full">
-        <Card className="py-0">
-          <TabsList className="w-full justify-around">
-            <TabsTrigger value="All">All</TabsTrigger>
-            <TabsTrigger value="Sellings">Sellings</TabsTrigger>
-            <TabsTrigger value="Auctions">Auctions</TabsTrigger>
-          </TabsList>
-          <div className="flex px-4 pb-4 gap-2">
-            <Input
-              placeholder="Search..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-            <Button>
-              <Search />
-            </Button>
-          </div>
-        </Card>
+//   const qquery = useProducts();
+//   const [loading, setLoading] = useState(true);
+//   const [query, setQuery] = useState("");
+//   const [tab, setTab] = useState("All");
+//   // useEffect(() => {
+//   //   let mounted = true;
+//   //   const fetchProducts = async () => {
+//   //     try {
+//   //       const data = await productsAction.get();
+//   //       if (!mounted) return;
+//   //       // setModals(data);
+//   //     } catch (e) {
+//   //       // giữ nguyên danh sách rỗng khi lỗi
+//   //     } finally {
+//   //       if (mounted) setLoading(false);
+//   //     }
+//   //   };
+//   //   fetchProducts();
+//   //   return () => {
+//   //     mounted = false;
+//   //   };
+//   // }, []);
+//   return (
+//     <>
+//       <Tabs value={tab} onValueChange={setTab} className="w-full">
+//         <Card className="py-0">
+//           <TabsList className="w-full justify-around">
+//             <TabsTrigger value="All">All</TabsTrigger>
+//             <TabsTrigger value="Sellings">Sellings</TabsTrigger>
+//             <TabsTrigger value="Auctions">Auctions</TabsTrigger>
+//           </TabsList>
+//           <div className="flex px-4 pb-4 gap-2">
+//             <Input
+//               placeholder="Search..."
+//               value={query}
+//               onChange={(e) => setQuery(e.target.value)}
+//             />
+//             <Button>
+//               <Search />
+//             </Button>
+//           </div>
+//         </Card>
 
-        <TabsContent value="All">
-          {qquery.isLoading ? (
-            <ProductsSkeleton />
-          ) : (
-            <ModalListing modals={filterByQuery(filterByTab(qquery.data!, tab), query)} />
-          )}
-        </TabsContent>
-        <TabsContent value="Sellings">
-          {qquery.isLoading ? (
-            <ProductsSkeleton />
-          ) : (
-            <ModalListing modals={filterByQuery(filterByTab(qquery.data!, tab), query)} />
-          )}
-        </TabsContent>
-        <TabsContent value="Auctions">
-          {qquery.isLoading ? (
-            <ProductsSkeleton />
-          ) : (
-            <ModalListing modals={filterByQuery(filterByTab(qquery.data!, tab), query)} />
-          )}
-        </TabsContent>
-      </Tabs>
-    </>
-  );
-}
-function filterByQuery(items: DesignResType[], q: string) {
-  const s = q.trim().toLowerCase();
-  if (!s) return items;
-  return items.filter((it) => it.title.toLowerCase().includes(s));
-}
-function filterByTab(items: DesignResType[], tab: string) {
-  // switch (tab) {
-  //   case "Sellings":
-  //     return items.filter((it) => it.kind === "selling");
-  //   case "Auctions":
-  //     return items.filter((it) => it.kind === "auction");
-  //   case "Boughts":
-  //     return items.filter((it) => it.kind === "bought");
-  //   default:
-      return items;
-  // }
-}
-function ProductsSkeleton() {
-  return (
-    <div className="grid grid-cols-3 grid-flow-row gap-4 w-full">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <Card key={i} className="w-full overflow-hidden py-0">
-          <div className="flex flex-col">
-            <Skeleton className="w-full h-48" />
-            <div className="px-4 py-2">
-              <Skeleton className="h-4 w-32" />
-            </div>
-          </div>
-        </Card>
-      ))}
-    </div>
-  );
-}
-function ModalListing({ modals }: { modals: DesignResType[] }) {
-  return (
-    <div className="grid grid-cols-3 grid-flow-row gap-4 w-full">
-      {modals.map((m, index) => (
-        <Modal key={m._id} {...m} />
-      ))}
-    </div>
-  );
-}
+//         <TabsContent value="All">
+//           {qquery.isLoading ? (
+//             <ProductsSkeleton />
+//           ) : (
+//             <ModalListing modals={filterByQuery(filterByTab(qquery.data!, tab), query)} />
+//           )}
+//         </TabsContent>
+//         <TabsContent value="Sellings">
+//           {qquery.isLoading ? (
+//             <ProductsSkeleton />
+//           ) : (
+//             <ModalListing modals={filterByQuery(filterByTab(qquery.data!, tab), query)} />
+//           )}
+//         </TabsContent>
+//         <TabsContent value="Auctions">
+//           {qquery.isLoading ? (
+//             <ProductsSkeleton />
+//           ) : (
+//             <ModalListing modals={filterByQuery(filterByTab(qquery.data!, tab), query)} />
+//           )}
+//         </TabsContent>
+//       </Tabs>
+//     </>
+//   );
+// }
+// function filterByQuery(items: DesignResType[], q: string) {
+//   const s = q.trim().toLowerCase();
+//   if (!s) return items;
+//   return items.filter((it) => it.title.toLowerCase().includes(s));
+// }
+// function filterByTab(items: DesignResType[], tab: string) {
+//   // switch (tab) {
+//   //   case "Sellings":
+//   //     return items.filter((it) => it.kind === "selling");
+//   //   case "Auctions":
+//   //     return items.filter((it) => it.kind === "auction");
+//   //   case "Boughts":
+//   //     return items.filter((it) => it.kind === "bought");
+//   //   default:
+//       return items;
+//   // }
+// }
+// function ProductsSkeleton() {
+//   return (
+//     <div className="grid grid-cols-3 grid-flow-row gap-4 w-full">
+//       {Array.from({ length: 6 }).map((_, i) => (
+//         <Card key={i} className="w-full overflow-hidden py-0">
+//           <div className="flex flex-col">
+//             <Skeleton className="w-full h-48" />
+//             <div className="px-4 py-2">
+//               <Skeleton className="h-4 w-32" />
+//             </div>
+//           </div>
+//         </Card>
+//       ))}
+//     </div>
+//   );
+// }
+// function ModalListing({ modals }: { modals: DesignResType[] }) {
+//   return (
+//     <div className="grid grid-cols-3 grid-flow-row gap-4 w-full">
+//       {modals.map((m, index) => (
+//         <Modal key={m._id} {...m} />
+//       ))}
+//     </div>
+//   );
+// }
 
-function Modal({ title, imagesUrl, _id }: DesignResType) {
-  return (
-    <Card className="w-full overflow-hidden py-0 ">
-      <Link href={`/products/${_id}/detail`}>
-      <div className="flex flex-col">
-        <div className="relative">
-          <img src={imagesUrl[0]} alt="Thumb" className="w-full h-48" />
-        </div>
-        <div className="px-4 py-2">
-          <h3>{title}</h3>
-        </div>
-      </div>
-      </Link>
+// function Modal({ title, imagesUrl, _id }: DesignResType) {
+//   return (
+//     <Card className="w-full overflow-hidden py-0 ">
+//       <Link href={`/products/${_id}/detail`}>
+//       <div className="flex flex-col">
+//         <div className="relative">
+//           <img src={imagesUrl[0]} alt="Thumb" className="w-full h-48" />
+//         </div>
+//         <div className="px-4 py-2">
+//           <h3>{title}</h3>
+//         </div>
+//       </div>
+//       </Link>
       
-    </Card>
-  );
-}
+//     </Card>
+//   );
+// }
