@@ -41,11 +41,11 @@ export const metadata: Metadata = {
 export default function RootLayout(props: {
   children: React.ReactNode;
   modal: React.ReactNode;
+  params: Promise<any>;
 }) {
   return (
     <html lang="en">
       <head>
-        {/* <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script> */}
 
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} ${pressStart.variable} ${brunoAce.variable} antialiased flex`}>
@@ -56,15 +56,7 @@ export default function RootLayout(props: {
               {props.children}
 
             </TanstackProvider>
-            {/* <model-viewer
-             src={"https://res.cloudinary.com/diedtejt4/raw/upload/v1763395709/3d_models/gxs66xizhphvm8qzd0ne.gltf"}
-      alt="3D model"
-      auto-rotate
-      camera-controls
-      ar
-      style={{ width: "500px", height: "500px" }}>
-              
-            </model-viewer> */}
+          
             <Toaster />
           </div>
         </main>
