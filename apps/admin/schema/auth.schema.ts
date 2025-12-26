@@ -2,11 +2,10 @@ import z from "zod";
 
 export const LoginBodySchema = z
   .object({
-    email: z.string(),
+    email: z.string().email({ message: "Invalid email address" }),
     password: z.string().max(100),
   })
   .strict();
-
 
 export const LoginResSchema = z.object({
   id: z.string(),
@@ -27,59 +26,59 @@ export const RegisterSchema = z
   .object({
     email: z
       .string()
-      .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, { message: "Email không hợp lệ" }),
+      .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, { message: "Invalid email address" }),
 
     password: z
       .string()
-      .min(8, { message: "Mật khẩu phải có ít nhất 8 ký tự" })
-      .max(100, { message: "Mật khẩu không được vượt quá 100 ký tự" })
+      .min(8, { message: "Password must be at least 8 characters long" })
+      .max(100, { message: "Password must not exceed 100 characters" })
       .refine((val) => /[a-z]/.test(val), {
-        message: "Mật khẩu phải chứa ít nhất một chữ thường",
+        message: "Password must contain at least one lowercase letter",
       })
       .refine((val) => /[A-Z]/.test(val), {
-        message: "Mật khẩu phải chứa ít nhất một chữ hoa",
+        message: "Password must contain at least one uppercase letter",
       })
       .refine((val) => /\d/.test(val), {
-        message: "Mật khẩu phải chứa ít nhất một chữ số",
+        message: "Password must contain at least one digit",
       })
       .refine((val) => /\W/.test(val), {
-        message: "Mật khẩu phải chứa ít nhất một ký tự đặc biệt",
+        message: "Password must contain at least one special character",
       }),
   })
   .strict();
 
-
-export const forgotPasswordBodySchema = z.object({
+export const forgotPasswordBodySchema = z
+  .object({
     email: z
       .string()
-      .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, { message: "Email không hợp lệ" }),
-    }) 
-    .strict();
+      .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, { message: "Invalid email address" }),
+  })
+  .strict();
 
-export const changePasswordSchema = z.object({
-   password: z
+export const changePasswordSchema = z
+  .object({
+    password: z
       .string()
-      .min(8, { message: "Mật khẩu phải có ít nhất 8 ký tự" })
-      .max(100, { message: "Mật khẩu không được vượt quá 100 ký tự" })
+      .min(8, { message: "Password must be at least 8 characters long" })
+      .max(100, { message: "Password must not exceed 100 characters" })
       .refine((val) => /[a-z]/.test(val), {
-        message: "Mật khẩu phải chứa ít nhất một chữ thường",
+        message: "Password must contain at least one lowercase letter",
       })
       .refine((val) => /[A-Z]/.test(val), {
-        message: "Mật khẩu phải chứa ít nhất một chữ hoa",
+        message: "Password must contain at least one uppercase letter",
       })
       .refine((val) => /\d/.test(val), {
-        message: "Mật khẩu phải chứa ít nhất một chữ số",
+        message: "Password must contain at least one digit",
       })
       .refine((val) => /\W/.test(val), {
-        message: "Mật khẩu phải chứa ít nhất một ký tự đặc biệt",
+        message: "Password must contain at least one special character",
       }),
-  confirmPassword: z.string().min(8).max(100),
-})
-.refine((data) => data.password === data.confirmPassword, {
-  message: "Mật khẩu không khớp",
-  path: ["confirmPassword"],
-});
-
+    confirmPassword: z.string().min(8).max(100),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 export const LogoutResSchema = z.object({
   message: z.string(),
@@ -88,30 +87,30 @@ export const LogoutResSchema = z.object({
 export type RegisterType = z.TypeOf<typeof RegisterSchema>;
 export type LoginBodyType = z.TypeOf<typeof LoginBodySchema>;
 export type LoginResType = {
-  // user: {
-  //   userId: string,
-  //   name: string,
-  //   email: string,
-    avatarUrl: string,
-  //   bio: string,
-  //   status: "active" | "banned"
-  //   createdAt: string,
-  // },
-  accessToken: string,
-  refreshToken?: string,
-}
-// export type SendVerifyEmailBodyType = {
-//   email: string,
-// }
-// export type ForgotPasswordBodyType = z.TypeOf<typeof forgotPasswordBodySchema>
-// export type ChangePasswordType = z.TypeOf<typeof changePasswordSchema>
-// export type ChangePasswordBodyType = {
-//   token: string,
-//   password: string,
-// }
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    avatarUrl: string;
+    // bio: string,
+    // status: "active" | "banned"
+    // createdAt: string,
+  };
+  accessToken: string;
+  refreshToken?: string;
+};
+export type SendVerifyEmailBodyType = {
+  email: string;
+};
+export type ForgotPasswordBodyType = z.TypeOf<typeof forgotPasswordBodySchema>;
+export type ChangePasswordType = z.TypeOf<typeof changePasswordSchema>;
+export type ChangePasswordBodyType = {
+  token: string;
+  password: string;
+};
 export type LogoutResType = z.TypeOf<typeof LogoutResSchema>;
 
 export type JwtPayload = {
-  userId: string,
-  email: string
-}
+  userId: string;
+  email: string;
+};

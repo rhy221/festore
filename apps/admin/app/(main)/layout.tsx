@@ -8,6 +8,7 @@ import { SidebarProvider, SidebarTrigger } from "@workspace/ui/components/sideba
 import { AppSidebar } from "@/components/app-sidebar";
 import Header from "@/components/Header/Header";
 import TanstackProvider from "@/providers/tanstack-provider";
+import AuthGuard from "@/components/AuthGuard";
 
 const fontSans = Geist({
   subsets: ["latin"],
@@ -25,25 +26,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
-      >
-        <TanstackProvider>
-
-           <Providers>
-          
+    <div >
+    
+            <AuthGuard>
+                <SidebarProvider>
+             <AppSidebar />
+             
               
-            <main className="relative">
-              
+            <main className="w-full">
+              <div className="sticky top-0 left-0 z-10">
+                <Header role="admin" name="ABC" />
+                <SidebarTrigger />
+              </div>
               {children}
             </main>
-
-          </Providers>
-        </TanstackProvider>
+              
+          </SidebarProvider>
+            </AuthGuard>
+          
        
         <Toaster />
-      </body>
-    </html>
+      
+    </div>
   );
 }

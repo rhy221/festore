@@ -28,7 +28,7 @@ export function AppSidebar() {
     href === "/home" ? pathname === href : pathname.startsWith(href)
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" className="z-50">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AlertTriangle } from "lucide-react";
-import { Button } from "../../../../packages/ui/src/components/button";
+import { Button } from "../../../../../packages/ui/src/components/button";
 import { CategoriesAPI, type Category } from "@/api/categories.api";
 import { toast } from "sonner";
 

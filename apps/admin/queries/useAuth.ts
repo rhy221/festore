@@ -1,10 +1,10 @@
-import authAction from "@/api/categories.api";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { LoginBodyType, LoginResType } from "@/schema/auth.schema";
+import authAction from "@/api/auth.api";
 
 export const useLoginMutation = () => {
   return useMutation({
-    mutationFn: authAction.login,
+    mutationFn: authAction.login
   });
 };
 
@@ -32,15 +32,15 @@ export const useLoginMutation = () => {
 //   })
 // }
 
-export const useLogoutMutation = () => {
-  return useMutation({
-    mutationFn: authAction.logout,
-  });
-};
+// export const useLogoutMutation = () => {
+//   return useMutation({
+//     mutationFn: authAction.logout,
+//   });
+// };
 
-export const useGetMeQuery = () => {
-  return useQuery({
-    queryKey: ["account-me"],
-    queryFn: authAction.getMe,
-  });
-};
+// export const useGetMeQuery = () => {
+//   return useQuery({
+//     queryKey: ["account-me"],
+//     queryFn: authAction.getMe,
+//   });
+// };

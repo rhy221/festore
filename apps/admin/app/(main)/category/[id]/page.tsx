@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
-import { Input } from "../../../../../packages/ui/src/components/input";
+import { Input } from "../../../../../../packages/ui/src/components/input";
 import { ProductCard } from "components/card";
 import { CategoriesAPI, type Category, type Product } from "@/api/categories.api";
 import { toast } from "sonner";

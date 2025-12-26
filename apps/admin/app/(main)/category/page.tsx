@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Button } from "../../../../packages/ui/src/components/button";
+import { Button } from "../../../../../packages/ui/src/components/button";
 import { toast } from "sonner";
 import Sidebar from "components/Sidebar/Sidebar";
 import Header from "components/Header/Header";

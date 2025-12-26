@@ -10,27 +10,6 @@ export const usePurchasedProducts = (params?: any) => {
   });
 };
 
-// export const useDownloadProduct = () => {
-//   return useMutation({
-//     mutationFn: purchaseAction.downloadProduct,
-//     onSuccess: (data) => {
-//       // Trigger download
-//     //   const link = document.createElement('a');
-//     //   link.href = data.downloadUrl;
-//     //   link.download = data.fileName;
-//     //   document.body.appendChild(link);
-//     //   link.click();
-//     //   document.body.removeChild(link);
-//     window.location.href = data.downloadUrl; 
-//       toast.success('Download started');
-//     },
-//     onError: (err: AxiosError) => {
-//       toast.error('Failed to download product ' + err.message);
-//     },
-//   });
-// };
-
-// useDownloadProduct.ts
 export const useDownloadProduct = () => {
   return useMutation({
     mutationFn: purchaseAction.downloadProduct,
