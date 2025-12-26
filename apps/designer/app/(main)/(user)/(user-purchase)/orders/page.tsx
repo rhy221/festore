@@ -30,7 +30,7 @@ import {
 } from '@workspace/ui/components/pagination';
 
 import { formatCurrency } from '@/lib/utils'; 
-import http from '@/lib/Http'; 
+import http from '@/lib/http'; 
 import { cn } from '@workspace/ui/lib/utils';
 import Link from 'next/link';
 

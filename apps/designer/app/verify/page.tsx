@@ -1,6 +1,6 @@
 "use client"
 
-import http from '@/lib/Http';
+import http from '@/lib/http';
 import { useAuthStore } from '@/stores/authStore';
 import { useMutation } from '@tanstack/react-query';
 import { Button } from '@workspace/ui/components/button';

@@ -10,7 +10,7 @@ import {
 import { Loader2, CalendarDays, TrendingUp, Package, DollarSign, PieChartIcon } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@workspace/ui/components/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@workspace/ui/components/select';
-import http from '@/lib/Http';
+import http from '@/lib/http';
 import { formatCurrency } from '@/lib/utils';
 
 const COLORS = ['#8b5cf6', '#06b6d4', '#ec4899', '#f59e0b'];

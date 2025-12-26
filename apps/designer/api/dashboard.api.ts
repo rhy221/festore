@@ -1,4 +1,4 @@
-import http from "@/lib/Http";
+import http from "@/lib/http";
 import { MonthlyReportData, SalesHistoryData } from "@/schemas/dashboard.schema";
 
 
