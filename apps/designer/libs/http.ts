@@ -1,6 +1,6 @@
 import envConfig from "@/config";
 import { useAuthStore } from "@/stores/authStore";
-import { isTokenExpired } from "./jwt"; // Import từ file mới
+import { isTokenExpired } from "../lib/jwt"; // Import từ file mới
 import axios, { AxiosInstance } from "axios";
 
 

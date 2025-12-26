@@ -1,4 +1,4 @@
-import http from "@/lib/http";
+import http from "@/libs/http";
 import { UserProfileResType, UserProfileStaticsResType } from "@/schemas/user.schema";
 
 

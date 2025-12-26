@@ -1,4 +1,4 @@
-import http from "@/lib/http";
+import http from "@/libs/http";
 
 export const commentAction = {
   createComment: async (data: { productId: string; content: string; parentId?: string }) => {
