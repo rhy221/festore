@@ -68,7 +68,6 @@ const AdminCategoryActionsDropdown: React.FC<{
 
 export default function AdminCategoryPage() {
   return (
-    // Bọc Suspense để bảo vệ các component con có thể dùng useSearchParams ngầm
     <Suspense fallback={<div>
       <Spinner/>
     </div>}>
@@ -77,7 +76,7 @@ export default function AdminCategoryPage() {
   );
 }
 
-export  function CategoryPageContent() {
+function CategoryPageContent() {
   const [categories, setCategories] = useState<CategoryFixed[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
