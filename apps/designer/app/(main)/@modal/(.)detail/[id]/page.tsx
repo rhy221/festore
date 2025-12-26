@@ -11,20 +11,7 @@ interface ProductModalProps {
   onClose: () => void;
 }
 
-const product = 
-  
-  {
-    id: 2,
-    name: 'Male Winter Jacket',
-    price: 8.0,
-    image: 'https://images.pexels.com/photos/1021693/pexels-photo-1021693.jpeg',
-    designer: '3dstitch',
-    curatorPick: true,
-    likes: 38,
-    bookmarks: 0,
-    views: 157,
-  }
-;
+
 
 export default async function ProductModal({
     params,

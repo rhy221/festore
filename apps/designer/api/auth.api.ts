@@ -1,3 +1,4 @@
+import http from "@/lib/http";
 import {
   ChangePasswordBodyType,
   ForgotPasswordBodyType,
@@ -8,7 +9,6 @@ import {
   SendVerifyEmailBodyType,
   
 } from "@/schema/auth.schema";
-import http from "@/lib/http";
 
 const authAction = {
   login: async (body: LoginBodyType) => {
