@@ -26,7 +26,7 @@ export default function ChangePasswordForm()
       useEffect(() => {
          if(!token) 
         router.push("/auth/login");
-      },[])
+      },[token, router])
 
    
 
