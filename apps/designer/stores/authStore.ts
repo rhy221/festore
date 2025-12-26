@@ -1,4 +1,4 @@
-import { isTokenExpired } from '@/lib/jwt';
+import { isTokenExpired } from '@/Lib/jwt';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 

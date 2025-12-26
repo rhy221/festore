@@ -1,4 +1,4 @@
-import http from "@/lib/http";
+import http from "@/Lib/http";
 import { Cart } from "@/schema/cart.schema";
 
 export const cartAction = {

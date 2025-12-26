@@ -11,7 +11,7 @@ import { Button } from '@workspace/ui/components/button';
 import { useCreateRating, useMyRating, useUpdateRating } from '@/queries/useRating';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
-import { formatToLocalInput } from '@/lib/utils';
+import { formatToLocalInput } from '@/Lib/utils';
 import { ratingAction } from '@/api/rating.api';
 import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui/components/avatar';
 import { cn } from '@workspace/ui/lib/utils';

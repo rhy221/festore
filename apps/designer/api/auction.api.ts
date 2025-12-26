@@ -1,4 +1,4 @@
-import http from "@/lib/http";
+import http from "@/Lib/http";
 import { AuctionType, GetAuctionBidsResType, GetAuctionResType, GetAuctionsResType, PlaceAcutionBidResType, PlaceAuctionBidBodyType } from "@/schema/auction.schema";
 import { string } from "zod";
 

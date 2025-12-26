@@ -614,7 +614,7 @@ import { Button } from '@workspace/ui/components/button';
 import { User, Sparkles, Upload, ArrowRight, CheckCircle2, ImageIcon, RotateCcw, Download } from 'lucide-react';
 import { cn } from '@workspace/ui/lib/utils';
 import { useMutation } from '@tanstack/react-query';
-import http from '@/lib/http'; 
+import http from '@/Lib/http'; 
 import toast from 'react-hot-toast';
 
 interface VirtualTryOnModalProps {

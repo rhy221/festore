@@ -12,7 +12,7 @@ import { commentAction } from '@/api/comment.api';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { Button } from '@workspace/ui/components/button';
 import dayjs from 'dayjs';
-import { formatToLocalInput } from '@/lib/utils';
+import { formatToLocalInput } from '@/Lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui/components/avatar';
 
 interface ProductDetailTabsProps {

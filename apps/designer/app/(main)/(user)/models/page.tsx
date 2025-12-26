@@ -1166,7 +1166,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useDeleteProduct, useMyProducts } from '@/queries/useProduct';
 import { useCancelAuction } from '@/queries/useAuction';
 import { cn } from '@workspace/ui/lib/utils';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency } from '@/Lib/utils';
 import Link from 'next/link';
 
 // Interface (Giữ nguyên)

@@ -12,7 +12,7 @@ import { Button } from '@workspace/ui/components/button';
 import { useFollowDesignerMutation } from '@/queries/useProduct';
 import { useAuth } from '@/hooks/useAuth';
 import { set } from 'date-fns';
-import { copyToClipboard } from '@/lib/utils';
+import { copyToClipboard } from '@/Lib/utils';
 import { usePathname } from 'next/navigation';
 import { FollowModal } from '@/components/FollowModal';
 import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui/components/avatar';

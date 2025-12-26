@@ -29,8 +29,8 @@ import {
   PaginationPrevious,
 } from '@workspace/ui/components/pagination';
 
-import { formatCurrency } from '@/lib/utils'; 
-import http from '@/lib/http'; 
+import { formatCurrency } from '@/Lib/utils'; 
+import http from '@/Lib/http'; 
 import { cn } from '@workspace/ui/lib/utils';
 import Link from 'next/link';
 

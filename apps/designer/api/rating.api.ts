@@ -1,4 +1,4 @@
-import http from "@/lib/http";
+import http from "@/Lib/http";
 
 export const ratingAction = {
   createRating: async (data: { productId: string; rating: number; review?: string }) => {

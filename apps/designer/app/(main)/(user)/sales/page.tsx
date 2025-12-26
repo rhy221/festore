@@ -835,8 +835,8 @@ import {
 } from '@workspace/ui/components/pagination';
 import { Badge } from "@workspace/ui/components/badge";
 import { Card } from '@workspace/ui/components/card';
-import http from '@/lib/http';
-import { formatCurrency } from '@/lib/utils';
+import http from '@/Lib/http';
+import { formatCurrency } from '@/Lib/utils';
 
 interface MetaData {
   page: number;

@@ -1,5 +1,5 @@
 import productsAction from "@/api/products.api"
-import http from "@/lib/http"
+import http from "@/Lib/http"
 import { CategoryType, CommentType, DesignResType, GetGalleryItemsResType, GetStoreItemsResType } from "@/schema/product.schema"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import toast from "react-hot-toast"
