@@ -38,6 +38,12 @@ class Http {
             useAuthStore.getState().logout();
             window.location.href = "/auth/login";
           }
+
+          if (status === 401 && (data?.message === "User has to be an admin")) {
+            alert("Unauthorized!");
+            useAuthStore.getState().logout();
+            window.location.href = "/auth/login";
+          }
         }
         return Promise.reject(error.response?.data || error);
       }
