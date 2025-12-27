@@ -166,7 +166,7 @@ export default function TopRankingsSection() {
           Top Rankings
         </h1>
         <p className="text-sm text-muted-foreground max-w-lg">
-          The most outstanding templates and designers.
+          The most outstanding design pattern and designers.
         </p>
       </div>
 

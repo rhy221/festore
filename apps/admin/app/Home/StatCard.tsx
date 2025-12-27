@@ -81,7 +81,7 @@ export default function QuickStatsSection() {
 
   const statCards: StatCardProps[] = [
     { title: "Users", value: stats.userCount, icon: <Users size={22} /> },
-    { title: "Templates", value: stats.templateCount, icon: <FileText size={22} /> },
+    { title: "Design Pattern", value: stats.templateCount, icon: <FileText size={22} /> },
     { title: "Categories", value: stats.categoryCount, icon: <Grid3x3 size={22} /> },
   ];
 
