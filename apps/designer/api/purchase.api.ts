@@ -1,4 +1,4 @@
-import http from "@/libs/http";
+import http from "@/libs/api-client";
 import { Purchase } from "@/schemas/purchase.schema";
 
 export const purchaseAction = {

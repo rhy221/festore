@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@workspace/ui/components/av
 import { Button } from "@workspace/ui/components/button";
 import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import { useQuery } from "@tanstack/react-query";
-import http from "@/libs/http";
+import http from "@/libs/api-client";
 import Link from "next/link";
 import { useAuthStore } from "@/stores/authStore";
 

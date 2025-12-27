@@ -12,7 +12,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { useNotificationSocket } from "@/queries/useNotification";
 import { useAuthStore } from "@/stores/authStore";
-import http from "@/libs/http";
+import http from "@/libs/api-client";
 import { cn } from "@workspace/ui/lib/utils"; // Giả sử bạn có utility cn
 import { useRouter } from "next/navigation";
 

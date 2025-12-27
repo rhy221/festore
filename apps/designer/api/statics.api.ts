@@ -1,4 +1,4 @@
-import http from "@/libs/http";
+import http from "@/libs/api-client";
 
 type UserStats = {
   rating?: number;
