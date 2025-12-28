@@ -1,4 +1,4 @@
-import https from "@/apiclient";
+import https from "../apiclient.ts";
 import { AuctionType, GetAuctionBidsResType, GetAuctionResType, GetAuctionsResType, PlaceAcutionBidResType, PlaceAuctionBidBodyType } from "@/schemas/auction.schema";
 
 

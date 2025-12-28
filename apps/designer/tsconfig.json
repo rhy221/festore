@@ -10,7 +10,10 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "moduleResolution": "bundler", 
+    "module": "esnext",
+    "allowImportingTsExtensions": true
   },
   "include": [
     "next-env.d.ts",
