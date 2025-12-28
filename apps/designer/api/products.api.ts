@@ -1,4 +1,4 @@
-import http from "@/libs/api-client";
+import http from "@/lib/http";
 import { CategoryType, CommentType, DesignResType, EditProductType, GetGalleryItemsResType, GetStoreItemsResType, UploadDesignType, UploadProductType } from "@/schemas/product.schema";
 
 // export type ProductKind = "selling" | "auction" | "bought";

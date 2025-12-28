@@ -16,6 +16,10 @@ class Http {
     });
 
     this.instance.interceptors.request.use((config) => {
+      if (config.data instanceof FormData) {
+            config.headers["Content-Type"] = "multipart/form-data";
+      }
+
       if (typeof window !== 'undefined') {
         const token = useAuthStore.getState().token;
         if (token) {

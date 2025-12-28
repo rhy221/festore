@@ -1,4 +1,4 @@
-import http from "@/libs/api-client";
+import http from "@/lib/http";
 import {
   ChangePasswordBodyType,
   ForgotPasswordBodyType,

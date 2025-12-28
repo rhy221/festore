@@ -835,7 +835,7 @@ import {
 } from '@workspace/ui/components/pagination';
 import { Badge } from "@workspace/ui/components/badge";
 import { Card } from '@workspace/ui/components/card';
-import http from '@/libs/api-client';
+import http from '@/lib/http';
 import { formatCurrency } from '@/lib/utils';
 
 interface MetaData {

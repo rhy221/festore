@@ -614,7 +614,7 @@ import { Button } from '@workspace/ui/components/button';
 import { User, Sparkles, Upload, ArrowRight, CheckCircle2, ImageIcon, RotateCcw, Download } from 'lucide-react';
 import { cn } from '@workspace/ui/lib/utils';
 import { useMutation } from '@tanstack/react-query';
-import http from '@/libs/api-client'; 
+import http from '@/lib/http'; 
 import toast from 'react-hot-toast';
 
 interface VirtualTryOnModalProps {
@@ -737,7 +737,7 @@ export function VirtualTryOnModal({
       </DialogTrigger>
       
       {/* UPDATE: Dialog chính */}
-      <DialogContent className="min-w-[50vw] max-w-[90rem] h-[90vh] p-0 gap-0 bg-zinc-950 border-zinc-800 text-white overflow-hidden flex flex-col">
+      <DialogContent className="sm:max-w-[60rem] h-[90vh] p-0 gap-0 bg-zinc-950 border-zinc-800 text-white overflow-hidden flex flex-col">
         
         {/* Header */}
         <div className="p-4 pr-12 border-b border-zinc-800 flex justify-between items-center bg-zinc-900/50 relative flex-shrink-0">
@@ -888,7 +888,7 @@ export function VirtualTryOnModal({
                   </div>
                   <div>
                     <h3 className="text-white font-medium text-lg md:text-xl mb-2">Creating Magic...</h3>
-                    <p className="text-zinc-500 text-sm">Gemini AI is fitting the garment.</p>
+                    <p className="text-zinc-500 text-sm">AI is fitting the garment.</p>
                   </div>
                 </div>
               ) : resultImage ? (

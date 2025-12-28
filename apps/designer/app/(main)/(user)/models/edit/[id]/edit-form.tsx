@@ -80,8 +80,8 @@ export default function EditForm({ id }: { id: string  })
       type: design.type,
       oldImages: design.imageUrls || [],
       oldModels: design.modelFiles.map(m => m.publicId) || [],
-        images: [],
-        models: [],
+      // images: [],
+      // models: [],
       price: design.price || 0,
       startingPrice: design.startingPrice || 0,
       bidIncrement: design.bidIncrement || 1,
@@ -146,7 +146,7 @@ export default function EditForm({ id }: { id: string  })
     data.images.map((file) => {
       formData.append("images", file);
     });
-
+     
     if(data.models)
     data.models.map((file) => {
       formData.append("models", file);
@@ -179,12 +179,15 @@ export default function EditForm({ id }: { id: string  })
         console.log(new Date(data.startTime ?? "").toISOString());
         console.log(design?.startTime);
     }
-
+    
     if(editMutation.isPending) return
 
     try {
       const result = await editMutation.mutateAsync({data:formData, id: id})
-        alert('Design edit successfully!');
+        if(result.type === "auction")
+        router.push(`/auction/detail/${result._id}`)
+      else 
+        router.push(`/detail/${result._id}`)
    
 
     } catch(error) {
