@@ -69,5 +69,5 @@ class Http {
   }
 }
 
-const http = new Http().instance;
-export default http;
+const https = new Http().instance;
+export default https;
