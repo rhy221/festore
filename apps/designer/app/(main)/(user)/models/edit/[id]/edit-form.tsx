@@ -265,7 +265,7 @@ export default function EditForm({ id }: { id: string  })
                   control={form.control}
                   render={({field, fieldState}) => (
                     <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name} className="block text-sm font-medium text-gray-700">
+                      <FieldLabel htmlFor={field.name} className="block text-sm font-medium ">
                         Category
                       </FieldLabel>
                       <Select
@@ -298,7 +298,7 @@ export default function EditForm({ id }: { id: string  })
                   control={form.control}
                   render={({field, fieldState}) => (
                     <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name} className="block text-sm font-medium text-gray-700">
+                      <FieldLabel htmlFor={field.name} className="block text-sm font-medium ">
                         Styles
                       </FieldLabel>
                       <Select
@@ -331,7 +331,7 @@ export default function EditForm({ id }: { id: string  })
                   control={form.control}
                   render={({field, fieldState}) => (
                     <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name} className="block text-sm font-medium text-gray-700">
+                      <FieldLabel htmlFor={field.name} className="block text-sm font-medium ">
                         Gender
                       </FieldLabel>
                       <Select

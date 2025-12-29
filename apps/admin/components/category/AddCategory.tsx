@@ -88,9 +88,11 @@ export default function AdminCategoryAddPopup({
               Category name
             </label>
             <Input
+          
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Tops"
+              className="text-black"
             />
             {name && (
               <p className="mt-1 text-xs text-muted-foreground">
@@ -107,6 +109,7 @@ export default function AdminCategoryAddPopup({
               value={stylesInput}
               onChange={(e) => setStylesInput(e.target.value)}
               placeholder="T-Shirt, Hoodie, Jacket"
+              className="text-black"
             />
           </div>
         </div>

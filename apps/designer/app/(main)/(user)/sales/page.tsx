@@ -933,7 +933,8 @@ export default function SalesReportPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll lên đầu
   };
 
-  const handleReset = () => { /* ... giữ nguyên logic reset ... */ };
+  const handleReset = () => {  router.push(pathname, { scroll: false });
+};
 
   // --- FETCH DATA ---
   const fetchSalesData = async () => {

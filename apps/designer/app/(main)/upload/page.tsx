@@ -250,7 +250,7 @@ export default function CreateAuctionPage() {
                   control={form.control}
                   render={({field, fieldState}) => (
                     <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name} className="block text-sm font-medium text-gray-700">
+                      <FieldLabel htmlFor={field.name} className="block text-sm font-medium ">
                         Category
                       </FieldLabel>
                       <Select
@@ -283,7 +283,7 @@ export default function CreateAuctionPage() {
                   control={form.control}
                   render={({field, fieldState}) => (
                     <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name} className="block text-sm font-medium text-gray-700">
+                      <FieldLabel htmlFor={field.name} className="block text-sm font-medium ">
                         Styles
                       </FieldLabel>
                       <Select
@@ -316,7 +316,7 @@ export default function CreateAuctionPage() {
                   control={form.control}
                   render={({field, fieldState}) => (
                     <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name} className="block text-sm font-medium text-gray-700">
+                      <FieldLabel htmlFor={field.name} className="block text-sm font-medium ">
                         Gender
                       </FieldLabel>
                       <Select
@@ -385,7 +385,7 @@ export default function CreateAuctionPage() {
                   control={form.control}
                   render={({field, fieldState}) => (
                     <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name} className="block text-sm font-medium text-gray-700">
+                      <FieldLabel htmlFor={field.name} className="block text-sm font-medium ">
                         Format
                       </FieldLabel>
                       <Select
