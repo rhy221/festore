@@ -1,7 +1,10 @@
 import userAction from "@/api/user.api"
 import http from "@/lib/http"
 import { UserProfileResType, UserProfileStaticsResType } from "@/schemas/user.schema"
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useAuthStore } from "@/stores/authStore"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { da } from "date-fns/locale"
+import toast from "react-hot-toast"
 
 export const useUserProfile = () => {
     return useQuery<UserProfileResType>({
@@ -31,8 +34,23 @@ export const useUserPortfolio = (userId: string) => {
 }
 
 export const useUserPortfolioEditing = () => {
+    const updateUser = useAuthStore((state) => state.updateUser);
+  const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: userAction.updateUserPortfolio
+        mutationFn: userAction.updateUserPortfolio,
+        onSuccess: (data) => {
+      if (data) {
+        updateUser({id: data.userId, name: data.name, email: data.email, avatarUrl: data.avatarUrl});
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['userPortfolio'] });
+
+      toast.success("Profile updated successfully!");
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || "Failed to update profile");
+    }
+        
     })
 }
 
