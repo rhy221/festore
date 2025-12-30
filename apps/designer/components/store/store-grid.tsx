@@ -9,6 +9,7 @@ import { DesignResType, GetStoreItemsResType } from '@/schemas/product.schema';
 import { useAddToCart } from '@/queries/useCart';
 import { formatCurrency } from '@/lib/utils';
 import Image from 'next/image';
+import { useAuth } from '@/hooks/useAuth';
 
 export interface StoreItem {
   id: string;
@@ -33,18 +34,21 @@ export function StoreGrid({store} : {store: GetStoreItemsResType}) {
 
   const router = useRouter();
   const addToCartMutation = useAddToCart();
+  const {execute} = useAuth();
 
   const onItemClick = (id: string) => {
     router.push(`/detail/${id}`);
   }
   
   const onAddToCart = async (id: string) => {
-    if(addToCartMutation.isPending) return;
+    execute(async () => {
+      if(addToCartMutation.isPending) return;
     try {
       const result = await addToCartMutation.mutateAsync({productId: id});
     } catch(err)  {
       console.log(err);
     }
+    })
   }
 
   return (

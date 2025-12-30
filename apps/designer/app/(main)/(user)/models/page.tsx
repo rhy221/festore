@@ -1349,8 +1349,8 @@ export default function ManageModelsPage() {
         ),
         cell: ({ row }) => {
             const d = row.original;
-            if(d.type === 'fixed') return <span className="text-emerald-400 font-semibold">${d.price?.toLocaleString()}</span>
-            if(d.type === 'auction') return <span className="text-orange-400 font-semibold">${(d.currentPrice || d.startingPrice)?.toLocaleString()}</span>
+            if(d.type === 'fixed') return <span className="text-emerald-400 font-semibold">{formatCurrency(d.price || 0)}</span>
+            if(d.type === 'auction') return <span className="text-orange-400 font-semibold">{formatCurrency(d.currentPrice || d.startingPrice || 0)}</span>
             return <span className="text-muted-foreground">-</span>
         }
       },

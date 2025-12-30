@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { X, Heart, Bookmark, Share2, Download, Info, ShoppingCart, Link } from 'lucide-react';
+import { X, Heart, Bookmark, Share2, Download, Info, ShoppingCart} from 'lucide-react';
 import { Button } from '@workspace/ui/components/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui/components/avatar';
 import { Badge } from '@workspace/ui/components/badge';
@@ -17,6 +17,7 @@ import { LikeListModal } from './LikeModal';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { Skeleton } from '@workspace/ui/components/skeleton';
+import Link from 'next/link';
 
 export function GalleryItemModal({ id }: { id: string }) {
   const [mainActionElement, setMainActionElement] = useState<HTMLButtonElement | null>(null);
@@ -138,12 +139,16 @@ const [isLikeListOpen, setIsLikeListOpen] = useState(false);
                 </h2>
 
                 <div className="flex items-center gap-3 pt-4 border-t border-zinc-800">
-                  <Avatar className="w-10 h-10 md:w-12 md:h-12">
+                    <Link href={`/portfolio/${design.designerId}`}>
+                    <Avatar className="w-10 h-10 md:w-12 md:h-12">
                     <AvatarImage src={design.designerProfile.avatarUrl} />
                     <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-blue-500 text-white font-bold">
                       {design.designerId.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
+                  </Link>
+
+                  
                   <div className="flex-1">
                     <p className="text-white font-medium text-sm md:text-base line-clamp-1">
                       {design.designerProfile.name}
@@ -277,10 +282,13 @@ const [isLikeListOpen, setIsLikeListOpen] = useState(false);
 
             {/* Creator */}
             <div className="flex flex-col items-center gap-1 group cursor-pointer">
-              <Avatar className="w-10 h-10 border-2 border-transparent group-hover:border-white/50 transition-all">
+              <Link href={`/portfolio/${design.designerId}`}>
+                <Avatar className="w-10 h-10 border-2 border-transparent group-hover:border-white/50 transition-all">
                 <AvatarImage src={design.designerProfile.avatarUrl} />
                 <AvatarFallback className="bg-blue-600 text-white">{design.designerId.charAt(0)}</AvatarFallback>
               </Avatar>
+              </Link>
+              
               <span className="text-[10px] text-white/60 uppercase font-bold">Creator</span>
             </div>
 

@@ -65,6 +65,7 @@ import { Button } from '@workspace/ui/components/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useLikeDesignMutation } from '@/queries/useProduct';
 import { on } from 'events';
+import { formatCurrency } from '@/lib/utils';
 
 // Interface based on your Mongoose Schema
 export interface DesignItem {
@@ -154,7 +155,7 @@ if (onAddToCart) {
     if (type === 'fixed') {
       return (
         <div className="absolute top-3 left-3 z-20 bg-zinc-800/90 backdrop-blur-md text-white px-3 py-1.5 rounded-full border border-white/10 shadow-lg">
-          <span className="font-bold text-sm">${price?.toLocaleString() || '0.00'}</span>
+          <span className="font-bold text-sm">{formatCurrency(price || 0)}</span>
         </div>
       );
     }
@@ -165,7 +166,7 @@ if (onAddToCart) {
        return (
         <div className="absolute bottom-16 left-3 z-20 bg-black/70 backdrop-blur-md text-white px-3 py-1 rounded-full border border-white/10 flex items-center gap-1.5 ">
            <span className="text-[10px] text-zinc-300 uppercase">Current Bid</span>
-           <span className="font-bold text-sm">${displayPrice.toLocaleString()}</span>
+           <span className="font-bold text-sm">{formatCurrency(displayPrice)}</span>
         </div>
        );
     }

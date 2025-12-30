@@ -94,7 +94,7 @@ export default function LikedModelsPage({ params }: { params: Promise<{ id: stri
         )}
 
         {/* Pagination */}
-        {data?.meta?.totalPages > 1 && (
+        {data?.meta?.totalPages > 0 && (
           <Pagination>
             <PaginationContent>
               <PaginationItem>

@@ -60,7 +60,7 @@ class Http {
               alert(alertMessage);
               
               useAuthStore.getState().logout();
-              window.location.href = "/login";
+              window.location.href = "/auth/login";
               
               // Lưu ý: window.location.href sẽ làm mới trang nên 
               // biến isRedirecting sẽ tự động reset về false khi trang mới load.
