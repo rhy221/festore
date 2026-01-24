@@ -4,12 +4,13 @@ import { X, Trash2 } from 'lucide-react';
 import { Button } from '@workspace/ui/components/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@workspace/ui/components/tabs';
 import { Checkbox } from '@workspace/ui/components/checkbox';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useCart, useRemoveFromCart } from '@/queries/useCart';
 import { useCreateOrder } from '@/queries/useOrder';
 import { Spinner } from '@workspace/ui/components/spinner';
 import { formatCurrency } from '@/lib/utils';
+import PaymentDialog from '@/app/(main)/(user)/(user-purchase)/cart/PaymentDialog';
 
 interface CartItem {
   id: string;
@@ -42,6 +43,7 @@ export default function MyCartPage() {
 
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const {data: cart, isLoading: loadingCart} = useCart();
 
   const removeItemMutation = useRemoveFromCart();
@@ -78,11 +80,25 @@ export default function MyCartPage() {
     }
   };
 
-  const onPlaceOrder = async () => {
+  const onPlaceOrder = () => {
+    //  if(placeOderMutation.isPending) return;
+
+    // try{
+    //   const result = placeOderMutation.mutateAsync({paymentMethod: "paypal"});
+    // } catch(err) {
+    //   console.error(err);
+    // }
+    // Open payment dialog instead of directly placing order
+    setShowPaymentDialog(true);
+  }
+
+  useEffect(()=>{console.log(cart?.totalAmount)},[cart])
+  const handlePaymentSuccess = async () => {
     if(placeOderMutation.isPending) return;
 
     try{
-      const result = placeOderMutation.mutateAsync({paymentMethod: "paypal"});
+      await placeOderMutation.mutateAsync({paymentMethod: "stripe"});
+      setShowPaymentDialog(false);
     } catch(err) {
       console.error(err);
     }
@@ -217,7 +233,7 @@ export default function MyCartPage() {
                     >
                       {placeOderMutation.isPending ? (
                         <Spinner />
-                      ) : 
+                      ) :
                       (<span>PLACE ORDER</span>)}
                     </Button>
                   </div>
@@ -225,6 +241,13 @@ export default function MyCartPage() {
               </div>
             </div>
           </div>
+
+          <PaymentDialog
+            open={showPaymentDialog}
+            onOpenChange={setShowPaymentDialog}
+            amount={cart.totalAmount}
+            onSuccess={handlePaymentSuccess}
+          />
 
           {/* <TabsContent value="purchase" className="mt-8">
             <div className="text-center py-12">

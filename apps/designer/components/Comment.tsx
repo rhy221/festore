@@ -82,7 +82,7 @@ export function CommentsSection({ productId }: CommentsSectionProps) {
   const { isAuthenticated, user } = useAuthStore();
   const [commentText, setCommentText] = useState('');
   const [replyTo, setReplyTo] = useState<{ id: string; userName: string } | null>(null);
-  
+  const [isChecking, setIsChecking] = useState(false);
   const createCommentMutation = useCreateComment();
   const parentRef = useRef<HTMLDivElement>(null);
 
@@ -134,12 +134,30 @@ export function CommentsSection({ productId }: CommentsSectionProps) {
     rowVirtualizer.getVirtualItems(),
   ]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!commentText.trim()) return;
           console.log(replyTo);
+    setIsChecking(true);
+    try {
+      // Kiểm tra nội dung trước khi lưu vào database
+      const res = await fetch("/api/moderate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ content: commentText }),
+      });
 
-    createCommentMutation.mutate(
+      const data = await res.json();
+
+      if (!data.isSafe) {
+        alert(`Alert: ${data.message} (${data.categories.join(", ")})`);
+        return;
+      }
+
+      console.log("Bình luận hợp lệ, đang gửi...");
+      createCommentMutation.mutate(
       {
         productId,
         content: commentText,
@@ -152,6 +170,13 @@ export function CommentsSection({ productId }: CommentsSectionProps) {
         },
       }
     );
+
+    } catch (error) {
+      console.error(error);
+    }finally {
+      setIsChecking(false);
+    }
+    
   };
 
   return (
@@ -173,7 +198,7 @@ export function CommentsSection({ productId }: CommentsSectionProps) {
           )}
           <form onSubmit={handleSubmit} className="flex gap-2 ">
             <textarea
-              value={commentText}
+              value={isChecking ? "checking..." : commentText}
               onChange={(e) => setCommentText(e.target.value)}
               className="flex-1 rounded-lg p-3 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 bg-zinc-700 placeholder-zinc-400"
               rows={3}
